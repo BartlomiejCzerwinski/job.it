@@ -40,6 +40,10 @@
                 <label for="{{ form.repeated_password.id_for_label }}" class="form-label">{{ form.repeated_password.label }}</label>
                 {{ form.repeated_password }}
             </div>
+            <div class="mb-3">
+                <label for="{{ form.role.id_for_label }}" class="form-label">{{ form.role.label }}</label>
+                {{ form.role }}
+            </div>
             <button type="button" name="register" class="btn btn-secondary" onclick="window.location.href='/job.it/login'">Login</button>
             <button type="submit" name="register" class="btn btn-primary me-2">Register</button>
         </form>

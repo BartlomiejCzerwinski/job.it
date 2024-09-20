@@ -30,15 +30,18 @@ def register(request):
             email = form.cleaned_data.get('email')
             password = form.cleaned_data.get('password')
             repeated_password = form.cleaned_data.get('repeated_password')
+            role = form.cleaned_data.get('role')
             if not is_password_valid(password, repeated_password):
                 messages.error(request, "Wrong repeated password")
                 form = RegisterForm()
+                print("ERROR: Wrong repeated password")
                 return render(request, 'users/register.html', {'form': form})
             if User.objects.filter(email=email):
+                print("ERROR: User already exist!")
                 messages.error(request, "Email already taken!")
                 form = RegisterForm()
                 return render(request, 'users/register.html', {'form': form})
-            user = User(first_name=first_name, last_name=last_name, email=email, password=make_password(password))
+            user = User(first_name=first_name, last_name=last_name, email=email, password=make_password(password), role=role)
             user.save()
 
             return HttpResponse("Success!!")
