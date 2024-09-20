@@ -8,7 +8,7 @@
 </head>
 <body>
     <div class="container mt-5">
-        <h2 class="text-center">Login Form</h2>
+        <h2 class="text-center">Login</h2>
         <form method="post" class="border p-4 shadow rounded">
             {% csrf_token %}
             <div class="mb-3">
@@ -20,7 +20,7 @@
                 {{ form.password }}
             </div>
             <button type="submit" name="login" class="btn btn-primary me-2">Login</button>
-            <button type="submit" name="register" class="btn btn-secondary">Register</button>
+            <button type="button" name="register" class="btn btn-secondary" onclick="window.location.href='/job.it/register'">Register</button>
         </form>
     </div>
 
