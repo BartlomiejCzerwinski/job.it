@@ -2,6 +2,7 @@ from django.shortcuts import render, HttpResponse
 from .forms import LoginForm, RegisterForm
 from django.contrib.auth.hashers import make_password
 from django.contrib import messages
+from .models import User
 
 
 def index(request):
@@ -33,6 +34,9 @@ def register(request):
                 messages.error(request, "Wrong repeated password")
                 form = RegisterForm()
                 return render(request, 'users/register.html', {'form': form})
+            user = User(first_name=first_name, last_name=last_name, email=email, password=make_password(password))
+            user.save()
+
             return HttpResponse("Success!!")
     else:
         form = RegisterForm()
