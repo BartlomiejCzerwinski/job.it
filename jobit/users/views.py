@@ -1,5 +1,7 @@
 from django.shortcuts import render, HttpResponse
 from .forms import LoginForm, RegisterForm
+from django.contrib.auth.hashers import make_password
+from django.contrib import messages
 
 
 def index(request):
@@ -27,7 +29,17 @@ def register(request):
             email = form.cleaned_data.get('email')
             password = form.cleaned_data.get('password')
             repeated_password = form.cleaned_data.get('repeated_password')
-            # register ...
+            if not is_password_valid(password, repeated_password):
+                messages.error(request, "Wrong repeated password")
+                form = RegisterForm()
+                return render(request, 'users/register.html', {'form': form})
+            return HttpResponse("Success!!")
     else:
         form = RegisterForm()
     return render(request, 'users/register.html', {'form': form})
+
+
+def is_password_valid(password, repeated_password):
+    if password != repeated_password:
+        return False
+    return True
