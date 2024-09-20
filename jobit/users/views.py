@@ -34,6 +34,10 @@ def register(request):
                 messages.error(request, "Wrong repeated password")
                 form = RegisterForm()
                 return render(request, 'users/register.html', {'form': form})
+            if User.objects.filter(email=email):
+                messages.error(request, "Email already taken!")
+                form = RegisterForm()
+                return render(request, 'users/register.html', {'form': form})
             user = User(first_name=first_name, last_name=last_name, email=email, password=make_password(password))
             user.save()
 
