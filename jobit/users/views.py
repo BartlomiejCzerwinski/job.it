@@ -1,4 +1,4 @@
-from django.shortcuts import render, HttpResponse
+from django.shortcuts import render
 from .forms import LoginForm, RegisterForm
 from django.contrib.auth.hashers import make_password
 from django.contrib import messages
@@ -39,8 +39,8 @@ def register(request):
                 return render(request, 'users/register.html', {'form': form})
             user = User(first_name=first_name, last_name=last_name, email=email, password=make_password(password), role=role)
             user.save()
-
-            return HttpResponse("Success!!")
+            form = LoginForm()
+            return render(request, 'users/login.html', {'form': form})
     else:
         form = RegisterForm()
     return render(request, 'users/register.html', {'form': form})
