@@ -23,7 +23,7 @@ def register(request):
         form = RegisterForm(request.POST)
 
         if form.is_valid():
-            first_name, last_name, email, password, repeated_password, role = extract_register_form_data(form)
+            first_name, last_name, email, password, repeated_password, role = extract_registration_form_data(form)
             if not is_password_valid(password, repeated_password):
                 messages.error(request, "Wrong repeated password")
                 form = RegisterForm()
@@ -50,7 +50,8 @@ def create_user(first_name, last_name, email, password, role):
     app_user = AppUser.objects.create(user=user, role=role)
     app_user.save()
 
-def extract_register_form_data(form):
+
+def extract_registration_form_data(form):
     return form.cleaned_data.get('first_name'), \
         form.cleaned_data.get('last_name'), \
         form.cleaned_data.get('email'), \
