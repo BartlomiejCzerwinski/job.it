@@ -2,8 +2,8 @@ from django.shortcuts import render
 from .forms import LoginForm, RegisterForm
 from django.contrib.auth.hashers import make_password
 from django.contrib import messages
-from .models import User
 from django.contrib.auth.models import User
+from .models import AppUser
 
 
 def login(request):
@@ -21,30 +21,42 @@ def login(request):
 def register(request):
     if request.method == 'POST':
         form = RegisterForm(request.POST)
+
         if form.is_valid():
-            first_name = form.cleaned_data.get('first_name')
-            last_name = form.cleaned_data.get('last_name')
-            email = form.cleaned_data.get('email')
-            password = form.cleaned_data.get('password')
-            repeated_password = form.cleaned_data.get('repeated_password')
-            role = form.cleaned_data.get('role')
+            first_name, last_name, email, password, repeated_password, role = extract_register_form_data(form)
             if not is_password_valid(password, repeated_password):
                 messages.error(request, "Wrong repeated password")
                 form = RegisterForm()
-                print("ERROR: Wrong repeated password")
                 return render(request, 'users/register.html', {'form': form})
-            if User.objects.filter(email=email):
-                print("ERROR: User already exist!")
+
+            if User.objects.filter(email=email).exists():
                 messages.error(request, "Email already taken!")
                 form = RegisterForm()
                 return render(request, 'users/register.html', {'form': form})
-            user = User(first_name=first_name, last_name=last_name, email=email, password=make_password(password), role=role)
-            user.save()
+
+            create_user(first_name, last_name, email, password, role)
             form = LoginForm()
             return render(request, 'users/login.html', {'form': form})
+
     else:
         form = RegisterForm()
     return render(request, 'users/register.html', {'form': form})
+
+
+def create_user(first_name, last_name, email, password, role):
+    user = User.objects.create(username=email, first_name=first_name, last_name=last_name, email=email,
+                               password=make_password(password))
+    user.save()
+    app_user = AppUser.objects.create(user=user, role=role)
+    app_user.save()
+
+def extract_register_form_data(form):
+    return form.cleaned_data.get('first_name'), \
+        form.cleaned_data.get('last_name'), \
+        form.cleaned_data.get('email'), \
+        form.cleaned_data.get('password'), \
+        form.cleaned_data.get('repeated_password'), \
+        form.cleaned_data.get('role')
 
 
 def is_password_valid(password, repeated_password):
