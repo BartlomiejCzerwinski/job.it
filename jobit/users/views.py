@@ -3,6 +3,7 @@ from .forms import LoginForm, RegisterForm
 from django.contrib.auth.hashers import make_password
 from django.contrib import messages
 from django.contrib.auth.models import User
+from django.contrib.auth import authenticate
 from .models import AppUser
 
 
@@ -12,7 +13,11 @@ def login(request):
         if form.is_valid():
             email = form.cleaned_data.get('email')
             password = form.cleaned_data.get('password')
-            # login...
+            user = authenticate(username=email, password=password)
+            if user is not None:
+                print("SUCCESSFULLY LOGGED IN")
+            else:
+                print("WRONG USER DATA")
     else:
         form = LoginForm()
     return render(request, 'users/login.html', {'form': form})
