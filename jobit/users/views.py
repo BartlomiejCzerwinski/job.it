@@ -1,10 +1,11 @@
 from django.shortcuts import render
+
+from users import models
 from .forms import LoginForm, RegisterForm
 from django.contrib.auth.hashers import make_password
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
-from .models import AppUser
 
 
 def login(request):
@@ -52,7 +53,7 @@ def create_user(first_name, last_name, email, password, role):
     user = User.objects.create(username=email, first_name=first_name, last_name=last_name, email=email,
                                password=make_password(password))
     user.save()
-    app_user = AppUser.objects.create(user=user, role=role)
+    app_user = models.AppUser.objects.create(user=user, role=role)
     app_user.save()
 
 
