@@ -1,6 +1,6 @@
 from django.shortcuts import render
 
-from users import models
+from users.models import AppUser
 from .forms import LoginForm, RegisterForm
 from django.contrib.auth.hashers import make_password
 from django.contrib import messages
@@ -27,7 +27,6 @@ def login(request):
 def register(request):
     if request.method == 'POST':
         form = RegisterForm(request.POST)
-
         if form.is_valid():
             first_name, last_name, email, password, repeated_password, role = extract_registration_form_data(form)
             if not is_password_valid(password, repeated_password):
@@ -53,7 +52,7 @@ def create_user(first_name, last_name, email, password, role):
     user = User.objects.create(username=email, first_name=first_name, last_name=last_name, email=email,
                                password=make_password(password))
     user.save()
-    app_user = models.AppUser.objects.create(user=user, role=role)
+    app_user = AppUser.objects.create(user=user, role=role)
     app_user.save()
 
 
