@@ -71,3 +71,10 @@ def is_password_valid(password, repeated_password):
     if password != repeated_password:
         return False
     return True
+
+
+def get_current_user(request):
+    user = request.user
+    if user:
+        return HttpResponse(user)
+    return HttpResponse(None)
