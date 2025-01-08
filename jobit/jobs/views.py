@@ -10,7 +10,10 @@ ROLE_RECRUITER = "recruiter"
 @login_required
 def index(request):
     role = get_user_role(request.user)
-    return render(request, 'jobs/index.html')
+    if role == ROLE_WORKER:
+        return render(request, 'jobs/index_worker.html')
+    elif role == ROLE_RECRUITER:
+        return render(request, 'jobs/index_recruiter.html')
 
 
 def get_user_role(email):
