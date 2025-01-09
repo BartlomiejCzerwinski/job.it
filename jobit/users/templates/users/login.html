@@ -9,6 +9,15 @@
 <body>
     <div class="container mt-5">
         <h2 class="text-center">Login</h2>
+
+        {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-danger" role="alert">
+                {{ message }}
+            </div>
+            {% endfor %}
+        {% endif %}
+
         <form method="post" class="border p-4 shadow rounded">
             {% csrf_token %}
             <div class="mb-3">

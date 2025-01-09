@@ -17,9 +17,10 @@ def login_view(request):
             user = authenticate(request, username=email, password=password)
             if user is not None:
                 login(request, user)
-                print("SUCCESSFULLY LOGGED IN")
             else:
-                print("WRONG USER DATA")
+                messages.error(request, "Wrong login data!")
+                form = LoginForm()
+                render(request, 'users/login.html', {'form': form})
     else:
         form = LoginForm()
     return render(request, 'users/login.html', {'form': form})
@@ -82,6 +83,7 @@ def get_current_user(request):
 def get_user_role(email):
     role = AppUser.objects.filter(user=email).first().role
     return role
+
 
 def logout_user(request):
     logout(request)
