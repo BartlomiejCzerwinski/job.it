@@ -4,7 +4,7 @@ from .forms import LoginForm, RegisterForm
 from django.contrib.auth.hashers import make_password
 from django.contrib import messages
 from django.contrib.auth.models import User
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponse
 
 
@@ -77,3 +77,11 @@ def get_current_user(request):
     if user:
         return HttpResponse(user)
     return HttpResponse(None)
+
+
+def get_user_role(email):
+    role = AppUser.objects.filter(user=email).first().role
+    return role
+
+def logout_user(request):
+    logout(request)
