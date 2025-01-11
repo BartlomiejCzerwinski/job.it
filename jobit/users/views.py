@@ -9,8 +9,6 @@ from django.http import HttpResponse, HttpResponseRedirect
 
 
 def login_view(request):
-    if request.user is not None:
-        return HttpResponseRedirect('/job.it')
     if request.method == 'POST':
         form = LoginForm(request.POST)
         if form.is_valid():
@@ -30,8 +28,6 @@ def login_view(request):
 
 
 def register(request):
-    if request.user is not None:
-        return HttpResponseRedirect('/job.it')
     if request.method == 'POST':
         form = RegisterForm(request.POST)
         if form.is_valid():
