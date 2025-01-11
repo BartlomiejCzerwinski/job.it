@@ -5,7 +5,7 @@ from django.contrib.auth.hashers import make_password
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 
 
 def login_view(request):
@@ -17,6 +17,7 @@ def login_view(request):
             user = authenticate(request, username=email, password=password)
             if user is not None:
                 login(request, user)
+                return HttpResponseRedirect('/job.it')
             else:
                 messages.error(request, "Wrong login data!")
                 form = LoginForm()
