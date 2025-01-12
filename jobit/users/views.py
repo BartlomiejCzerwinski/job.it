@@ -24,6 +24,9 @@ def login_view(request):
                 render(request, 'users/login.html', {'form': form})
     else:
         form = LoginForm()
+    is_registration = request.GET.get('registration')
+    if is_registration:
+        messages.success(request, "Registration success!")
     return render(request, 'users/login.html', {'form': form})
 
 
@@ -43,8 +46,8 @@ def register(request):
                 return render(request, 'users/register.html', {'form': form})
 
             create_user(first_name, last_name, email, password, role)
-            form = LoginForm()
-            return HttpResponseRedirect('/job.it/login')
+            query_string = '?registration=ture'
+            return HttpResponseRedirect('/job.it/login' + query_string)
 
     else:
         form = RegisterForm()
