@@ -44,7 +44,7 @@ def register(request):
 
             create_user(first_name, last_name, email, password, role)
             form = LoginForm()
-            return render(request, 'users/login.html', {'form': form})
+            return HttpResponseRedirect('/job.it/login')
 
     else:
         form = RegisterForm()
