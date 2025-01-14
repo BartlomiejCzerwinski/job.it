@@ -18,6 +18,9 @@ def index(request):
         return render(request, 'jobs/index_recruiter.html')
 
 
+def worker_profile(request):
+    return render(request, 'jobs/worker_profile.html')
+
 def view_logout(request):
     logout(request)
     return HttpResponseRedirect('/job.it/login')
