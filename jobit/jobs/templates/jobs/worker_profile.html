@@ -231,9 +231,13 @@
                             <div class="invalid-feedback">Skill name cannot be empty.</div>
                         </div>
                         <div class="mb-3 position-relative">
-                            <label for="skillLevel" class="form-label">Skill Level (1-100)</label>
-                            <input type="number" class="form-control" id="skillLevel" min="1" max="100" required>
-                            <div class="invalid-feedback">Skill level must be between 1 and 100.</div>
+                            <label class="form-label">Skill Level</label>
+                            <div class="progress position-relative" style="height: 30px; cursor: pointer;">
+                                <div class="progress-bar bg-success" id="beginner" role="progressbar" style="width: 33%;" aria-valuenow="1" aria-valuemin="1" aria-valuemax="3">Beginner</div>
+                                <div class="progress-bar bg-warning" id="intermediate" role="progressbar" style="width: 33%;" aria-valuenow="2" aria-valuemin="1" aria-valuemax="3">Intermediate</div>
+                                <div class="progress-bar bg-danger" id="advanced" role="progressbar" style="width: 34%;" aria-valuenow="3" aria-valuemin="1" aria-valuemax="3">Advanced</div>
+                            </div>
+                            <input type="hidden" id="selectedSkillLevel" name="skillLevel" value="1">
                         </div>
                     </form>
                 </div>
@@ -301,6 +305,22 @@
             `;
             skillsList.appendChild(skillDiv);
         }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const skillLevels = document.querySelectorAll(".progress-bar");
+            const selectedSkillLevelInput = document.getElementById("selectedSkillLevel");
+
+            skillLevels.forEach(level => {
+                level.addEventListener("click", function () {
+                    skillLevels.forEach(l => l.classList.remove("active"));
+
+                    this.classList.add("active");
+
+                    selectedSkillLevelInput.value = this.getAttribute("aria-valuenow");
+                });
+            });
+        });
+
     </script>
 
 {% endblock %}
