@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse, HttpResponseRedirect
-from users.models import AppUser
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
+from users.models import AppUser, Skill
 from users.views import get_user_role, logout_user
 from django.contrib.auth import logout
 
@@ -29,3 +29,8 @@ def view_logout(request):
 
 def view_settings(request):
     return render(request, 'jobs/settings.html')
+
+
+def get_skills(request):
+    skills = Skill.objects.all().values("name", "id")
+    return JsonResponse(list(skills), safe=False)
