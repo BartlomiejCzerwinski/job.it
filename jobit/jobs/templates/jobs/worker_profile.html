@@ -199,7 +199,7 @@
                             <div class="progress-bar bg-primary" role="progressbar" style="width: 80%;" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100"></div>
                         </div>
                         <div class="mb-3 pb-2" style="height: 5px;">
-                            <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addSkillModal">Add skill <i class="bi bi-plus-lg"></i></button>
+                            <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addSkillModal" onclick="fetchSkills(SKILLS_URL)">Add skill <i class="bi bi-plus-lg"></i></button>
                         </div>
 
                     </div>
@@ -230,11 +230,6 @@
                         <input type="text" class="form-control" id="searchSkillInput" placeholder="Wpisz, aby wyszukać...">
                         <div class="dropdown" style="position: relative;">
                             <select class="form-control custom-select-menu" id="skillNameSelect" size="5" style="max-height: 150px; overflow-y: auto; position: absolute; z-index: 1050; display: none; background: white; border: 1px solid #ced4da; width: 100%;">
-                                <option value="1">Option 1</option>
-                                <option value="2">Option 2</option>
-                                <option value="3">Option 3</option>
-                                <option value="4">Option 4</option>
-                                <option value="5">Option 5</option>
                             </select>
                         </div>
                         <div class="invalid-feedback">Skill name cannot be empty.</div>
@@ -323,6 +318,7 @@
     });
 
     function fetchSkills(endpointUrl) {
+        console.log("fetching right now...")
           return fetch(endpointUrl)
             .then(response => {
               if (!response.ok) {
@@ -331,8 +327,7 @@
               return response.json();
             })
             .then(data => {
-              console.log('Fetched data:', data);
-              return data;
+              return loadSkills(data)
             })
             .catch(error => {
               console.error('Error fetching skills:', error.message || error);
@@ -341,7 +336,16 @@
         }
 
     let SKILLS_URL = "http://127.0.0.1:8000/job.it/get_skills";
-    
+    function loadSkills(skills) {
+        const selectElement = document.getElementById('skillNameSelect');
+        for(let i = 0; i < skills.length; i++) {
+            const newOption = document.createElement('option');
+            let skill = skills[i];
+            newOption.value = skill.id;
+            newOption.textContent = skill.name;
+            selectElement.appendChild(newOption);
+        }
+    }
 </script>
 
 {% endblock %}
