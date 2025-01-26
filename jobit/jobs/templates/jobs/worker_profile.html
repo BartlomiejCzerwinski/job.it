@@ -227,12 +227,12 @@
                 <form id="addSkillForm">
                     <div class="mb-3 position-relative">
                         <label for="searchSkillInput" class="form-label">Skill Name</label>
-                        <input type="text" class="form-control" id="searchSkillInput" placeholder="Wpisz, aby wyszukać...">
+                        <input type="text" class="form-control" id="searchSkillInput" placeholder="Type to search...">
                         <div class="dropdown" style="position: relative;">
                             <select class="form-control custom-select-menu" id="skillNameSelect" size="5" style="max-height: 150px; overflow-y: auto; position: absolute; z-index: 1050; display: none; background: white; border: 1px solid #ced4da; width: 100%;">
                             </select>
                         </div>
-                        <div class="invalid-feedback">Skill name cannot be empty.</div>
+                        <div class="invalid-feedback" id="skillNameFeedback">Skill name cannot be empty.</div>
                     </div>
 
                     <div class="mb-3 position-relative">
@@ -242,7 +242,8 @@
                             <div class="progress-bar bg-warning" id="intermediate" role="progressbar" style="width: 33%;" aria-valuenow="2" aria-valuemin="1" aria-valuemax="3">Intermediate</div>
                             <div class="progress-bar bg-danger" id="advanced" role="progressbar" style="width: 34%;" aria-valuenow="3" aria-valuemin="1" aria-valuemax="3">Advanced</div>
                         </div>
-                        <input type="hidden" id="selectedSkillLevel" name="skillLevel" value="1">
+                        <input type="hidden" id="skillLevelSelect" name="skillLevel" value="4">
+                        <div class="invalid-feedback" id="skillLevelFeedback">Skill level cannot be empty.</div>
                     </div>
                 </form>
             </div>
@@ -294,7 +295,7 @@
         });
 
         const skillLevels = document.querySelectorAll(".progress-bar");
-        const selectedSkillLevelInput = document.getElementById("selectedSkillLevel");
+        const selectedSkillLevelInput = document.getElementById("skillNameSelect");
 
         skillLevels.forEach(level => {
             level.addEventListener("click", function () {
@@ -307,15 +308,44 @@
 
     document.getElementById('addSkillButton').addEventListener('click', function () {
         const skillName = document.getElementById('searchSkillInput').value.trim();
-        const skillLevel = document.getElementById('selectedSkillLevel').value;
+        const skillLevel = document.getElementById('skillLevelSelect').value;
+
+        let isValid = true;
 
         if (!skillName) {
-            alert("Skill name cannot be empty.");
-            return;
+            showError('skillNameFeedback')
+            isValid = false;
+        }
+        else {
+            hideError('skillNameFeedback')
+        }
+console.log("skill level: ", skillLevel)
+        if (skillLevel.value !== 1 && skillLevel.value !== 2 || skillLevel.value !== 3) {
+            console.log("skill level: ", skillLevel)
+            showError('skillLevelFeedback')
+            isValid = false;
+        }
+        else {
+            hideError('skillLevelFeedback')
         }
 
-        console.log(`Skill Added: ${skillName} - Level: ${skillLevel}`);
+        if (isValid) {
+            console.log(`Skill Added: ${skillName} - Level: ${skillLevel}`);
+        }
+        else {
+            console.log("Cannot add skill")
+        }
     });
+
+    function showError(fieldId) {
+        let errorMessage = document.getElementById(fieldId);
+        errorMessage.style.display = 'block';
+    }
+
+    function hideError(fieldId) {
+        let errorMessage = document.getElementById(fieldId);
+        errorMessage.style.display = 'none';
+    }
 
     function fetchSkills(endpointUrl) {
           return fetch(endpointUrl)
