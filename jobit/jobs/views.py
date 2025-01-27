@@ -1,3 +1,5 @@
+import json
+
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
@@ -34,3 +36,20 @@ def view_settings(request):
 def get_skills(request):
     skills = Skill.objects.all().values("name", "id")
     return JsonResponse(list(skills), safe=False)
+
+
+def add_skill(request):
+    if request.method == "POST":
+        try:
+            body = json.loads(request.body)
+            skill_id = body.get("skillId")
+            level = body.get("skillLevel")
+
+            if not skill_id or not level:
+                return JsonResponse({"error": "Both 'skillId' and 'skillLevel' are required"}, status=400)
+
+            return JsonResponse({"message": f"Skill {skill_id} with level {level} added successfully"}, status=200)
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Invalid JSON format"}, status=400)
+
+    return JsonResponse({"error": "Invalid request method"}, status=405)
