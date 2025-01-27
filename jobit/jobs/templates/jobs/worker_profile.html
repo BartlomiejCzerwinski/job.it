@@ -242,7 +242,7 @@
                             <div class="progress-bar bg-warning" id="intermediate" role="progressbar" style="width: 33%;" aria-valuenow="2" aria-valuemin="1" aria-valuemax="3">Intermediate</div>
                             <div class="progress-bar bg-danger" id="advanced" role="progressbar" style="width: 34%;" aria-valuenow="3" aria-valuemin="1" aria-valuemax="3">Advanced</div>
                         </div>
-                        <input type="hidden" id="skillLevelSelect" name="skillLevel" value="4">
+                        <input type="hidden" id="skillLevelSelect" name="skillLevel" value="10">
                         <div class="invalid-feedback" id="skillLevelFeedback">Skill level cannot be empty.</div>
                     </div>
                 </form>
@@ -295,13 +295,15 @@
         });
 
         const skillLevels = document.querySelectorAll(".progress-bar");
-        const selectedSkillLevelInput = document.getElementById("skillNameSelect");
+        const selectedSkillLevelInput = document.getElementById("skillLevelSelect");
+        selectedSkillLevelInput.value = 10;
 
         skillLevels.forEach(level => {
             level.addEventListener("click", function () {
                 skillLevels.forEach(l => l.classList.remove("active"));
                 this.classList.add("active");
                 selectedSkillLevelInput.value = this.getAttribute("aria-valuenow");
+
             });
         });
     });
@@ -319,9 +321,9 @@
         else {
             hideError('skillNameFeedback')
         }
-console.log("skill level: ", skillLevel)
-        if (skillLevel.value !== 1 && skillLevel.value !== 2 || skillLevel.value !== 3) {
-            console.log("skill level: ", skillLevel)
+        console.log("skilllevel: ", skillLevel);
+
+        if (skillLevel != 1 && skillLevel != 2 && skillLevel != 3) {
             showError('skillLevelFeedback')
             isValid = false;
         }
