@@ -22,3 +22,8 @@ class Skill(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=255)
 
+
+class UserSkill(models.Model):
+    user = models.ForeignKey(AppUser, on_delete=models.CASCADE)
+    skill = models.ForeignKey(Skill, on_delete=models.CASCADE)
+    level = models.PositiveIntegerField()
