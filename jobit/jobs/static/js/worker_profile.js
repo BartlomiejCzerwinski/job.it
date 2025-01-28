@@ -1,3 +1,5 @@
+let SKILLS_URL = "http://127.0.0.1:8000/job.it/get_skills";
+
 document.addEventListener("DOMContentLoaded", function() {
     const searchInput = document.getElementById("searchSkillInput");
     const skillSelect = document.getElementById("skillNameSelect");
@@ -62,7 +64,6 @@ document.getElementById('addSkillButton').addEventListener('click', function() {
     } else {
         hideError('skillNameFeedback')
     }
-    console.log("skilllevel: ", skillLevel);
 
     if (skillLevel != 1 && skillLevel != 2 && skillLevel != 3) {
         showError('skillLevelFeedback')
@@ -74,7 +75,7 @@ document.getElementById('addSkillButton').addEventListener('click', function() {
     if (isValid) {
         console.log(`Skill Added: ${skillName} - Level: ${skillLevel}`);
     } else {
-        console.log("Cannot add skill")
+        console.log('Cannot add skill')
     }
 });
 
@@ -104,8 +105,6 @@ function fetchSkills(endpointUrl) {
             throw error;
         });
 }
-
-let SKILLS_URL = "http://127.0.0.1:8000/job.it/get_skills";
 
 function loadSkills(skills) {
     const selectElement = document.getElementById('skillNameSelect');
