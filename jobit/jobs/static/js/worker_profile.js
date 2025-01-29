@@ -116,3 +116,7 @@ function loadSkills(skills) {
         selectElement.appendChild(newOption);
     }
 }
+
+function addSkillRequest(skillId, skillLevel) {
+
+}
