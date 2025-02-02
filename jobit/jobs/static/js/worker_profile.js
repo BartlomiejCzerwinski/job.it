@@ -117,6 +117,16 @@ function loadSkills(skills) {
     }
 }
 
+function getSkillId(skillName) {
+    let selectElement = document.getElementById('skillNameSelect');
+    let skillsArray = selectElement.children;
+    for (skillObject of skillsArray) {
+        if (skillObject.textContent == skillName) {
+            return skillObject.value;
+        }
+    }
+}
+
 function addSkillRequest(skillId, skillLevel) {
     fetch('/job.it/add_skill', {
         method: 'POST',
