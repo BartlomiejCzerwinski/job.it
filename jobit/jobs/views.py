@@ -1,9 +1,12 @@
 import json
 
+from django.contrib.auth.models import User
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
-from users.models import AppUser, Skill
+from django.views.decorators.csrf import csrf_exempt
+
+from users.models import AppUser, Skill, UserSkill
 from users.views import get_user_role, logout_user
 from django.contrib.auth import logout
 
@@ -38,18 +41,48 @@ def get_skills(request):
     return JsonResponse(list(skills), safe=False)
 
 
+@csrf_exempt
 def add_skill(request):
-    if request.method == "POST":
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+
+    try:
+        data = json.loads(request.body)
+        skill_id = data.get('skillId')
+        skill_level = data.get('skillLevel')
+        user_id = data.get('userId')
+
+        # Validate inputs
+        if not all([skill_id, skill_level, user_id]):
+            return JsonResponse({'error': 'Missing required fields'}, status=400)
+
+        # Check if skill_level is valid
         try:
-            body = json.loads(request.body)
-            skill_id = body.get("skillId")
-            level = body.get("skillLevel")
+            skill_level = int(skill_level)
+            if skill_level not in range(1, 4):
+                return JsonResponse({'error': 'Skill level must be between 1 and 3'}, status=400)
+        except ValueError:
+            return JsonResponse({'error': 'Skill level must be an integer'}, status=400)
 
-            if not skill_id or not level:
-                return JsonResponse({"error": "Both 'skillId' and 'skillLevel' are required"}, status=400)
+        # Check if user exists
+        try:
+            user = User.objects.get(id=user_id)
+        except User.DoesNotExist:
+            return JsonResponse({'error': 'User does not exist'}, status=404)
 
-            return JsonResponse({"message": f"Skill {skill_id} with level {level} added successfully"}, status=200)
-        except json.JSONDecodeError:
-            return JsonResponse({"error": "Invalid JSON format"}, status=400)
+        # Check if skill exists
+        try:
+            skill = Skill.objects.get(id=skill_id)
+        except Skill.DoesNotExist:
+            return JsonResponse({'error': 'Skill does not exist'}, status=404)
 
-    return JsonResponse({"error": "Invalid request method"}, status=405)
+        # Assuming you have a model to link skills to users, like UserSkill
+        # Here we're making up this model for the example:
+        UserSkill.objects.create(user=AppUser.objects.get(user=user), skill=skill, level=skill_level)
+
+        return JsonResponse({'message': 'Skill added successfully'}, status=201)
+
+    except json.JSONDecodeError:
+        return JsonResponse({'error': 'Invalid JSON'}, status=400)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
