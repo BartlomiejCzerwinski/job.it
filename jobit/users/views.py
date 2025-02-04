@@ -89,5 +89,10 @@ def get_user_role(email):
     return role
 
 
+def get_user_id(email):
+    role = AppUser.objects.filter(user=email).first().id
+    return role
+
+
 def logout_user(request):
     logout(request)
