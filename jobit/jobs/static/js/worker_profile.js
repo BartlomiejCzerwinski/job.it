@@ -73,7 +73,9 @@ document.getElementById('addSkillButton').addEventListener('click', function() {
     }
 
     if (isValid) {
-        console.log(`Skill Added: ${skillName} - Level: ${skillLevel}`);
+        console.log(`Trying to add skill: ${skillName} - Level: ${skillLevel}`);
+        let skillId = getSkillId(skillName);
+        addSkillRequest(skillId, skillLevel);
     } else {
         console.log('Cannot add skill')
     }
