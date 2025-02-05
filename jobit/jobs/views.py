@@ -65,6 +65,6 @@ def add_skill(request):
         except Skill.DoesNotExist:
             return JsonResponse({'error': 'Skill does not exist'}, status=404)
 
-        UserSkill.objects.create(user=AppUser.objects.get(user=user), skill=skill, level=skill_level)
+        UserSkill.objects.create(user=user, skill=skill, level=skill_level)
 
         return JsonResponse({'message': 'Skill added successfully'}, status=201)
