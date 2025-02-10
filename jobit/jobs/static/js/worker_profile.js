@@ -149,8 +149,18 @@ function addSkillRequest(skillId, skillLevel) {
     })
     .then(data => {
         console.log('Success:', data);
+        hideModal();
+        // Add success notification and clear modal form
     })
     .catch(error => {
         console.error('ERROR:', error);
+        hideModal();
+        // Add failure notification and clear modal form
     });
+}
+
+function hideModal() {
+    let addSkillModalElement = document.getElementById("addSkillModal");
+    let addSkillModal = bootstrap.Modal.getInstance(addSkillModalElement);
+    addSkillModal.hide();
 }
