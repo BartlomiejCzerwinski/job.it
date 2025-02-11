@@ -151,11 +151,13 @@ function addSkillRequest(skillId, skillLevel) {
         console.log('Success:', data);
         hideModal();
         // Add success notification and clear modal form
+        resetAddSkillModal()
     })
     .catch(error => {
         console.error('ERROR:', error);
         hideModal();
         // Add failure notification and clear modal form
+        resetAddSkillModal()
     });
 }
 
@@ -163,4 +165,17 @@ function hideModal() {
     let addSkillModalElement = document.getElementById("addSkillModal");
     let addSkillModal = bootstrap.Modal.getInstance(addSkillModalElement);
     addSkillModal.hide();
+}
+
+function resetAddSkillModal() {
+    document.getElementById("searchSkillInput").value = "";
+    document.getElementById("skillNameSelect").innerHTML = "";
+    document.getElementById("skillLevelSelect").value = "";
+
+    document.getElementById("beginner").classList.remove("active");
+    document.getElementById("intermediate").classList.remove("active");
+    document.getElementById("advanced").classList.remove("active");
+
+    document.getElementById("skillNameFeedback").style.display = "none";
+    document.getElementById("skillLevelFeedback").style.display = "none";
 }
