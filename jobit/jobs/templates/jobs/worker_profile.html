@@ -7,6 +7,18 @@
     <button type="button" class="btn btn-primary" onclick="window.location.href='/job.it/worker_profile'">My Profile</button>
 </div>
 {% endblock %} {% block content %}
+
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1050">
+    <div id="customToast" class="toast align-items-center text-bg-primary border-0 d-flex justify-content-between" role="alert" aria-live="assertive" aria-atomic="true">
+        <div id="toastMessage" class="toast-body">
+            Toast message content
+        </div>
+        <button type="button" class="btn-close btn-close-white me-2" data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>
+</div>
+
+
+
 <div class="row gutters-sm">
     <div class="col-md-4 mb-3">
         <div class="card shadow p-2">
