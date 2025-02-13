@@ -150,13 +150,13 @@ function addSkillRequest(skillId, skillLevel) {
     .then(data => {
         console.log('Success:', data);
         hideModal();
-        // Add success notification and clear modal form
+        showToast("Skill added successfully", "success");
         resetAddSkillModal()
     })
     .catch(error => {
         console.error('ERROR:', error);
         hideModal();
-        // Add failure notification and clear modal form
+        showToast("Failed to add skill", "error");
         resetAddSkillModal()
     });
 }
@@ -178,4 +178,24 @@ function resetAddSkillModal() {
 
     document.getElementById("skillNameFeedback").style.display = "none";
     document.getElementById("skillLevelFeedback").style.display = "none";
+}
+
+function showToast(message, type) {
+    const toastElement = document.getElementById("customToast");
+    const toastMessage = document.getElementById("toastMessage");
+
+    toastMessage.innerText = message;
+
+    toastElement.classList.remove("text-bg-primary", "text-bg-success", "text-bg-danger");
+
+    if (type === "success") {
+        toastElement.classList.add("text-bg-success");
+    } else if (type === "error") {
+        toastElement.classList.add("text-bg-danger");
+    } else {
+        toastElement.classList.add("text-bg-primary");
+    }
+
+    const toast = new bootstrap.Toast(toastElement);
+    toast.show();
 }
