@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from users.models import AppUser
+from users.models import AppUser, UserSkill
 from .forms import LoginForm, RegisterForm
 from django.contrib.auth.hashers import make_password
 from django.contrib import messages
@@ -82,6 +82,15 @@ def get_current_user(request):
     if user:
         return HttpResponse(user)
     return HttpResponse(None)
+
+
+def get_user_skills(email):
+    user = AppUser.objects.filter(user=email)[0]
+    user_skills = UserSkill.objects.filter(user=user)
+    skills = []
+    for user_skill in user_skills:
+        skills.append({"name": user_skill.skill.name, "level": user_skill.level})
+    return skills
 
 
 def get_user_role(email):
