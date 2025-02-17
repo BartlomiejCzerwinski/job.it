@@ -4,7 +4,7 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect, JsonResponse
 from users.models import Skill, UserSkill
-from users.views import get_user_role, get_user
+from users.views import get_user_role, get_user, get_user_skills
 from django.contrib.auth import logout
 
 ROLE_WORKER = "worker"
@@ -21,7 +21,9 @@ def index(request):
 
 
 def worker_profile(request):
-    return render(request, 'jobs/worker_profile.html')
+    skills = get_user_skills(request.user)
+    print(skills)
+    return render(request, 'jobs/worker_profile.html', {'skills': skills})
 
 
 def view_logout(request):
