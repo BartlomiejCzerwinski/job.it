@@ -1,13 +1,10 @@
 import json
 
-from django.contrib.auth.models import User
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-
-from users.models import AppUser, Skill, UserSkill
-from users.views import get_user_role, logout_user, get_user
+from django.http import HttpResponseRedirect, JsonResponse
+from users.models import Skill, UserSkill
+from users.views import get_user_role, get_user
 from django.contrib.auth import logout
 
 ROLE_WORKER = "worker"
