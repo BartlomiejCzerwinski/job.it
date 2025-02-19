@@ -3,7 +3,7 @@ import json
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect, JsonResponse
-from users.models import Skill, UserSkill
+from users.models import Skill, UserSkill, AppUser
 from users.views import get_user_role, get_user, get_user_skills
 from django.contrib.auth import logout
 
@@ -67,3 +67,24 @@ def add_skill(request):
         UserSkill.objects.create(user=user, skill=skill, level=skill_level)
 
         return JsonResponse({'message': 'Skill added successfully'}, status=201)
+
+
+def update_user_skill(email, skill_id, new_level):
+    user = AppUser.objects.filter(user=email)[0]
+    skill = Skill.objects.get(id=skill_id)
+
+    if not user:
+        return JsonResponse({'error': 'User does not exist'}, status=404)
+    if not skill:
+        return JsonResponse({'error': 'Skill does not exist'}, status=404)
+    if new_level not in range(1, 4):
+        return JsonResponse({'error': 'Skill level must be between 1 and 3'}, status=400)
+
+    user_skill = UserSkill.objects.filter(user=user, skill=skill)[0]
+    if not user_skill:
+        return JsonResponse({'error': 'No such skill for the user'}, status=404)
+
+    user_skill.level = new_level
+    user_skill.save()
+
+    return JsonResponse({'message': 'Skill updated successfully'}, status=201)
