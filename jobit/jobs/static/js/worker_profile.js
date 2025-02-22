@@ -199,3 +199,7 @@ function showToast(message, type) {
     const toast = new bootstrap.Toast(toastElement);
     toast.show();
 }
+
+window.editSkill = function (id) {
+    console.log('edit skill called', id);
+}
