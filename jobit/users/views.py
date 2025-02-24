@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from users.models import AppUser, UserSkill
+from users.models import AppUser, UserSkill, Skill
 from .forms import LoginForm, RegisterForm
 from django.contrib.auth.hashers import make_password
 from django.contrib import messages
@@ -89,7 +89,7 @@ def get_user_skills(email):
     user_skills = UserSkill.objects.filter(user=user)
     skills = []
     for user_skill in user_skills:
-        skills.append({"name": user_skill.skill.name, "level": user_skill.level})
+        skills.append({"name": user_skill.skill.name, "level": user_skill.level, "skillId": user_skill.skill.id})
     return skills
 
 
