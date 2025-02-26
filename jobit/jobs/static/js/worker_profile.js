@@ -200,6 +200,7 @@ function showToast(message, type) {
     toast.show();
 }
 
-window.editSkill = function (id) {
+window.editSkill = function (id, level) {
     console.log('edit skill called', id);
+    console.log("skill level: ", level);
 }

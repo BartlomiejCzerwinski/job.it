@@ -89,7 +89,7 @@ def get_user_skills(email):
     user_skills = UserSkill.objects.filter(user=user)
     skills = []
     for user_skill in user_skills:
-        skills.append({"name": user_skill.skill.name, "level": user_skill.level, "skillId": user_skill.skill.id})
+        skills.append({"name": user_skill.skill.name, "level": user_skill.level, "id": user_skill.skill.id})
     return skills
 
 
