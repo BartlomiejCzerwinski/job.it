@@ -88,21 +88,3 @@ def update_user_skill(email, skill_id, new_level):
     user_skill.save()
 
     return JsonResponse({'message': 'Skill updated successfully'}, status=201)
-
-
-def remove_user_skill(email, skill_id):
-    user = AppUser.objects.filter(user=email)[0]
-    skill = Skill.objects.get(id=skill_id)
-
-    if not user:
-        return JsonResponse({'error': 'User does not exist'}, status=404)
-    if not skill:
-        return JsonResponse({'error': 'Skill does not exist'}, status=404)
-
-    user_skill = UserSkill.objects.filter(user=user, skill=skill)[0]
-    if not user_skill:
-        return JsonResponse({'error': 'No such skill for the user'}, status=404)
-
-    user_skill.delete()
-
-    return JsonResponse({'message': 'Skill deleted successfully'}, status=201)

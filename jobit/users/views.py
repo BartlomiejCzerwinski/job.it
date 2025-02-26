@@ -1,11 +1,14 @@
+import json
+
 from django.shortcuts import render
+from django.views.decorators.http import require_http_methods
 from users.models import AppUser, UserSkill, Skill
 from .forms import LoginForm, RegisterForm
 from django.contrib.auth.hashers import make_password
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 
 
 def login_view(request):
@@ -92,6 +95,13 @@ def get_user_skills(email):
         skills.append({"name": user_skill.skill.name, "level": user_skill.level, "id": user_skill.skill.id})
     return skills
 
+@require_http_methods(["POST"])
+def remove_skill(request):
+    email = request.user
+    data = json.loads(request.body)
+    id = data.get("id")
+    return remove_user_skill(email, id)
+
 
 def get_user_role(email):
     role = AppUser.objects.filter(user=email).first().role
@@ -105,3 +115,20 @@ def get_user(email):
 
 def logout_user(request):
     logout(request)
+
+def remove_user_skill(email, skill_id):
+    user = AppUser.objects.filter(user=email)[0]
+    skill = Skill.objects.get(id=skill_id)
+
+    if not user:
+        return JsonResponse({'error': 'User does not exist'}, status=404)
+    if not skill:
+        return JsonResponse({'error': 'Skill does not exist'}, status=404)
+
+    user_skill = UserSkill.objects.filter(user=user, skill=skill)[0]
+    if not user_skill:
+        return JsonResponse({'error': 'No such skill for the user'}, status=404)
+
+    user_skill.delete()
+
+    return JsonResponse({'message': 'Skill deleted successfully'}, status=201)
