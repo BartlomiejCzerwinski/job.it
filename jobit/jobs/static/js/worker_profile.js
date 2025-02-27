@@ -230,7 +230,12 @@ window.removeSkill  = function (id, name) {
     })
     .then(data => {
         console.log('Success:', data);
+        let skillItemId = "skillItem-".concat(id.toString());
+        let skillItem = document.getElementById(skillItemId);
+        
+        skillItem.remove();
         showToast("Skill removed successfully: ".concat(name), "success");
+
     })
     .catch(error => {
         console.error('ERROR:', error);
