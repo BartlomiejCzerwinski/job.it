@@ -95,6 +95,7 @@ def get_user_skills(email):
         skills.append({"name": user_skill.skill.name, "level": user_skill.level, "id": user_skill.skill.id})
     return skills
 
+
 @require_http_methods(["POST"])
 def remove_skill(request):
     email = request.user
@@ -115,6 +116,16 @@ def get_user(email):
 
 def logout_user(request):
     logout(request)
+
+
+def get_current_user_data(request):
+    user = get_user(request.user)
+    first_name = user.first_name
+    last_name = user.last_name
+    email = user.email
+    user_data = {"firstName": first_name, "lastName": last_name, "email": email}
+    return user_data
+
 
 def remove_user_skill(email, skill_id):
     user = AppUser.objects.filter(user=email)[0]
