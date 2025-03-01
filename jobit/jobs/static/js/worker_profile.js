@@ -151,7 +151,8 @@ function addSkillRequest(skillId, skillLevel) {
         console.log('Success:', data);
         hideModal();
         showToast("Skill added successfully", "success");
-        resetAddSkillModal()
+        resetAddSkillModal();
+        addSkillItem(data.skill);
     })
     .catch(error => {
         console.error('ERROR:', error);
@@ -242,3 +243,42 @@ window.removeSkill  = function (id, name) {
         showToast("Failed to remove skill: ".concat(name), "error");
     });
 }
+
+function generateSkillHTML(skill) {
+    let progressBarClass = "bg-danger";
+    let progressWidth = "100%";
+    let progressValue = 100;
+
+    if (skill.level === 1) {
+        progressBarClass = "bg-success";
+        progressWidth = "33%";
+        progressValue = 33;
+    } else if (skill.level === 2) {
+        progressBarClass = "bg-warning";
+        progressWidth = "66%";
+        progressValue = 66;
+    }
+
+    return `
+        <div id="skillItem-${skill.id}">
+            <div class="d-flex align-items-center">
+                <small class="w-100 text-truncate">${skill.name}</small>
+                <i class="bi bi-pencil ms-auto" style="font-size: 1rem; color: black; cursor: pointer;"
+                   onclick="editSkill('${skill.id}', '${skill.level}', '${skill.name}')"
+                   data-bs-toggle="modal" data-bs-target="#editSkillModal"></i>
+            </div>
+            <div class="progress mb-3" style="height: 5px;">
+                <div class="progress-bar ${progressBarClass}" role="progressbar" 
+                     style="width: ${progressWidth};" aria-valuenow="${progressValue}" 
+                     aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+        </div>
+    `;
+}
+
+window.addSkillItem = function(skill) {
+    let skillsList = document.getElementById("skillsList");
+    let skillHTML = generateSkillHTML(skill);
+    skillsList.innerHTML += skillHTML;
+}
+

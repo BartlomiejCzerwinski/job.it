@@ -65,8 +65,9 @@ def add_skill(request):
             return JsonResponse({'error': 'Skill does not exist'}, status=404)
 
         UserSkill.objects.create(user=user, skill=skill, level=skill_level)
+        added_skill = {"name": skill.name, "level": skill_level, "id": skill_id}
 
-        return JsonResponse({'message': 'Skill added successfully'}, status=201)
+        return JsonResponse({'message': 'Skill added successfully', 'skill': added_skill}, status=201)
 
 
 def update_user_skill(email, skill_id, new_level):
