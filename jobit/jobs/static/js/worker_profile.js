@@ -206,11 +206,14 @@ window.editSkill = function (id, level, name) {
     console.log("skill level: ", level);
     let removeSkillButton = document.getElementById("removeSkillButton");
     console.log(removeSkillButton);
-    removeSkillButton.addEventListener("click", () => {
+
+    removeSkillButton.onclick = function () {
         console.log("listener is working");
-       removeSkill(id, name);
-    });
-}
+        removeSkill(id, name);
+    };
+};
+
+
 
 window.removeSkill  = function (id, name) {
     fetch('/job.it/remove-skill', {
@@ -233,7 +236,6 @@ window.removeSkill  = function (id, name) {
         console.log('Success:', data);
         let skillItemId = "skillItem-".concat(id.toString());
         let skillItem = document.getElementById(skillItemId);
-        
         skillItem.remove();
         showToast("Skill removed successfully: ".concat(name), "success");
 
