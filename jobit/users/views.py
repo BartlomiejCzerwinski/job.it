@@ -20,7 +20,7 @@ def login_view(request):
             user = authenticate(request, username=email, password=password)
             if user is not None:
                 login(request, user)
-                return HttpResponseRedirect('/job.it')
+                return HttpResponseRedirect('/')
             else:
                 messages.error(request, "Wrong login data!")
                 form = LoginForm()
@@ -50,7 +50,7 @@ def register(request):
 
             create_user(first_name, last_name, email, password, role)
             query_string = '?registration=ture'
-            return HttpResponseRedirect('/job.it/login' + query_string)
+            return HttpResponseRedirect('login' + query_string)
 
     else:
         form = RegisterForm()

@@ -20,6 +20,7 @@ def index(request):
         return render(request, 'jobs/index_recruiter.html')
 
 
+@login_required
 def worker_profile(request):
     skills = get_user_skills(request.user)
     print(skills)
@@ -28,7 +29,7 @@ def worker_profile(request):
 
 def view_logout(request):
     logout(request)
-    return HttpResponseRedirect('/job.it/login')
+    return HttpResponseRedirect('login')
 
 
 def view_settings(request):

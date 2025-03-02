@@ -1,4 +1,4 @@
-let SKILLS_URL = "http://127.0.0.1:8000/job.it/get_skills";
+let SKILLS_URL = "http://127.0.0.1:8000/get_skills";
 
 document.addEventListener("DOMContentLoaded", function() {
     const searchInput = document.getElementById("searchSkillInput");
@@ -130,7 +130,7 @@ function getSkillId(skillName) {
 }
 
 function addSkillRequest(skillId, skillLevel) {
-    fetch('/job.it/add_skill', {
+    fetch('/add_skill', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -216,7 +216,7 @@ window.editSkill = function (id, level, name) {
 
 
 window.removeSkill  = function (id, name) {
-    fetch('/job.it/remove-skill', {
+    fetch('/remove-skill', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
