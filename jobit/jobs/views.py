@@ -27,6 +27,13 @@ def worker_profile(request):
     return render(request, 'jobs/worker_profile.html', {'skills': skills})
 
 
+@login_required
+def listings_view(request):
+    skills = get_user_skills(request.user)
+    print(skills)
+    return render(request, 'jobs/listings.html')
+
+
 def view_logout(request):
     logout(request)
     return HttpResponseRedirect('login')
