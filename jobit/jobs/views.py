@@ -33,6 +33,10 @@ def listings_view(request):
     print(skills)
     return render(request, 'jobs/listings.html')
 
+@login_required
+def add_listing_view(request):
+    return render(request, 'jobs/add_listing.html')
+
 
 def view_logout(request):
     logout(request)

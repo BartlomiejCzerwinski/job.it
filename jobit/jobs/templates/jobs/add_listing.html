@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}Add Job Offer - Job.it{% endblock %}
+
+{% block content %}
+    <div class="container mt-5">
+        <div class="card shadow p-4">
+            <h2 class="text-center">Add New Job Offer</h2>
+            <form method="POST" action="{% url 'add_listing' %}">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="jobTitle" class="form-label">Job Title</label>
+                    <input type="text" class="form-control" name="job_title" id="jobTitle" required>
+                </div>
+                <div class="mb-3">
+                    <label for="companyName" class="form-label">Company Name</label>
+                    <input type="text" class="form-control" name="company_name" id="companyName" required>
+                </div>
+                <div class="mb-3">
+                    <label for="jobDescription" class="form-label">Job Description</label>
+                    <textarea class="form-control" name="job_description" id="jobDescription" rows="3" required></textarea>
+                </div>
+                <div class="mb-3">
+                    <label for="jobSalary" class="form-label">Salary</label>
+                    <input type="text" class="form-control" name="job_salary" id="jobSalary">
+                </div>
+                <div class="mb-3">
+                    <label for="jobLocation" class="form-label">Location</label>
+                    <input type="text" class="form-control" name="job_location" id="jobLocation">
+                </div>
+                <button type="submit" class="btn btn-primary w-100">Submit</button>
+            </form>
+        </div>
+    </div>
+{% endblock %}
