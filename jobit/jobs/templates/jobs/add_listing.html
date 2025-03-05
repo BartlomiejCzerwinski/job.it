@@ -8,28 +8,82 @@
             <h2 class="text-center">Add New Job Offer</h2>
             <form method="POST" action="{% url 'add_listing' %}">
                 {% csrf_token %}
+                {{ form.non_field_errors }}
+
                 <div class="mb-3">
-                    <label for="jobTitle" class="form-label">Job Title</label>
-                    <input type="text" class="form-control" name="job_title" id="jobTitle" required>
+                    {{ form.job_title.label_tag }}
+                    {{ form.job_title }}
                 </div>
                 <div class="mb-3">
-                    <label for="companyName" class="form-label">Company Name</label>
-                    <input type="text" class="form-control" name="company_name" id="companyName" required>
+                    {{ form.company_name.label_tag }}
+                    {{ form.company_name }}
                 </div>
                 <div class="mb-3">
-                    <label for="jobDescription" class="form-label">Job Description</label>
-                    <textarea class="form-control" name="job_description" id="jobDescription" rows="3" required></textarea>
+                    {{ form.about_company.label_tag }}
+                    {{ form.about_company }}
                 </div>
                 <div class="mb-3">
-                    <label for="jobSalary" class="form-label">Salary</label>
-                    <input type="text" class="form-control" name="job_salary" id="jobSalary">
+                    {{ form.job_description.label_tag }}
+                    {{ form.job_description }}
                 </div>
                 <div class="mb-3">
-                    <label for="jobLocation" class="form-label">Location</label>
-                    <input type="text" class="form-control" name="job_location" id="jobLocation">
+                    <label class="form-label">Salary Range</label>
+                    <div class="row">
+                        <div class="col-md-4">
+                            {{ form.salary_min }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.salary_max }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.salary_currency }}
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    {{ form.job_location.label_tag }}
+                    {{ form.job_location }}
+                    <div id="locationSuggestions" class="list-group"></div>
                 </div>
                 <button type="submit" class="btn btn-primary w-100">Submit</button>
             </form>
         </div>
     </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const locationInput = document.getElementById("id_job_location");
+            const suggestionsDiv = document.getElementById("locationSuggestions");
+
+            locationInput.addEventListener("input", function () {
+                const query = locationInput.value;
+                if (query.length < 3) {
+                    suggestionsDiv.innerHTML = "";
+                    return;
+                }
+
+                fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${query}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        suggestionsDiv.innerHTML = "";
+                        data.forEach(location => {
+                            const item = document.createElement("div");
+                            item.classList.add("list-group-item", "list-group-item-action");
+                            item.textContent = location.display_name;
+                            item.addEventListener("click", function () {
+                                locationInput.value = location.display_name;
+                                suggestionsDiv.innerHTML = "";
+                            });
+                            suggestionsDiv.appendChild(item);
+                        });
+                    });
+            });
+
+            document.addEventListener("click", function (event) {
+                if (!suggestionsDiv.contains(event.target)) {
+                    suggestionsDiv.innerHTML = "";
+                }
+            });
+        });
+    </script>
 {% endblock %}

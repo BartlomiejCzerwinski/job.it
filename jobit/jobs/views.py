@@ -1,8 +1,10 @@
 import json
 
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect, JsonResponse
+
+from jobs.forms import JobListingForm
 from users.models import Skill, UserSkill, AppUser
 from users.views import get_user_role, get_user, get_user_skills
 from django.contrib.auth import logout
@@ -35,7 +37,15 @@ def listings_view(request):
 
 @login_required
 def add_listing_view(request):
-    return render(request, 'jobs/add_listing.html')
+    if request.method == "POST":
+        form = JobListingForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect("/")
+    else:
+        form = JobListingForm()
+
+    return render(request, "jobs/add_listing.html", {"form": form})
 
 
 def view_logout(request):
