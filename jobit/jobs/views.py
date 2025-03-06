@@ -9,6 +9,7 @@ from users.models import Skill, UserSkill, AppUser
 from users.views import get_user_role, get_user, get_user_skills
 from django.contrib.auth import logout
 from users.views import get_user
+from .models import JobListing
 
 ROLE_WORKER = "worker"
 ROLE_RECRUITER = "recruiter"
@@ -32,9 +33,8 @@ def worker_profile(request):
 
 @login_required
 def listings_view(request):
-    skills = get_user_skills(request.user)
-    print(skills)
-    return render(request, 'jobs/listings.html')
+    job_listings = get_recruiter_listings(request.user)
+    return render(request, 'jobs/listings.html', {"job_listings" : job_listings})
 
 @login_required
 def add_listing_view(request):
@@ -55,6 +55,10 @@ def add_listing_view(request):
     return render(request, "jobs/add_listing.html", {"form": form})
 
 
+def get_recruiter_listings(email):
+    recruiter = AppUser.objects.filter(user=email)[0]
+    job_listings = JobListing.objects.filter(owner=recruiter)
+    return job_listings
 
 
 def view_logout(request):
