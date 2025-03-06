@@ -8,6 +8,7 @@ from jobs.forms import JobListingForm
 from users.models import Skill, UserSkill, AppUser
 from users.views import get_user_role, get_user, get_user_skills
 from django.contrib.auth import logout
+from users.views import get_user
 
 ROLE_WORKER = "worker"
 ROLE_RECRUITER = "recruiter"
@@ -40,12 +41,20 @@ def add_listing_view(request):
     if request.method == "POST":
         form = JobListingForm(request.POST)
         if form.is_valid():
-            form.save()
+            job_listing = form.save()
+            job_listing.owner = get_user(request.user)
+            job_listing.save()
+            if job_listing.owner is None:
+                job_listing.delete()
+                print("Failed to add job listing")
+            print("Job listing added successfully")
             return redirect("/")
     else:
         form = JobListingForm()
 
     return render(request, "jobs/add_listing.html", {"form": form})
+
+
 
 
 def view_logout(request):

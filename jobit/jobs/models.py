@@ -1,5 +1,7 @@
 from django.db import models
 
+from users.models import AppUser
+
 
 class JobListing(models.Model):
     CURRENCY_CHOICES = [
@@ -16,6 +18,6 @@ class JobListing(models.Model):
     salary_max = models.PositiveIntegerField(null=True, blank=True)
     salary_currency = models.CharField(max_length=3, choices=CURRENCY_CHOICES, default="PLN")
     job_location = models.CharField(max_length=255)
-
+    owner = models.ForeignKey(AppUser, on_delete=models.CASCADE, null=True, blank=True)
     def __str__(self):
         return f"{self.job_title} at {self.company_name}"
