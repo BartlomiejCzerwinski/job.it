@@ -150,7 +150,7 @@ function addSkillRequest(skillId, skillLevel) {
     .then(data => {
         console.log('Success:', data);
         hideModal();
-        showToast("Skill added successfully", "success");
+        showToastshowToast("Skill added successfully", "success");
         resetAddSkillModal();
         addSkillItem(data.skill);
     })
