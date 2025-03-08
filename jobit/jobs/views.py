@@ -34,7 +34,8 @@ def worker_profile(request):
 @login_required
 def listings_view(request):
     job_listings = get_recruiter_listings(request.user)
-    return render(request, 'jobs/listings.html', {"job_listings": job_listings})
+    is_successful_add_listing = request.GET.get('success')
+    return render(request, 'jobs/listings.html', {"job_listings": job_listings, "is_success": is_successful_add_listing})
 
 
 @login_required
@@ -49,10 +50,14 @@ def add_listing_view(request):
             if job_listing.owner is None:
                 job_listing.delete()
                 is_success = False
-                print("Failed to add job listing")
 
-            print("Job listing added successfully")
-            return render(request, "jobs/listings.html", {"is_success": is_success}) #change to redirect!!!
+            query_string = '?success='
+            if is_success:
+                query_string += "True"
+            else:
+                query_string += "False"
+
+            return HttpResponseRedirect("/listings" + query_string)
     else:
         form = JobListingForm()
 
