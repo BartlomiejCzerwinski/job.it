@@ -1,6 +1,6 @@
 import json
 
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect, JsonResponse
 
@@ -72,6 +72,11 @@ def get_recruiter_listings(email):
     recruiter = AppUser.objects.filter(user=email)[0]
     job_listings = JobListing.objects.filter(owner=recruiter)
     return job_listings
+
+
+def listing_details_view(request, id):
+    job_listing = get_object_or_404(JobListing, id=id)
+    return render(request, 'jobs/listing_details.html', {'job_listing': job_listing})
 
 
 def view_logout(request):
