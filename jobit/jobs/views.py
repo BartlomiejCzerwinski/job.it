@@ -34,8 +34,12 @@ def worker_profile(request):
 @login_required
 def listings_view(request):
     job_listings = get_recruiter_listings(request.user)
+    num_of_listings = len(job_listings)
     is_successful_add_listing = request.GET.get('success')
-    return render(request, 'jobs/listings.html', {"job_listings": job_listings, "is_success": is_successful_add_listing})
+    return render(request, 'jobs/listings.html',
+                  {"job_listings": job_listings,
+                   "is_success": is_successful_add_listing,
+                   "num_of_listings": num_of_listings})
 
 
 @login_required
