@@ -76,7 +76,7 @@ def get_recruiter_listings(email):
 
 def listing_details_view(request, id):
     job_listing = get_object_or_404(JobListing, id=id)
-    return render(request, 'jobs/listing_details.html', {'job_listing': job_listing})
+    return render(request, 'jobs/listing_details.html', {'job': job_listing})
 
 
 def view_logout(request):
