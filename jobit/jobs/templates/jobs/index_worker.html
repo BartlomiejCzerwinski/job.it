@@ -5,12 +5,39 @@
 {% block navbar_extra %}
     <div class="position-absolute top-50 start-50 translate-middle">
         <button type="button" class="btn btn-primary me-2" onclick="window.location.href='/'">Search Jobs</button>
-        <button type="button" class="btn btn-secondary" onclick="window.location.href='/worker_profile'">My Profile</button>
+        <button type="button" class="btn btn-secondary" onclick="window.location.href='/worker_profile'">My Profile
+        </button>
     </div>
 {% endblock %}
 
 {% block content %}
     <div class="card shadow mx-auto my-5 p-4">
-        <h1>HELLO FROM INDEX WORKER!</h1>
+        <h1 class="text-center fw-semibold">FIND YOUR <span class="material-icons text-info fst-italic"> DREAM</span>
+            JOB TODAY!</>
+    </div>
+    <div class="card shadow mx-auto my-5 p-4">
+        {% for job in job_listings %}
+            <div class="list-group-item list-group-item-action p-4 border rounded mb-3">
+                <div class="d-flex w-100 justify-content-between">
+                    <h5 class="mb-1 fw-semibold text-primary">{{ job.job_title }}</h5>
+                    <small class="text-muted">{{ job.job_location }}</small>
+                </div>
+                <p class="mb-1 text-muted">{{ job.company_name }}</p>
+                <p class="text-secondary">{{ job.job_description|truncatewords:20 }}</p>
+                <div class="d-flex justify-content-between align-items-center mt-3">
+                    {% if job.salary_min and job.salary_max %}
+                        <span class="fw-bold text-success">
+                                {{ job.salary_min }} - {{ job.salary_max }} {{ job.salary_currency }}
+                            </span>
+                    {% else %}
+                        <span class="text-muted">Salary not specified</span>
+                    {% endif %}
+                    <button type="button" class="btn btn-outline-primary btn-sm"
+                            onclick="window.location.href='/listings/{{ job.id }}'">
+                        View Details <i class="bi bi-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        {% endfor %}
     </div>
 {% endblock %}

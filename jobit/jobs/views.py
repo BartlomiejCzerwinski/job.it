@@ -19,7 +19,8 @@ ROLE_RECRUITER = "recruiter"
 def index(request):
     role = get_user_role(request.user)
     if role == ROLE_WORKER:
-        return render(request, 'jobs/index_worker.html')
+        job_listings = get_all_listings()
+        return render(request, 'jobs/index_worker.html', {"job_listings": job_listings})
     elif role == ROLE_RECRUITER:
         return render(request, 'jobs/index_recruiter.html')
 
@@ -71,6 +72,11 @@ def add_listing_view(request):
 def get_recruiter_listings(email):
     recruiter = AppUser.objects.filter(user=email)[0]
     job_listings = JobListing.objects.filter(owner=recruiter)
+    return job_listings
+
+
+def get_all_listings():
+    job_listings = JobListing.objects.all()
     return job_listings
 
 
