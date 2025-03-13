@@ -82,7 +82,9 @@ def get_all_listings():
 
 def listing_details_view(request, id):
     job_listing = get_object_or_404(JobListing, id=id)
-    return render(request, 'jobs/listing_details.html', {'job': job_listing})
+    user_role = get_user_role(request.user)
+    print(user_role)
+    return render(request, 'jobs/listing_details.html', {'job': job_listing, 'role': user_role})
 
 
 def view_logout(request):
