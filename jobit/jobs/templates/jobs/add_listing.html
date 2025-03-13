@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "base.html" %} {% load static %}
 
 {% block title %}Add Job Offer - Job.it{% endblock %}
 
@@ -34,6 +34,16 @@
                     {{ form.job_description }}
                 </div>
                 <div class="mb-3">
+                    <label class="form-label">Skills</label>
+                    <div id="skillsList">
+                        <div class="d-flex align-items-center">
+                            <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal"
+                                    data-bs-target="#addSkillModal" onclick="fetchSkills(SKILLS_URL)">Add skill <i
+                                    class="bi bi-plus-lg"></i></button>
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3">
                     <label class="form-label">Salary Range</label>
                     <div class="row">
                         <div class="col-md-4">
@@ -57,7 +67,57 @@
         </div>
     </div>
 
-    <script>
+    <div class="modal fade" id="addSkillModal" tabindex="-1" aria-labelledby="addSkillModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addSkillModalLabel">Add New Skill</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addSkillForm">
+                        <div class="mb-3 position-relative">
+                            <label for="searchSkillInput" class="form-label">Skill Name</label>
+                            <input type="text" class="form-control" id="searchSkillInput"
+                                   placeholder="Type to search..."/>
+                            <div class="dropdown" style="position: relative;">
+                                <select
+                                        class="form-control custom-select-menu"
+                                        id="skillNameSelect"
+                                        size="5"
+                                        style="max-height: 150px; overflow-y: auto; position: absolute; z-index: 1050; display: none; background: white; border: 1px solid #ced4da; width: 100%;"
+                                >
+                                </select>
+                            </div>
+                            <div class="invalid-feedback" id="skillNameFeedback">Skill name cannot be empty.</div>
+                        </div>
+                        <div class="mb-3 position-relative">
+                            <label class="form-label">Skill Level</label>
+                            <div class="progress position-relative" style="height: 30px; cursor: pointer;">
+                                <div class="progress-bar bg-success" id="beginner" role="progressbar"
+                                     style="width: 33%;" aria-valuenow="1" aria-valuemin="1" aria-valuemax="3">Beginner
+                                </div>
+                                <div class="progress-bar bg-warning" id="intermediate" role="progressbar"
+                                     style="width: 33%;" aria-valuenow="2" aria-valuemin="1" aria-valuemax="3">
+                                    Intermediate
+                                </div>
+                                <div class="progress-bar bg-danger" id="advanced" role="progressbar" style="width: 34%;"
+                                     aria-valuenow="3" aria-valuemin="1" aria-valuemax="3">Advanced
+                                </div>
+                            </div>
+                            <input type="hidden" id="skillLevelSelect" name="skillLevel" value="10"/>
+                            <div class="invalid-feedback" id="skillLevelFeedback">Skill level cannot be empty.</div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="addSkillButton">Add</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="{% static 'js/recruiter.js' %}">
         document.addEventListener("DOMContentLoaded", function () {
             const locationInput = document.getElementById("id_job_location");
             const suggestionsDiv = document.getElementById("locationSuggestions");
@@ -92,5 +152,87 @@
                 }
             });
         });
+
+        document.getElementById('addSkillButton').addEventListener('click', function () {
+            const skillName = document.getElementById('searchSkillInput').value.trim();
+            const skillLevel = document.getElementById('skillLevelSelect').value;
+
+            let isValid = true;
+
+            if (!skillName) {
+                showError('skillNameFeedback')
+                isValid = false;
+            } else {
+                hideError('skillNameFeedback')
+            }
+
+            if (skillLevel != 1 && skillLevel != 2 && skillLevel != 3) {
+                showError('skillLevelFeedback')
+                isValid = false;
+            } else {
+                hideError('skillLevelFeedback')
+            }
+
+            if (isValid) {
+                console.log(`Trying to add skill: ${skillName} - Level: ${skillLevel}`);
+                let skillId = getSkillId(skillName);
+                addSkillRequest(skillId, skillLevel);
+            } else {
+                console.log('Cannot add skill')
+            }
+        });
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const searchInput = document.getElementById("searchSkillInput");
+            const skillSelect = document.getElementById("skillNameSelect");
+            let isOptionSelected = false;
+
+            searchInput.addEventListener("focus", () => {
+                skillSelect.style.display = "block";
+            });
+
+            searchInput.addEventListener("input", function () {
+                const filter = this.value.toLowerCase();
+                const options = skillSelect.querySelectorAll("option");
+
+                isOptionSelected = false;
+                options.forEach(option => {
+                    if (option.textContent.toLowerCase().includes(filter)) {
+                        option.style.display = "";
+                    } else {
+                        option.style.display = "none";
+                    }
+                });
+            });
+
+            document.addEventListener("click", function (event) {
+                if (!searchInput.contains(event.target) && !skillSelect.contains(event.target)) {
+                    if (!isOptionSelected) {
+                        searchInput.value = "";
+                    }
+                    skillSelect.style.display = "none";
+                }
+            });
+
+            skillSelect.addEventListener("change", function () {
+                searchInput.value = this.options[this.selectedIndex].text;
+                isOptionSelected = true;
+                skillSelect.style.display = "none";
+            });
+
+            const skillLevels = document.querySelectorAll(".progress-bar");
+            const selectedSkillLevelInput = document.getElementById("skillLevelSelect");
+            selectedSkillLevelInput.value = 10;
+
+            skillLevels.forEach(level => {
+                level.addEventListener("click", function () {
+                    skillLevels.forEach(l => l.classList.remove("active"));
+                    this.classList.add("active");
+                    selectedSkillLevelInput.value = this.getAttribute("aria-valuenow");
+
+                });
+            });
+        });
+
     </script>
 {% endblock %}
