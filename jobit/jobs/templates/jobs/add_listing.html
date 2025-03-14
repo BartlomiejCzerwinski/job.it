@@ -38,7 +38,7 @@
                     <div id="skillsList">
                         <div class="d-flex align-items-center">
                             <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal"
-                                    data-bs-target="#addSkillModal" onclick="fetchSkills(SKILLS_URL)">Add skill <i
+                                    data-bs-target="#addSkillModal">Add skill <i
                                     class="bi bi-plus-lg"></i></button>
                         </div>
                     </div>
@@ -117,11 +117,15 @@
             </div>
         </div>
     </div>
-    <script src="{% static 'js/recruiter.js' %}">
+    <script src="{% static 'js/recruiter.js' %}"></script>
+    <script>
+        let SKILLS_LIST = fetchSkills(SKILLS_URL);
+        loadSkills(SKILLS_LIST)
+
+        // Job location logic
         document.addEventListener("DOMContentLoaded", function () {
             const locationInput = document.getElementById("id_job_location");
             const suggestionsDiv = document.getElementById("locationSuggestions");
-
             locationInput.addEventListener("input", function () {
                 const query = locationInput.value;
                 if (query.length < 3) {
@@ -153,6 +157,18 @@
             });
         });
 
+        function getSkillId(skillName) {
+            let selectElement = document.getElementById('skillNameSelect');
+            let skillsArray = selectElement.children;
+            for (skillObject of skillsArray) {
+                if (skillObject.textContent == skillName) {
+                    return skillObject.value;
+                }
+            }
+        }
+
+        // Add skill logic
+        let SKILLS = [];
         document.getElementById('addSkillButton').addEventListener('click', function () {
             const skillName = document.getElementById('searchSkillInput').value.trim();
             const skillLevel = document.getElementById('skillLevelSelect').value;
@@ -174,14 +190,15 @@
             }
 
             if (isValid) {
-                console.log(`Trying to add skill: ${skillName} - Level: ${skillLevel}`);
                 let skillId = getSkillId(skillName);
-                addSkillRequest(skillId, skillLevel);
+                SKILLS.push({"id": skillId, "name": skillName, "level": skillLevel});
+                console.log(`Added skill: ${skillName} - Level: ${skillLevel}`);
             } else {
                 console.log('Cannot add skill')
             }
         });
 
+        // Search skill logic
         document.addEventListener("DOMContentLoaded", function () {
             const searchInput = document.getElementById("searchSkillInput");
             const skillSelect = document.getElementById("skillNameSelect");
@@ -233,6 +250,7 @@
                 });
             });
         });
+        
 
     </script>
 {% endblock %}

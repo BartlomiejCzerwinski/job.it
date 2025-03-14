@@ -9,7 +9,7 @@ function fetchSkills(endpointUrl) {
             return response.json();
         })
         .then(data => {
-            return loadSkills(data)
+            return data;
         })
         .catch(error => {
             console.error('Error fetching skills:', error.message || error);
@@ -55,4 +55,17 @@ function loadSkills(skills) {
         newOption.textContent = skill.name;
         selectElement.appendChild(newOption);
     }
+}
+
+function resetAddSkillModal() {
+    //document.getElementById("searchSkillInput").value = "";
+    //document.getElementById("skillNameSelect").innerHTML = "";
+    //document.getElementById("skillLevelSelect").value = "";
+
+    //document.getElementById("beginner").classList.remove("active");
+    //document.getElementById("intermediate").classList.remove("active");
+    //document.getElementById("advanced").classList.remove("active");
+
+    //document.getElementById("skillNameFeedback").style.display = "none";
+    //document.getElementById("skillLevelFeedback").style.display = "none";
 }
