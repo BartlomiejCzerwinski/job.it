@@ -119,8 +119,20 @@
     </div>
     <script src="{% static 'js/recruiter.js' %}"></script>
     <script>
-        let SKILLS_LIST = fetchSkills(SKILLS_URL);
-        loadSkills(SKILLS_LIST)
+        fetchSkills(SKILLS_URL)
+            .then(skills => {
+                SKILLS_LIST = skills;
+                loadSkills(SKILLS_LIST);
+                console.log(SKILLS_LIST);
+            })
+            .catch(error => console.error("Error during fetching skills:", error));
+
+        let SKILLS_LIST = [];
+
+        fetchSkills(SKILLS_URL).then(skills => {
+            SKILLS_LIST = skills;
+        });
+
 
         // Job location logic
         document.addEventListener("DOMContentLoaded", function () {
@@ -250,7 +262,26 @@
                 });
             });
         });
-        
+
+        // Listen on modal close
+        document.addEventListener("DOMContentLoaded", function () {
+            let skillModal = document.getElementById("addSkillModal");
+
+            skillModal.addEventListener("shown.bs.modal", function () {
+                console.log("Modal opened.");
+                fetchSkills(SKILLS_URL)
+                    .then(skills => {
+                        loadSkills(skills);
+                    })
+                    .catch(error => console.error("Error while loading skills:", error));
+            });
+
+            skillModal.addEventListener("hidden.bs.modal", function () {
+                console.log("Modal closed.");
+                resetAddSkillModal();
+            });
+        });
+
 
     </script>
 {% endblock %}

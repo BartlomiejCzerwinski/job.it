@@ -46,6 +46,7 @@ function hideError(fieldId) {
     errorMessage.style.display = 'none';
 }
 
+
 function loadSkills(skills) {
     const selectElement = document.getElementById('skillNameSelect');
     for (let i = 0; i < skills.length; i++) {
@@ -57,15 +58,3 @@ function loadSkills(skills) {
     }
 }
 
-function resetAddSkillModal() {
-    //document.getElementById("searchSkillInput").value = "";
-    //document.getElementById("skillNameSelect").innerHTML = "";
-    //document.getElementById("skillLevelSelect").value = "";
-
-    //document.getElementById("beginner").classList.remove("active");
-    //document.getElementById("intermediate").classList.remove("active");
-    //document.getElementById("advanced").classList.remove("active");
-
-    //document.getElementById("skillNameFeedback").style.display = "none";
-    //document.getElementById("skillLevelFeedback").style.display = "none";
-}
