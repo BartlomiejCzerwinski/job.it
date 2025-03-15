@@ -61,7 +61,8 @@
                     {{ form.job_location.label_tag }}
                     {{ form.job_location }}
                     <div id="locationSuggestions" class="list-group"></div>
-                </div>ss
+                </div>
+                ss
                 <button type="submit" class="btn btn-primary w-100">Submit</button>
             </form>
         </div>
@@ -120,19 +121,16 @@
     </div>
     <script src="{% static 'js/recruiter.js' %}"></script>
     <script>
-        fetchSkills(SKILLS_URL)
-            .then(skills => {
-                SKILLS_LIST = skills;
-                loadSkills(SKILLS_LIST);
-                console.log(SKILLS_LIST);
-            })
-            .catch(error => console.error("Error during fetching skills:", error));
+
 
         let SKILLS_LIST = [];
 
-        fetchSkills(SKILLS_URL).then(skills => {
-            SKILLS_LIST = skills;
-        });
+        fetchSkills(SKILLS_URL)
+            .then(skills => {
+                SKILLS_LIST = skills;
+                console.log("Loaded skills list.");
+            })
+            .catch(error => console.error("Error during fetching skills:", error));
 
 
         // Job location logic
@@ -181,7 +179,7 @@
         }
 
         // Add skill logic
-        let SKILLS = [];
+        let SKILLS_IN_LISTING = [];
         document.getElementById('addSkillButton').addEventListener('click', function () {
             const skillName = document.getElementById('searchSkillInput').value.trim();
             const skillLevel = document.getElementById('skillLevelSelect').value;
@@ -210,25 +208,21 @@
                     hideModal();
                     console.log(`Added skill: ${skillName} - Level: ${skillLevel}`);
                 } else {
-                    showError('skillExistsFeedback')
+                    showError('skillExistsFeedback');
                     console.log(`Cannot add skill: ${skillName} - Level: ${skillLevel}`);
                 }
             } else {
+                hideError('skillExistsFeedback');
                 console.log('Cannot add skill')
             }
         });
 
         function addSkillToSkillsList(skill) {
-            let exists = false;
-            for (let i = 0; i < SKILLS.length; i++) {
-                if (skill.id == SKILLS_LIST[i].id && skill.name == SKILLS_LIST[i].name)
-                    exists = true;
+            for (let i = 0; i < SKILLS_IN_LISTING.length; i++) {
+                if (skill.id == SKILLS_IN_LISTING[i].id && skill.name == SKILLS_IN_LISTING[i].name)
+                    return false
             }
-
-            if (exists)
-                return false;
-
-            SKILLS.push(skill);
+            SKILLS_IN_LISTING.push(skill);
             addSkillItem(skill);
             return true;
         }
