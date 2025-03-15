@@ -58,3 +58,8 @@ function loadSkills(skills) {
     }
 }
 
+function hideModal() {
+    let addSkillModalElement = document.getElementById("addSkillModal");
+    let addSkillModal = bootstrap.Modal.getInstance(addSkillModalElement);
+    addSkillModal.hide();
+}

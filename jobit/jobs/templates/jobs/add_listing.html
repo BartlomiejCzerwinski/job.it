@@ -203,7 +203,11 @@
 
             if (isValid) {
                 let skillId = getSkillId(skillName);
-                SKILLS.push({"id": skillId, "name": skillName, "level": skillLevel});
+                let skill = {"id": skillId, "name": skillName, "level": skillLevel};
+                SKILLS.push(skill);
+                addSkillItem(skill);
+                resetAddSkillModal();
+                hideModal();
                 console.log(`Added skill: ${skillName} - Level: ${skillLevel}`);
             } else {
                 console.log('Cannot add skill')
@@ -281,6 +285,51 @@
                 resetAddSkillModal();
             });
         });
+
+        // Skills list
+        function generateSkillHTML(skill) {
+            let progressBarClass = "bg-danger";
+            let progressWidth = "100%";
+            let progressValue = 100;
+
+            if (skill.level == 1) {
+                progressBarClass = "bg-success";
+                progressWidth = "33%";
+                progressValue = 33;
+            } else if (skill.level == 2) {
+                progressBarClass = "bg-warning";
+                progressWidth = "66%";
+                progressValue = 66;
+            }
+
+            return `
+        <div id="skillItem-${skill.id}">
+            <div class="d-flex align-items-center">
+                <small class="w-100 text-truncate">${skill.name}</small>
+                <i class="bi bi-x-lg ms-auto" style="font-size: 1rem; color: black; cursor: pointer;"
+                   onclick="removeSkillListItem('${skill.id}')"
+                   data-bs-toggle="modal" data-bs-target="#editSkillModal"></i>
+            </div>
+            <div class="progress mb-3" style="height: 5px;">
+                <div class="progress-bar ${progressBarClass}" role="progressbar"
+                     style="width: ${progressWidth};" aria-valuenow="${progressValue}"
+                     aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+        </div>
+    `;
+        }
+
+        function addSkillItem(skill) {
+            let skillsList = document.getElementById("skillsList");
+            let skillHTML = generateSkillHTML(skill);
+            skillsList.innerHTML += skillHTML;
+        }
+
+        function removeSkillListItem(skill) {
+            let skillsList = document.getElementById("skillsList");
+            let skillItem = document.getElementById("skillItem-".concat(skill.id));
+            skillItem.innerHTML = '';
+        }
 
 
     </script>
