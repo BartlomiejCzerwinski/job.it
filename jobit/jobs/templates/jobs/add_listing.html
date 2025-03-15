@@ -61,7 +61,7 @@
                     {{ form.job_location.label_tag }}
                     {{ form.job_location }}
                     <div id="locationSuggestions" class="list-group"></div>
-                </div>
+                </div>ss
                 <button type="submit" class="btn btn-primary w-100">Submit</button>
             </form>
         </div>
@@ -75,6 +75,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
+                    <div class="invalid-feedback text-center fs-7" id="skillExistsFeedback">Skill already added.</div>
                     <form id="addSkillForm">
                         <div class="mb-3 position-relative">
                             <label for="searchSkillInput" class="form-label">Skill Name</label>
@@ -204,15 +205,33 @@
             if (isValid) {
                 let skillId = getSkillId(skillName);
                 let skill = {"id": skillId, "name": skillName, "level": skillLevel};
-                SKILLS.push(skill);
-                addSkillItem(skill);
-                resetAddSkillModal();
-                hideModal();
-                console.log(`Added skill: ${skillName} - Level: ${skillLevel}`);
+                if (addSkillToSkillsList(skill)) {
+                    resetAddSkillModal();
+                    hideModal();
+                    console.log(`Added skill: ${skillName} - Level: ${skillLevel}`);
+                } else {
+                    showError('skillExistsFeedback')
+                    console.log(`Cannot add skill: ${skillName} - Level: ${skillLevel}`);
+                }
             } else {
                 console.log('Cannot add skill')
             }
         });
+
+        function addSkillToSkillsList(skill) {
+            let exists = false;
+            for (let i = 0; i < SKILLS.length; i++) {
+                if (skill.id == SKILLS_LIST[i].id && skill.name == SKILLS_LIST[i].name)
+                    exists = true;
+            }
+
+            if (exists)
+                return false;
+
+            SKILLS.push(skill);
+            addSkillItem(skill);
+            return true;
+        }
 
         // Search skill logic
         document.addEventListener("DOMContentLoaded", function () {
