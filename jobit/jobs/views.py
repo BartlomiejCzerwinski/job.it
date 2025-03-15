@@ -47,6 +47,8 @@ def listings_view(request):
 def add_listing_view(request):
     if request.method == "POST":
         form = JobListingForm(request.POST)
+        skills_data = request.POST.get("skills_data")
+        print("Skills for job listing: ", skills_data)
         if form.is_valid():
             job_listing = form.save()
             job_listing.owner = get_user(request.user)

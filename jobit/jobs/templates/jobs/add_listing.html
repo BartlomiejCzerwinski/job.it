@@ -62,7 +62,7 @@
                     {{ form.job_location }}
                     <div id="locationSuggestions" class="list-group"></div>
                 </div>
-                ss
+                <input type="hidden" name="skills_data" id="skillsListForListing">
                 <button type="submit" class="btn btn-primary w-100">Submit</button>
             </form>
         </div>
@@ -343,6 +343,16 @@
             let skillItem = document.getElementById("skillItem-".concat(skill.id));
             skillItem.innerHTML = '';
         }
+
+        // Send skills logic
+        function updateSkillsInput() {
+            let skillsDataInput = document.getElementById("skillsListForListing");
+            skillsDataInput.value = JSON.stringify(SKILLS_IN_LISTING);
+        }
+
+        document.querySelector("form").addEventListener("submit", function () {
+            updateSkillsInput();
+        });
 
 
     </script>
