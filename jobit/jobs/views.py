@@ -46,10 +46,9 @@ def listings_view(request):
 def listing_details_view(request, id):
     job_listing = get_object_or_404(JobListing, id=id)
     listing_skills = get_listing_skills(job_listing)
-    print("skills for listing: ", job_listing, ": ",  listing_skills)
     user_role = get_user_role(request.user)
     print(user_role)
-    return render(request, 'jobs/listing_details.html', {'job': job_listing, 'role': user_role})
+    return render(request, 'jobs/listing_details.html', {'job': job_listing, 'role': user_role, 'skills': listing_skills})
 
 
 @login_required
@@ -188,5 +187,5 @@ def get_listing_skills(job_listing):
     def level(e):
         return e['level']
     skills.sort(key=level, reverse=True)
-    
+
     return skills
