@@ -1,6 +1,6 @@
 from django.db import models
 
-from users.models import AppUser
+from users.models import AppUser, Skill
 
 
 class JobListing(models.Model):
@@ -19,5 +19,20 @@ class JobListing(models.Model):
     salary_currency = models.CharField(max_length=3, choices=CURRENCY_CHOICES, default="PLN")
     job_location = models.CharField(max_length=255)
     owner = models.ForeignKey(AppUser, on_delete=models.CASCADE, null=True, blank=True)
+
     def __str__(self):
         return f"{self.job_title} at {self.company_name}"
+
+
+class JobListingSkill(models.Model):
+    job_listing = models.ForeignKey(JobListing, on_delete=models.CASCADE)
+    skill = models.ForeignKey(Skill, on_delete=models.CASCADE)
+    level = models.PositiveIntegerField()
+
+    # Unique constraint to allow only one the same pair of JobListing and Skill
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['job_listing', 'skill'], name='unique_job_listing_skill')
+        ]
+
+
