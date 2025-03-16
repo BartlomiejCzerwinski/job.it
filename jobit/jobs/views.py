@@ -43,6 +43,15 @@ def listings_view(request):
                    "num_of_listings": num_of_listings})
 
 
+def listing_details_view(request, id):
+    job_listing = get_object_or_404(JobListing, id=id)
+    listing_skills = get_listing_skills(job_listing)
+    print("skills for listing: ", job_listing, ": ",  listing_skills)
+    user_role = get_user_role(request.user)
+    print(user_role)
+    return render(request, 'jobs/listing_details.html', {'job': job_listing, 'role': user_role})
+
+
 @login_required
 def add_listing_view(request):
     if request.method == "POST":
@@ -99,13 +108,6 @@ def get_recruiter_listings(email):
 def get_all_listings():
     job_listings = JobListing.objects.all()
     return job_listings
-
-
-def listing_details_view(request, id):
-    job_listing = get_object_or_404(JobListing, id=id)
-    user_role = get_user_role(request.user)
-    print(user_role)
-    return render(request, 'jobs/listing_details.html', {'job': job_listing, 'role': user_role})
 
 
 def view_logout(request):
@@ -175,3 +177,16 @@ def update_user_skill(email, skill_id, new_level):
     user_skill.save()
 
     return JsonResponse({'message': 'Skill updated successfully'}, status=201)
+
+
+def get_listing_skills(job_listing):
+    job_listing_skills = JobListingSkill.objects.filter(job_listing=job_listing)
+    skills = []
+    for job_listing_skill in job_listing_skills:
+        skills.append({"name": job_listing_skill.skill.name, "level": job_listing_skill.level, "id": job_listing_skill.skill.id})
+
+    def level(e):
+        return e['level']
+    skills.sort(key=level, reverse=True)
+    
+    return skills
