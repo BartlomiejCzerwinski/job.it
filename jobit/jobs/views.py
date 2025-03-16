@@ -9,8 +9,8 @@ from users.models import Skill, UserSkill, AppUser
 from users.views import get_user_role, get_user, get_user_skills
 from django.contrib.auth import logout
 from users.views import get_user
-from .models import JobListing
-
+from .models import JobListing, JobListingSkill
+from django.db.utils import IntegrityError
 ROLE_WORKER = "worker"
 ROLE_RECRUITER = "recruiter"
 
@@ -47,7 +47,7 @@ def listings_view(request):
 def add_listing_view(request):
     if request.method == "POST":
         form = JobListingForm(request.POST)
-        skills_data = request.POST.get("skills_data")
+        skills_data = parse_skills_from_form(request.POST.get("skills_data"))
         print("Skills for job listing: ", skills_data)
         if form.is_valid():
             job_listing = form.save()
@@ -60,7 +60,11 @@ def add_listing_view(request):
 
             query_string = '?success='
             if is_success:
-                query_string += "True"
+                try:
+                    add_skills_to_job_listing(job_listing, skills_data)
+                    query_string += "True"
+                except IntegrityError:
+                    query_string += "False"
             else:
                 query_string += "False"
 
@@ -69,6 +73,21 @@ def add_listing_view(request):
         form = JobListingForm()
 
     return render(request, "jobs/add_listing.html", {"form": form})
+
+
+def parse_skills_from_form(skills_string):
+    if skills_string:
+        try:
+            skills_data = json.loads(skills_string)
+        except json.JSONDecodeError:
+            skills_data = []
+    return skills_data
+
+
+def add_skills_to_job_listing(job_listing, skills):
+    for skill in skills:
+        print(skill)
+        JobListingSkill.objects.create(job_listing=job_listing, skill=get_skill_by_id(skill['id']), level=skill['level'])
 
 
 def get_recruiter_listings(email):
@@ -101,6 +120,10 @@ def view_settings(request):
 def get_skills(request):
     skills = Skill.objects.all().values("name", "id")
     return JsonResponse(list(skills), safe=False)
+
+
+def get_skill_by_id(skill_id):
+    return Skill.objects.filter(id=skill_id)[0]
 
 
 def add_skill(request):
