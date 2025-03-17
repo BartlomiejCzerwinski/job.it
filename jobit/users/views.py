@@ -93,6 +93,11 @@ def get_user_skills(email):
     skills = []
     for user_skill in user_skills:
         skills.append({"name": user_skill.skill.name, "level": user_skill.level, "id": user_skill.skill.id})
+    
+    def level(e):
+        return e['level']
+    skills.sort(key=level, reverse=True)
+
     return skills
 
 
