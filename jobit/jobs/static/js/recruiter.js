@@ -37,6 +37,10 @@ function resetAddSkillModal() {
 
     document.getElementById("skillNameFeedback").style.display = "none";
     document.getElementById("skillLevelFeedback").style.display = "none";
+
+    hideErrorInModal('skillNameFeedback');
+    hideErrorInModal('skillLevelFeedback');
+    hideErrorInModal('skillExistsFeedback');
 }
 
 function showErrorInModal(fieldId) {
