@@ -81,6 +81,16 @@ function addSkillToJobListing(skill) {
     return true; // If skill is not present in job listing, it will be successfully added
 }
 
+function removeSkillFromJobListing(skillId) {
+    for (let i = 0; i < SKILLS_IN_LISTING.length; i++) {
+        if (skillId == SKILLS_IN_LISTING[i].id) {
+            SKILLS_IN_LISTING.splice(i, 1);
+            return true; // Success
+        }
+    }
+    return false; // Failed
+}
+
 function generateSkillHTML(skill) {
     let progressBarClass = "bg-danger";
     let progressWidth = "100%";
@@ -101,8 +111,7 @@ function generateSkillHTML(skill) {
             <div class="d-flex align-items-center">
                 <small class="w-100 text-truncate">${skill.name}</small>
                 <i class="bi bi-x-lg ms-auto" style="font-size: 1rem; color: black; cursor: pointer;"
-                   onclick="removeSkillListItem('${skill.id}')"
-                   data-bs-toggle="modal" data-bs-target="#editSkillModal"></i>
+                   onclick="removeSkillListItem(${skill.id})"></i>
             </div>
             <div class="progress mb-3" style="height: 5px;">
                 <div class="progress-bar ${progressBarClass}" role="progressbar"
@@ -119,9 +128,10 @@ function addSkillItem(skill) {
     skillsList.innerHTML += skillHTML;
 }
 
-function removeSkillListItem(skill) {
-    let skillItem = document.getElementById("skillItem-".concat(skill.id));
+function removeSkillListItem(skillId) {
+    let skillItem = document.getElementById("skillItem-".concat(skillId));
     skillItem.innerHTML = '';
+    removeSkillFromJobListing(skillId);
 }
 
 // Main logic ****************************************************************************
