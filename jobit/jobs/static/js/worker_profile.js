@@ -1,6 +1,12 @@
 let SKILLS_URL = "http://127.0.0.1:8000/get_skills";
 
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function () {
+    addSkillModalFormLogic();
+    addSkillModalAddButtonLogic();
+});
+
+function addSkillModalFormLogic() {
+
     const searchInput = document.getElementById("searchSkillInput");
     const skillSelect = document.getElementById("skillNameSelect");
     let isOptionSelected = false;
@@ -9,7 +15,7 @@ document.addEventListener("DOMContentLoaded", function() {
         skillSelect.style.display = "block";
     });
 
-    searchInput.addEventListener("input", function() {
+    searchInput.addEventListener("input", function () {
         const filter = this.value.toLowerCase();
         const options = skillSelect.querySelectorAll("option");
 
@@ -23,7 +29,7 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     });
 
-    document.addEventListener("click", function(event) {
+    document.addEventListener("click", function (event) {
         if (!searchInput.contains(event.target) && !skillSelect.contains(event.target)) {
             if (!isOptionSelected) {
                 searchInput.value = "";
@@ -32,7 +38,7 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 
-    skillSelect.addEventListener("change", function() {
+    skillSelect.addEventListener("change", function () {
         searchInput.value = this.options[this.selectedIndex].text;
         isOptionSelected = true;
         skillSelect.style.display = "none";
@@ -43,43 +49,46 @@ document.addEventListener("DOMContentLoaded", function() {
     selectedSkillLevelInput.value = 10;
 
     skillLevels.forEach(level => {
-        level.addEventListener("click", function() {
+        level.addEventListener("click", function () {
             skillLevels.forEach(l => l.classList.remove("active"));
             this.classList.add("active");
             selectedSkillLevelInput.value = this.getAttribute("aria-valuenow");
 
         });
     });
-});
 
-document.getElementById('addSkillButton').addEventListener('click', function() {
-    const skillName = document.getElementById('searchSkillInput').value.trim();
-    const skillLevel = document.getElementById('skillLevelSelect').value;
+}
 
-    let isValid = true;
+function addSkillModalAddButtonLogic() {
+    document.getElementById('addSkillButton').addEventListener('click', function () {
+        const skillName = document.getElementById('searchSkillInput').value.trim();
+        const skillLevel = document.getElementById('skillLevelSelect').value;
 
-    if (!skillName) {
-        showError('skillNameFeedback')
-        isValid = false;
-    } else {
-        hideError('skillNameFeedback')
-    }
+        let isValid = true;
 
-    if (skillLevel != 1 && skillLevel != 2 && skillLevel != 3) {
-        showError('skillLevelFeedback')
-        isValid = false;
-    } else {
-        hideError('skillLevelFeedback')
-    }
+        if (!skillName) {
+            showError('skillNameFeedback')
+            isValid = false;
+        } else {
+            hideError('skillNameFeedback')
+        }
 
-    if (isValid) {
-        console.log(`Trying to add skill: ${skillName} - Level: ${skillLevel}`);
-        let skillId = getSkillId(skillName);
-        addSkillRequest(skillId, skillLevel);
-    } else {
-        console.log('Cannot add skill')
-    }
-});
+        if (skillLevel != 1 && skillLevel != 2 && skillLevel != 3) {
+            showError('skillLevelFeedback')
+            isValid = false;
+        } else {
+            hideError('skillLevelFeedback')
+        }
+
+        if (isValid) {
+            console.log(`Trying to add skill: ${skillName} - Level: ${skillLevel}`);
+            let skillId = getSkillId(skillName);
+            addSkillRequest(skillId, skillLevel);
+        } else {
+            console.log('Cannot add skill')
+        }
+    });
+}
 
 function showError(fieldId) {
     let errorMessage = document.getElementById(fieldId);
@@ -141,25 +150,25 @@ function addSkillRequest(skillId, skillLevel) {
             skillLevel: skillLevel
         })
     })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Response was not ok');
-        }
-        return response.json();
-    })
-    .then(data => {
-        console.log('Success:', data);
-        hideModal();
-        showToastshowToast("Skill added successfully", "success");
-        resetAddSkillModal();
-        addSkillItem(data.skill);
-    })
-    .catch(error => {
-        console.error('ERROR:', error);
-        hideModal();
-        showToast("Failed to add skill", "error");
-        resetAddSkillModal()
-    });
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Success:', data);
+            hideModal();
+            showToastshowToast("Skill added successfully", "success");
+            resetAddSkillModal();
+            addSkillItem(data.skill);
+        })
+        .catch(error => {
+            console.error('ERROR:', error);
+            hideModal();
+            resetAddSkillModal()
+            showToast("Failed to add skill", "error");
+        });
 }
 
 function hideModal() {
@@ -214,8 +223,7 @@ window.editSkill = function (id, level, name) {
 };
 
 
-
-window.removeSkill  = function (id, name) {
+window.removeSkill = function (id, name) {
     fetch('/remove-skill', {
         method: 'POST',
         headers: {
@@ -226,24 +234,24 @@ window.removeSkill  = function (id, name) {
             id: id
         })
     })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Response was not ok');
-        }
-        return response.json();
-    })
-    .then(data => {
-        console.log('Success:', data);
-        let skillItemId = "skillItem-".concat(id.toString());
-        let skillItem = document.getElementById(skillItemId);
-        skillItem.remove();
-        showToast("Skill removed successfully: ".concat(name), "success");
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Success:', data);
+            let skillItemId = "skillItem-".concat(id.toString());
+            let skillItem = document.getElementById(skillItemId);
+            skillItem.remove();
+            showToast("Skill removed successfully: ".concat(name), "success");
 
-    })
-    .catch(error => {
-        console.error('ERROR:', error);
-        showToast("Failed to remove skill: ".concat(name), "error");
-    });
+        })
+        .catch(error => {
+            console.error('ERROR:', error);
+            showToast("Failed to remove skill: ".concat(name), "error");
+        });
 }
 
 function generateSkillHTML(skill) {
@@ -278,7 +286,7 @@ function generateSkillHTML(skill) {
     `;
 }
 
-window.addSkillItem = function(skill) {
+window.addSkillItem = function (skill) {
     let skillsList = document.getElementById("skillsList");
     let skillHTML = generateSkillHTML(skill);
     skillsList.innerHTML += skillHTML;
