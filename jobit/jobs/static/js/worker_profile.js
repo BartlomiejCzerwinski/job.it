@@ -3,6 +3,7 @@ let SKILLS_URL = "http://127.0.0.1:8000/get_skills";
 document.addEventListener("DOMContentLoaded", function () {
     addSkillModalFormLogic();
     addSkillModalAddButtonLogic();
+    modalVisibilityLogic();
 });
 
 function addSkillModalFormLogic() {
@@ -284,6 +285,24 @@ function generateSkillHTML(skill) {
             </div>
         </div>
     `;
+}
+
+function modalVisibilityLogic() {
+    let skillModal = document.getElementById("addSkillModal");
+
+    skillModal.addEventListener("shown.bs.modal", function () {
+        console.log("Modal opened.");
+        fetchSkills(SKILLS_URL)
+            .then(skills => {
+                loadSkillsListInModal(skills);
+            })
+            .catch(error => console.error("Error while loading skills:", error));
+    });
+
+    skillModal.addEventListener("hidden.bs.modal", function () {
+        console.log("Modal closed.");
+        resetAddSkillModal();
+    });
 }
 
 window.addSkillItem = function (skill) {
