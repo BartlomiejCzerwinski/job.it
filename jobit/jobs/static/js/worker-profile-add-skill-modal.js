@@ -110,7 +110,7 @@ function fetchSkills(endpointUrl) {
             return response.json();
         })
         .then(data => {
-            return loadSkills(data)
+            return data;
         })
         .catch(error => {
             console.error('Error fetching skills:', error.message || error);
@@ -160,7 +160,7 @@ function addSkillRequest(skillId, skillLevel) {
         .then(data => {
             console.log('Success:', data);
             hideModal();
-            showToastshowToast("Skill added successfully", "success");
+            showToast("Skill added successfully", "success");
             resetAddSkillModal();
             addSkillItem(data.skill);
         })
@@ -294,7 +294,7 @@ function modalVisibilityLogic() {
         console.log("Modal opened.");
         fetchSkills(SKILLS_URL)
             .then(skills => {
-                loadSkillsListInModal(skills);
+                loadSkills(skills);
             })
             .catch(error => console.error("Error while loading skills:", error));
     });
