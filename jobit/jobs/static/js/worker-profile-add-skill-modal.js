@@ -83,8 +83,14 @@ function addSkillModalAddButtonLogic() {
 
         if (isValid) {
             console.log(`Trying to add skill: ${skillName} - Level: ${skillLevel}`);
-            let skillId = getSkillId(skillName);
-            addSkillRequest(skillId, skillLevel);
+
+            if (skillExists(skillName)) {
+                showError('skillExistsFeedback');
+            }
+            else {
+                let skillId = getSkillId(skillName);
+                addSkillRequest(skillId, skillLevel);
+            }
         } else {
             console.log('Cannot add skill')
         }
@@ -201,6 +207,7 @@ function resetAddSkillModal() {
 
     document.getElementById("skillNameFeedback").style.display = "none";
     document.getElementById("skillLevelFeedback").style.display = "none";
+    document.getElementById("skillExistsFeedback").style.display = "none";
 }
 
 function showToast(message, type) {
