@@ -91,6 +91,18 @@ function addSkillModalAddButtonLogic() {
     });
 }
 
+function skillExists(skillName) {
+    let skillsList = document.getElementById('skillsList');
+    let skillItems = skillsList.querySelectorAll("small");
+
+    for (let item of skillItems) {
+        if (item.textContent.trim() === skillName) {
+            return true;
+        }
+    }
+    return false;
+}
+
 function showError(fieldId) {
     let errorMessage = document.getElementById(fieldId);
     errorMessage.style.display = 'block';
