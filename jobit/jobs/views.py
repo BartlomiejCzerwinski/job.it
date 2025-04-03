@@ -148,6 +148,11 @@ def add_skill(request):
 
         try:
             skill = Skill.objects.get(id=skill_id)
+            try:
+                user_skill = UserSkill.objects.get(user=user, skill=skill)
+                return JsonResponse({'error': 'Skill already defined for the user'}, status=400)
+            except UserSkill.DoesNotExist:
+                pass
         except Skill.DoesNotExist:
             return JsonResponse({'error': 'Skill does not exist'}, status=404)
 
