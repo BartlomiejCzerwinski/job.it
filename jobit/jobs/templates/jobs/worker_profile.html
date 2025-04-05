@@ -339,28 +339,30 @@
                     <form id="editSkillForm">
                         <div class="mb-3 position-relative">
                             <label class="form-label">Skill Level</label>
-                            <div class="progress position-relative" style="height: 30px; cursor: pointer;">
-                                <div class="progress-bar bg-success" id="beginner" role="progressbar"
+                            <div class="progress position-relative"
+                                 style="height: 30px; pointer-events: none; opacity: 0.6;">
+                                <div class="progress-bar bg-success" id="beginnerEdit" role="progressbar"
                                      style="width: 33%;" aria-valuenow="1" aria-valuemin="1" aria-valuemax="3">Beginner
                                 </div>
-                                <div class="progress-bar bg-warning" id="intermediate" role="progressbar"
+                                <div class="progress-bar bg-warning" id="intermediateEdit" role="progressbar"
                                      style="width: 33%;" aria-valuenow="2" aria-valuemin="1" aria-valuemax="3">
                                     Intermediate
                                 </div>
-                                <div class="progress-bar bg-danger" id="advanced" role="progressbar" style="width: 34%;"
-                                     aria-valuenow="3" aria-valuemin="1" aria-valuemax="3">Advanced
+                                <div class="progress-bar bg-danger" id="advancedEdit" role="progressbar"
+                                     style="width: 34%;" aria-valuenow="3" aria-valuemin="1" aria-valuemax="3">Advanced
                                 </div>
                             </div>
-                            <input type="hidden" id="skillLevelSelect" name="skillLevel" value="10"/>
+                            <input type="hidden" id="skillLevelSelectEdit" name="skillLevel" value="10"/>
                         </div>
                     </form>
+
                 </div>
                 <div class="modal-footer">
                     <button id="removeSkillButton" type="button" class="btn btn-danger me-auto" data-bs-dismiss="modal">
                         Remove
                     </button>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary" id="addSkillButton">Add</button>
+                    <button type="button" class="btn btn-primary" id="addSkillButton" disabled>Save</button>
                 </div>
             </div>
         </div>

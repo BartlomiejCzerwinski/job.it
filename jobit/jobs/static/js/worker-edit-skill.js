@@ -1,6 +1,7 @@
 function editSkill(id, level, name) {
     console.log('edit skill called for skill id: ', id);
     console.log("skill level: ", level);
+
     let removeSkillButton = document.getElementById("removeSkillButton");
 
     removeSkillButton.onclick = function () {
