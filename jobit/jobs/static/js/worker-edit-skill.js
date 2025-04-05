@@ -1,17 +1,15 @@
-window.editSkill = function (id, level, name) {
-    console.log('edit skill called', id);
+function editSkill(id, level, name) {
+    console.log('edit skill called for skill id: ', id);
     console.log("skill level: ", level);
     let removeSkillButton = document.getElementById("removeSkillButton");
-    console.log(removeSkillButton);
 
     removeSkillButton.onclick = function () {
-        console.log("listener is working");
+        console.log("Trying to remove skill");
         removeSkill(id, name);
     };
-};
+}
 
-
-window.removeSkill = function (id, name) {
+function removeSkill (id, name) {
     fetch('/remove-skill', {
         method: 'POST',
         headers: {
