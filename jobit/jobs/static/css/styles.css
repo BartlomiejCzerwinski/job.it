@@ -1,11 +1,55 @@
 .invalid-feedback {
-            display: none;
+    display: none;
 }
+
 .progress-bar {
     text-align: center;
     line-height: 30px;
     color: white;
 }
+
 .progress-bar.active {
     border: 2px solid black;
+}
+
+.profile-img-wrapper {
+    width: 150px;
+    height: 150px;
+    position: relative;
+    border-radius: 50%;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.profile-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.profile-img-wrapper .overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.55);
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    font-size: 0.9rem;
+    text-align: center;
+}
+
+.profile-img-wrapper:hover .overlay {
+    opacity: 1;
+}
+
+.profile-img-wrapper .overlay i {
+    font-size: 1.2rem;
+    margin-bottom: 5px;
 }
