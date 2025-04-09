@@ -11,33 +11,46 @@
 {% endblock %}
 
 {% block content %}
-    <div class="card shadow mx-auto my-5 p-4">
-        <h1 class="text-center fw-semibold">FIND YOUR <span class="material-icons text-info fst-italic"> DREAM</span>
-            JOB TODAY!</>
+    <div class="card shadow mx-auto my-5 p-5 text-center">
+        <h1 class="fw-semibold mb-4">
+            FIND YOUR <span class="material-icons text-info fst-italic"> DREAM </span> JOB TODAY!
+        </h1>
+        <div class="input-group mx-auto" style="max-width: 700px;">
+            <input type="text" class="form-control form-control-lg" placeholder="Search job titles, technologies..."
+                   disabled>
+            <button class="btn btn-outline-secondary" type="button" disabled>🔍</button>
+            <button class="btn btn-outline-info" type="button" disabled>
+                <i class="bi bi-sliders"></i> Filters
+            </button>
+        </div>
     </div>
+
     <div class="card shadow mx-auto my-5 p-4">
-        {% for job in job_listings %}
-            <div class="list-group-item list-group-item-action p-4 border rounded mb-3">
-                <div class="d-flex w-100 justify-content-between">
-                    <h5 class="mb-1 fw-semibold text-primary">{{ job.job_title }}</h5>
-                    <small class="text-muted">{{ job.job_location }}</small>
-                </div>
-                <p class="mb-1 text-muted">{{ job.company_name }}</p>
-                <p class="text-secondary">{{ job.job_description|truncatewords:20 }}</p>
-                <div class="d-flex justify-content-between align-items-center mt-3">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h5 class="fw-semibold mb-0">Latest & Recommended Offers</h5>
+            <a href="#" class="text-decoration-none small text-muted">View all</a>
+        </div>
+
+        <div class="d-flex gap-3 overflow-auto pb-2">
+            {% for job in job_listings %}
+                <div class="border rounded p-3 flex-shrink-0" style="min-width: 250px;">
+                    <h6 class="fw-bold text-primary mb-1">{{ job.job_title }}</h6>
+                    <p class="text-muted mb-1 small">{{ job.company_name }}</p>
+                    <p class="text-secondary small mb-2">{{ job.job_description|truncatewords:15 }}</p>
+
                     {% if job.salary_min and job.salary_max %}
-                        <span class="fw-bold text-success">
-                                {{ job.salary_min }} - {{ job.salary_max }} {{ job.salary_currency }}
-                            </span>
+                        <p class="fw-bold text-success small mb-1">{{ job.salary_min }}
+                            - {{ job.salary_max }} {{ job.salary_currency }}</p>
                     {% else %}
-                        <span class="text-muted">Salary not specified</span>
+                        <p class="text-muted small mb-1">Salary not specified</p>
                     {% endif %}
-                    <button type="button" class="btn btn-outline-primary btn-sm"
+
+                    <button class="btn btn-sm btn-outline-primary w-100 mt-2"
                             onclick="window.location.href='/listings/{{ job.id }}'">
-                        View Details <i class="bi bi-arrow-right"></i>
+                        Details <i class="bi bi-arrow-right"></i>
                     </button>
                 </div>
-            </div>
-        {% endfor %}
+            {% endfor %}
+        </div>
     </div>
 {% endblock %}
