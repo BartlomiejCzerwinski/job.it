@@ -62,6 +62,35 @@
     {% block content %}
     {% endblock %}
 </div>
+
+<footer class="bg-dark text-white pt-4 pb-3 mt-5 border-top w-100">
+    <div class="px-4 px-md-5">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-center">
+            <div class="mb-3 mb-md-0">
+                <h5 class="mb-1">Job.it</h5>
+                <p class="mb-0 text fw-light small">Helping you find your dream job in tech.</p>
+            </div>
+            <div>
+                <a href="#" class="text-white me-3">
+                    <i class="bi bi-github fs-5"></i>
+                </a>
+                <a href="#" class="text-white me-3">
+                    <i class="bi bi-linkedin fs-5"></i>
+                </a>
+                <a href="mailto:contact@job.it" class="text-white">
+                    <i class="bi bi-envelope fs-5"></i>
+                </a>
+            </div>
+        </div>
+        <hr class="border-secondary my-3">
+        <div class="text-center small text fw-light">
+            © 2025 Job.it — All rights reserved.
+        </div>
+    </div>
+</footer>
+
+
+
 <script>
     var CSRF_TOKEN = '{{ csrf_token }}';
 </script>
