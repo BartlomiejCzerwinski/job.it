@@ -3,54 +3,160 @@
 {% block title %}Index - Job.it{% endblock %}
 
 {% block navbar_extra %}
-    <div class="position-absolute top-50 start-50 translate-middle">
-        <button type="button" class="btn btn-primary me-2" onclick="window.location.href='/'">Search Jobs</button>
-        <button type="button" class="btn btn-secondary" onclick="window.location.href='/worker_profile'">My Profile
-        </button>
-    </div>
+<div class="position-absolute top-50 start-50 translate-middle">
+    <button type="button" class="btn btn-primary me-2" onclick="window.location.href='/'">Search Jobs</button>
+    <button type="button" class="btn btn-secondary" onclick="window.location.href='/worker_profile'">My Profile</button>
+</div>
 {% endblock %}
 
 {% block content %}
-    <div class="card shadow mx-auto my-5 p-5 text-center">
-        <h1 class="fw-semibold mb-4">
-            FIND YOUR <span class="material-icons text-info fst-italic"> DREAM </span> JOB TODAY!
-        </h1>
-        <div class="input-group mx-auto" style="max-width: 700px;">
-            <input type="text" class="form-control form-control-lg" placeholder="Search job titles, technologies..."
-                   disabled>
-            <button class="btn btn-outline-secondary" type="button" disabled>🔍</button>
-            <button class="btn btn-outline-info" type="button" disabled>
-                <i class="bi bi-sliders"></i> Filters
+
+<div class="card shadow mx-auto my-5 p-5 text-center">
+    <h1 class="fw-semibold mb-4">
+        FIND YOUR <span class="material-icons text-info fst-italic"> DREAM </span> JOB TODAY!
+    </h1>
+    <div class="input-group mx-auto" style="max-width: 700px;">
+        <input type="text" class="form-control form-control-lg" placeholder="Search job titles, technologies..." disabled>
+        <button class="btn btn-outline-secondary" type="button" disabled>🔍</button>
+        <button class="btn btn-outline-info" type="button" disabled>
+            <i class="bi bi-sliders"></i> Filters
+        </button>
+    </div>
+</div>
+
+
+<div class="card shadow mx-auto my-5 p-5 text-start">
+
+    <div class="mb-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h5 class="fw-semibold mb-0">Jobs You Might Like</h5>
+            <a href="#" class="text-decoration-none small text-muted">View all</a>
+        </div>
+
+        <div class="position-relative">
+            <button class="btn btn-light position-absolute top-50 start-0 translate-middle-y shadow" style="z-index: 2;" onclick="scrollContainer('section1', -300)">
+                <i class="bi bi-chevron-left"></i>
             </button>
+            <button class="btn btn-light position-absolute top-50 end-0 translate-middle-y shadow" style="z-index: 2;" onclick="scrollContainer('section1', 300)">
+                <i class="bi bi-chevron-right"></i>
+            </button>
+            <div id="section1" class="d-flex gap-4 pb-2 px-5" style="overflow-x: hidden; scroll-behavior: smooth;">
+                {% for job in job_listings %}
+                <div class="border rounded p-4 flex-shrink-0 d-flex flex-column justify-between"
+                     style="width: 300px; height: 300px;">
+                    <div>
+                        <h5 class="fw-bold text-primary mb-2">{{ job.job_title }}</h5>
+                        <p class="text-muted mb-1 small">{{ job.company_name }}</p>
+                        <p class="text-secondary small mb-3" style="max-height: 50px; overflow: hidden;">
+                            {{ job.job_description|truncatewords:20 }}
+                        </p>
+                        {% if job.salary_min and job.salary_max %}
+                            <p class="fw-bold text-success small mb-2">
+                                {{ job.salary_min }} - {{ job.salary_max }} {{ job.salary_currency }}
+                            </p>
+                        {% else %}
+                            <p class="text-muted small mb-2">Salary not specified</p>
+                        {% endif %}
+                    </div>
+                    <button class="btn btn-sm btn-outline-primary w-100 mt-auto"
+                            onclick="window.location.href='/listings/{{ job.id }}'">
+                        Details <i class="bi bi-arrow-right"></i>
+                    </button>
+                </div>
+                {% endfor %}
+            </div>
         </div>
     </div>
 
-    <div class="card shadow mx-auto my-5 p-4">
+    <div class="mb-5">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h5 class="fw-semibold mb-0">Latest & Recommended Offers</h5>
             <a href="#" class="text-decoration-none small text-muted">View all</a>
         </div>
 
-        <div class="d-flex gap-3 overflow-auto pb-2">
-            {% for job in job_listings %}
-                <div class="border rounded p-3 flex-shrink-0" style="min-width: 250px;">
-                    <h6 class="fw-bold text-primary mb-1">{{ job.job_title }}</h6>
-                    <p class="text-muted mb-1 small">{{ job.company_name }}</p>
-                    <p class="text-secondary small mb-2">{{ job.job_description|truncatewords:15 }}</p>
-
-                    {% if job.salary_min and job.salary_max %}
-                        <p class="fw-bold text-success small mb-1">{{ job.salary_min }}
-                            - {{ job.salary_max }} {{ job.salary_currency }}</p>
-                    {% else %}
-                        <p class="text-muted small mb-1">Salary not specified</p>
-                    {% endif %}
-
-                    <button class="btn btn-sm btn-outline-primary w-100 mt-2"
+        <div class="position-relative">
+            <button class="btn btn-light position-absolute top-50 start-0 translate-middle-y shadow" style="z-index: 2;" onclick="scrollContainer('section2', -300)">
+                <i class="bi bi-chevron-left"></i>
+            </button>
+            <button class="btn btn-light position-absolute top-50 end-0 translate-middle-y shadow" style="z-index: 2;" onclick="scrollContainer('section2', 300)">
+                <i class="bi bi-chevron-right"></i>
+            </button>
+            <div id="section2" class="d-flex gap-4 pb-2 px-5" style="overflow-x: hidden; scroll-behavior: smooth;">
+                {% for job in job_listings|slice:":6" %}
+                <div class="border rounded p-4 flex-shrink-0 d-flex flex-column justify-between"
+                     style="width: 300px; height: 300px;">
+                    <div>
+                        <h5 class="fw-bold text-primary mb-2">{{ job.job_title }}</h5>
+                        <p class="text-muted mb-1 small">{{ job.company_name }}</p>
+                        <p class="text-secondary small mb-3" style="max-height: 50px; overflow: hidden;">
+                            {{ job.job_description|truncatewords:20 }}
+                        </p>
+                        {% if job.salary_min and job.salary_max %}
+                            <p class="fw-bold text-success small mb-2">
+                                {{ job.salary_min }} - {{ job.salary_max }} {{ job.salary_currency }}
+                            </p>
+                        {% else %}
+                            <p class="text-muted small mb-2">Salary not specified</p>
+                        {% endif %}
+                    </div>
+                    <button class="btn btn-sm btn-outline-primary w-100 mt-auto"
                             onclick="window.location.href='/listings/{{ job.id }}'">
                         Details <i class="bi bi-arrow-right"></i>
                     </button>
                 </div>
-            {% endfor %}
+                {% endfor %}
+            </div>
         </div>
     </div>
+
+    <div>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h5 class="fw-semibold mb-0">Remote Offers</h5>
+            <a href="#" class="text-decoration-none small text-muted">View all</a>
+        </div>
+
+        <div class="position-relative">
+            <button class="btn btn-light position-absolute top-50 start-0 translate-middle-y shadow" style="z-index: 2;" onclick="scrollContainer('section3', -300)">
+                <i class="bi bi-chevron-left"></i>
+            </button>
+            <button class="btn btn-light position-absolute top-50 end-0 translate-middle-y shadow" style="z-index: 2;" onclick="scrollContainer('section3', 300)">
+                <i class="bi bi-chevron-right"></i>
+            </button>
+            <div id="section3" class="d-flex gap-4 pb-2 px-5" style="overflow-x: hidden; scroll-behavior: smooth;">
+                {% for job in job_listings %}
+                <div class="border rounded p-4 flex-shrink-0 d-flex flex-column justify-between"
+                     style="width: 300px; height: 300px;">
+                    <div>
+                        <h5 class="fw-bold text-primary mb-2">{{ job.job_title }}</h5>
+                        <p class="text-muted mb-1 small">{{ job.company_name }}</p>
+                        <p class="text-secondary small mb-3" style="max-height: 50px; overflow: hidden;">
+                            {{ job.job_description|truncatewords:20 }}
+                        </p>
+                        {% if job.salary_min and job.salary_max %}
+                            <p class="fw-bold text-success small mb-2">
+                                {{ job.salary_min }} - {{ job.salary_max }} {{ job.salary_currency }}
+                            </p>
+                        {% else %}
+                            <p class="text-muted small mb-2">Salary not specified</p>
+                        {% endif %}
+                        <span class="badge bg-success mb-2">Remote</span>
+                    </div>
+                    <button class="btn btn-sm btn-outline-primary w-100 mt-auto"
+                            onclick="window.location.href='/listings/{{ job.id }}'">
+                        Details <i class="bi bi-arrow-right"></i>
+                    </button>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+function scrollContainer(id, offset) {
+    const el = document.getElementById(id);
+    el.scrollLeft += offset;
+}
+</script>
 {% endblock %}
