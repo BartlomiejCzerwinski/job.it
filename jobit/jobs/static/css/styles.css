@@ -53,3 +53,12 @@
     font-size: 1.2rem;
     margin-bottom: 5px;
 }
+
+.job-card {
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.job-card:hover {
+    background-color: #f1f1f1;
+    cursor: pointer;
+}
