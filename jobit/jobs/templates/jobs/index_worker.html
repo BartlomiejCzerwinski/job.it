@@ -46,28 +46,37 @@
                 </button>
                 <div id="section1" class="d-flex gap-4 pb-2 px-5" style="overflow-x: hidden; scroll-behavior: smooth;">
                     {% for job in job_listings %}
-                        <div class="border rounded p-4 flex-shrink-0 d-flex flex-column justify-between job-card"
+                        <div class="border rounded p-4 flex-shrink-0 d-flex flex-column justify-content-between job-card"
                              style="width: 300px; height: 300px;"
                              onclick="window.location.href='/listings/{{ job.id }}'">
+
+                            <!-- Top of the tile -->
                             <div>
                                 <h5 class="fw-bold text-primary mb-2">{{ job.job_title }}</h5>
+
+                            </div>
+
+                            <!-- Bottom of the tile -->
+                            <div>
                                 <p class="text-secondary small mb-1">
                                     <strong><i class="bi bi-geo-alt"></i></strong> {{ job.job_location }}
                                 </p>
-                                {% if job.remote %}
-                                    <span class="badge bg-success mb-2">Remote</span>
-                                {% endif %}
-                                <p class="font-weight-bold mb-1">{{ job.company_name }}</p>
+
+                                <span class="badge bg-success mb-2">Remote</span>
+
+                                <p class="text-secondary small mb-1 fw-bold">
+                                    <i class="bi bi-buildings"></i> {{ job.company_name }}
+                                </p>
                                 {% if job.salary_min and job.salary_max %}
                                     <p class="fw-bold text-success mb-0">
                                         {{ job.salary_min }} - {{ job.salary_max }} {{ job.salary_currency }}
                                     </p>
                                 {% else %}
-                                    <p class="text-muted small mb-2">Salary not specified</p>
+                                    <p class="fw-bold text-muted mb-0">Salary not specified</p>
                                 {% endif %}
                             </div>
-                            </button>
                         </div>
+
                     {% endfor %}
                 </div>
             </div>
