@@ -19,7 +19,7 @@ ROLE_RECRUITER = "recruiter"
 def index(request):
     role = get_user_role(request.user)
     if role == ROLE_WORKER:
-        job_listings = get_all_listings()
+        job_listings = get_all_listings_for_tiles(4)
         return render(request, 'jobs/index_worker.html', {"job_listings": job_listings})
     elif role == ROLE_RECRUITER:
         return render(request, 'jobs/index_recruiter.html')
@@ -102,6 +102,27 @@ def get_recruiter_listings(email):
     recruiter = AppUser.objects.filter(user=email)[0]
     job_listings = JobListing.objects.filter(owner=recruiter)
     return job_listings
+
+
+def get_all_listings_for_tiles(number_of_skills_per_tile):
+    job_listings = get_all_listings()
+    result = []
+    for job_listing in job_listings:
+        skills = get_listing_skills(job_listing)[:number_of_skills_per_tile]
+        result.append({
+            "id": job_listing.id,
+            "job_title": job_listing.job_title,
+            "job_location": job_listing.job_location,
+            "company_name": job_listing.company_name,
+            "salary_min": job_listing.salary_min,
+            "salary_max": job_listing.salary_max,
+            "salary_currency": job_listing.salary_currency,
+            "skills": skills,
+            "is_remote": True,  # TODO
+            "is_hybrid": True  # TODO
+        })
+    return result
+
 
 
 def get_all_listings():
