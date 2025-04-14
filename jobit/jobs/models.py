@@ -10,6 +10,12 @@ class JobListing(models.Model):
         ("USD", "USD"),
     ]
 
+    JOB_MODELS = [
+        ("STATIONARY", "Stationary"),
+        ("HYBRID", "Hybrid"),
+        ("REMOTE", "Remote"),
+    ]
+
     job_title = models.CharField(max_length=255)
     company_name = models.CharField(max_length=255)
     about_company = models.TextField()
@@ -18,6 +24,7 @@ class JobListing(models.Model):
     salary_max = models.PositiveIntegerField(null=True, blank=True)
     salary_currency = models.CharField(max_length=3, choices=CURRENCY_CHOICES, default="PLN")
     job_location = models.CharField(max_length=255)
+    job_model = models.CharField(max_length=10, choices=JOB_MODELS, default="STATIONARY")
     owner = models.ForeignKey(AppUser, on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):

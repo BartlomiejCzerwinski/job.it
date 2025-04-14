@@ -14,6 +14,7 @@ class JobListingForm(forms.ModelForm):
             "salary_max",
             "salary_currency",
             "job_location",
+            "job_model"
         ]
 
     job_title = forms.CharField(
@@ -23,7 +24,8 @@ class JobListingForm(forms.ModelForm):
         widget=forms.TextInput(attrs={"class": "form-control", "placeholder": "Name of your company"})
     )
     about_company = forms.CharField(
-        widget=forms.Textarea(attrs={"class": "form-control", "rows": 3, "placeholder": "Tell something about your company"})
+        widget=forms.Textarea(
+            attrs={"class": "form-control", "rows": 3, "placeholder": "Tell something about your company"})
     )
     job_description = forms.CharField(
         widget=forms.Textarea(attrs={"class": "form-control", "rows": 5, "placeholder": "Describe the position"})
@@ -42,4 +44,8 @@ class JobListingForm(forms.ModelForm):
     )
     job_location = forms.CharField(
         widget=forms.TextInput(attrs={"class": "form-control", "autocomplete": "off", "placeholder": "Type to search"})
+    )
+    job_model = forms.ChoiceField(
+        choices=JobListing.JOB_MODELS,
+        widget=forms.RadioSelect(attrs={'class': 'form-check-input'})
     )

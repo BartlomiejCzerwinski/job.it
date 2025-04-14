@@ -62,6 +62,17 @@
                     {{ form.job_location }}
                     <div id="locationSuggestions" class="list-group"></div>
                 </div>
+                <div class="mb-3">
+                    <p>{{ form.job_model.label_tag }}</p>
+                    <div class="d-flex gap-3 align-items-center">
+                        {% for radio in form.job_model %}
+                            <div class="form-check form-check-inline">
+                                {{ radio.tag }}
+                                <label class="form-check-label ms-1">{{ radio.choice_label }}</label>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
                 <input type="hidden" name="skills_data" id="skillsListForListing">
                 <button type="submit" class="btn btn-primary w-100">Submit</button>
             </form>
