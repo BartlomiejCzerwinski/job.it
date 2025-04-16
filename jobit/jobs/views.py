@@ -118,8 +118,8 @@ def get_all_listings_for_tiles(number_of_skills_per_tile):
             "salary_max": job_listing.salary_max,
             "salary_currency": job_listing.salary_currency,
             "skills": skills,
-            "is_remote": True,  # TODO
-            "is_hybrid": True  # TODO
+            "is_remote": job_listing.job_model == 'REMOTE',
+            "is_hybrid": job_listing.job_model == 'HYBRID'
         })
     return result
 
