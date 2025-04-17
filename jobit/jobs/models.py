@@ -16,6 +16,12 @@ class JobListing(models.Model):
         ("REMOTE", "Remote"),
     ]
 
+    LISTING_STATUSES = [
+        ("ACTIVE", "Active"),
+        ("CLOSED", "Closed"),
+        ("ARCHIVED", "Archived"),
+    ]
+
     job_title = models.CharField(max_length=255)
     company_name = models.CharField(max_length=255)
     about_company = models.TextField()
@@ -26,6 +32,7 @@ class JobListing(models.Model):
     job_location = models.CharField(max_length=255)
     job_model = models.CharField(max_length=10, choices=JOB_MODELS, default="STATIONARY")
     owner = models.ForeignKey(AppUser, on_delete=models.CASCADE, null=True, blank=True)
+    status = models.CharField(max_length=10, choices=LISTING_STATUSES, default="ACTIVE")
 
     def __str__(self):
         return f"{self.job_title} at {self.company_name}"
