@@ -11,5 +11,6 @@ urlpatterns = [
     path("add_skill", views.add_skill, name="add_skill"),
     path("listings", views.listings_view, name="listings"),
     path("listings/<int:id>", views.listing_details_view, name="listing_details"),
+    path("listings/apply/<int:id>", views.apply, name="apply"),
     path("listings/add_listing", views.add_listing_view, name="add_listing")
 ]

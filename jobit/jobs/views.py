@@ -9,7 +9,7 @@ from users.models import Skill, UserSkill, AppUser
 from users.views import get_user_role, get_user, get_user_skills
 from django.contrib.auth import logout
 from users.views import get_user
-from .models import JobListing, JobListingSkill
+from .models import JobListing, JobListingSkill, Application
 from django.db.utils import IntegrityError
 ROLE_WORKER = "worker"
 ROLE_RECRUITER = "recruiter"
@@ -47,8 +47,45 @@ def listing_details_view(request, id):
     job_listing = get_object_or_404(JobListing, id=id)
     listing_skills = get_listing_skills(job_listing)
     user_role = get_user_role(request.user)
-    print(user_role)
-    return render(request, 'jobs/listing_details.html', {'job': job_listing, 'role': user_role, 'skills': listing_skills})
+    
+    has_applied = False
+    if user_role == ROLE_WORKER:
+        has_applied = Application.objects.filter(
+            job_listing=job_listing, 
+            candidate=get_user(request.user)
+        ).exists()
+    
+    return render(request, 'jobs/listing_details.html', {
+        'job': job_listing, 
+        'role': user_role, 
+        'skills': listing_skills,
+        'has_applied': has_applied
+    })
+
+
+@login_required
+def apply(request, id):
+    job_listing = get_object_or_404(JobListing, id=id)
+    user_role = get_user_role(request.user)
+    
+    if user_role != ROLE_WORKER:
+        return redirect('listing_details', id=id)
+    
+    if job_listing.status != 'ACTIVE':
+        return redirect('listing_details', id=id)
+    
+    existing_application = Application.objects.filter(job_listing=job_listing, candidate=get_user(request.user)).first()
+    if existing_application:
+        return redirect('listing_details', id=id)
+
+    try:
+        Application.objects.create(
+            job_listing=job_listing,
+            candidate=get_user(request.user)
+        )
+        return redirect('listing_details', id=id)
+    except Exception as e:
+        return redirect('listing_details', id=id)
 
 
 @login_required
