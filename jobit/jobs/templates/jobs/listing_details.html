@@ -122,10 +122,20 @@
                         <a href="/" class="btn btn-outline-secondary"><i class="bi bi-arrow-left"></i> Back to
                             Listings</a>
                         <div class="d-flex gap-3">
-                            <button type="button" class="btn btn-primary"
-                                    onclick="window.location.href='/apply/{{ job.id }}'">
-                                Apply <i class="bi bi-send"></i>
-                            </button>
+                            {% if has_applied %}
+                                <button type="button" class="btn btn-success" disabled>
+                                    Applied <i class="bi bi-check-circle"></i>
+                                </button>
+                            {% elif job.status == 'ACTIVE' %}
+                                <button type="button" class="btn btn-primary"
+                                        onclick="window.location.href='/listings/apply/{{ job.id }}'">
+                                    Apply <i class="bi bi-send"></i>
+                                </button>
+                            {% else %}
+                                <button type="button" class="btn btn-secondary" disabled>
+                                    Position Closed <i class="bi bi-x-circle"></i>
+                                </button>
+                            {% endif %}
                         </div>
                     </div>
 
