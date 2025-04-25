@@ -21,6 +21,44 @@
 
 
 {% block content %}
+    <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1050; display: none;" id="toastContainer">
+        <div id="customToast" class="toast align-items-center text-bg-primary border-0 d-flex justify-content-between"
+             role="alert" aria-live="assertive" aria-atomic="true">
+            <div id="toastMessage" class="toast-body">
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2" data-bs-dismiss="toast"
+                    aria-label="Close"></button>
+        </div>
+    </div>
+
+    {% if is_success == 'True' %}
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                var toastContainer = document.getElementById("toastContainer");
+                var toastElement = document.getElementById("customToast");
+                const toastMessage = document.getElementById("toastMessage");
+                var toast = new bootstrap.Toast(toastElement);
+                toastMessage.innerText = "Successfully applied for the position"
+                toastElement.classList.add("text-bg-success");
+                toastContainer.style.display = "block";
+                toast.show();
+            });
+        </script>
+    {% elif is_success is not None %}
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                var toastContainer = document.getElementById("toastContainer");
+                var toastElement = document.getElementById("customToast");
+                const toastMessage = document.getElementById("toastMessage");
+                var toast = new bootstrap.Toast(toastElement);
+                toastMessage.innerText = "Failed to apply for the position"
+                toastElement.classList.add("text-bg-danger");
+                toastContainer.style.display = "block";
+                toast.show();
+            });
+        </script>
+    {% endif %}
+
     {% if role == 'recruiter' %}
         <div class="container mt-5">
             <div class="card shadow-sm border rounded">

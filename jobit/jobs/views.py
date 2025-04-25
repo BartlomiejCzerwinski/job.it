@@ -55,11 +55,14 @@ def listing_details_view(request, id):
             candidate=get_user(request.user)
         ).exists()
     
+    is_success = request.GET.get('success')
+    
     return render(request, 'jobs/listing_details.html', {
         'job': job_listing, 
         'role': user_role, 
         'skills': listing_skills,
-        'has_applied': has_applied
+        'has_applied': has_applied,
+        'is_success': is_success
     })
 
 
@@ -83,9 +86,9 @@ def apply(request, id):
             job_listing=job_listing,
             candidate=get_user(request.user)
         )
-        return redirect('listing_details', id=id)
+        return redirect(f'/listings/{id}?success=True')
     except Exception as e:
-        return redirect('listing_details', id=id)
+        return redirect(f'/listings/{id}?success=False')
 
 
 @login_required
