@@ -14,13 +14,16 @@ function editSkill(id, level, name) {
     setInitialSkillLevel(level);
     addSkillLevelClickHandlers();
 
-    // Add save button handler when modal is shown
-    const editSkillModal = document.getElementById('editSkillModal');
-    editSkillModal.addEventListener('shown.bs.modal', function () {
-        document.getElementById('saveSkillButton').onclick = function() {
-            saveSkillLevel();
-        };
-    });
+    // Add save button handler
+    document.getElementById('saveSkillButton').onclick = function() {
+        saveSkillLevel();
+    };
+
+    // Add remove button handler
+    document.getElementById("removeSkillButton").onclick = function () {
+        console.log("Trying to remove skill");
+        removeSkill(id, name);
+    };
 }
 
 function setInitialSkillLevel(level) {
@@ -42,13 +45,21 @@ function addSkillLevelClickHandlers() {
     const skillLevels = document.querySelectorAll("#editSkillModal .progress-bar");
     const selectedSkillLevelInput = document.getElementById("skillLevelSelectEdit");
     
+    // Remove any existing click handlers
     skillLevels.forEach(level => {
-        level.addEventListener("click", function() {
-            skillLevels.forEach(l => l.classList.remove("active"));
-            this.classList.add("active");
-            selectedSkillLevelInput.value = this.getAttribute("aria-valuenow");
-        });
+        level.removeEventListener("click", handleSkillLevelClick);
     });
+    
+    // Add new click handlers
+    skillLevels.forEach(level => {
+        level.addEventListener("click", handleSkillLevelClick);
+    });
+    
+    function handleSkillLevelClick() {
+        skillLevels.forEach(l => l.classList.remove("active"));
+        this.classList.add("active");
+        selectedSkillLevelInput.value = this.getAttribute("aria-valuenow");
+    }
 }
 
 function saveSkillLevel() {
@@ -80,6 +91,7 @@ function saveSkillLevel() {
     })
     .then(data => {
         console.log('Success:', data);
+        currentSkillLevel = parseInt(newLevel);
         updateSkillUI(currentSkillId, newLevel);
         showToast("Skill level updated successfully", "success");
         
@@ -97,6 +109,7 @@ function saveSkillLevel() {
 function updateSkillUI(skillId, newLevel) {
     const skillItem = document.getElementById(`skillItem-${skillId}`);
     const progressBar = skillItem.querySelector('.progress-bar');
+    const editButton = skillItem.querySelector('.bi-pencil');
     
     // Update progress bar class and width based on new level
     if (newLevel == 1) {
@@ -109,6 +122,9 @@ function updateSkillUI(skillId, newLevel) {
         progressBar.className = 'progress-bar bg-danger';
         progressBar.style.width = '100%';
     }
+
+    // Update the edit button's onclick attribute with the new level
+    editButton.setAttribute('onclick', `editSkill('${skillId}', '${newLevel}', '${currentSkillName}')`);
 }
 
 function removeSkill(id, name) {
