@@ -1,6 +1,8 @@
 let currentSkillId = null;
 let currentSkillName = null;
 let currentSkillLevel = null;
+let skillToRemoveId = null;
+let skillToRemoveName = null;
 
 function editSkill(id, level, name) {
     console.log('edit skill called for skill id: ', id);
@@ -22,7 +24,11 @@ function editSkill(id, level, name) {
     // Add remove button handler
     document.getElementById("removeSkillButton").onclick = function () {
         console.log("Trying to remove skill");
-        removeSkill(id, name);
+        skillToRemoveId = id;
+        skillToRemoveName = name;
+        
+        const confirmModal = new bootstrap.Modal(document.getElementById('confirmRemoveSkillModal'));
+        confirmModal.show();
     };
 }
 
@@ -156,3 +162,20 @@ function removeSkill(id, name) {
         showToast("Failed to remove skill: ".concat(name), "error");
     });
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Add click handler for confirm remove button
+    document.getElementById('confirmRemoveButton').onclick = function() {
+        if (skillToRemoveId && skillToRemoveName) {
+            removeSkill(skillToRemoveId, skillToRemoveName);
+            
+            // Close the confirmation modal
+            const confirmModal = bootstrap.Modal.getInstance(document.getElementById('confirmRemoveSkillModal'));
+            confirmModal.hide();
+            
+            // Reset the variables
+            skillToRemoveId = null;
+            skillToRemoveName = null;
+        }
+    };
+});
