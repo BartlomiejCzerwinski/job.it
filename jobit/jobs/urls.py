@@ -12,5 +12,7 @@ urlpatterns = [
     path("listings", views.listings_view, name="listings"),
     path("listings/<int:id>", views.listing_details_view, name="listing_details"),
     path("listings/apply/<int:id>", views.apply, name="apply"),
-    path("listings/add_listing", views.add_listing_view, name="add_listing")
+    path("listings/add_listing", views.add_listing_view, name="add_listing"),
+    path('remove-skill', views.remove_skill, name='remove_skill'),
+    path('update_skill_level', views.update_skill_level, name='update_skill_level'),
 ]

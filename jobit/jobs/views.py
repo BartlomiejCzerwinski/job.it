@@ -3,6 +3,7 @@ import json
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect, JsonResponse
+from django.views.decorators.http import require_http_methods
 
 from jobs.forms import JobListingForm
 from users.models import Skill, UserSkill, AppUser
@@ -255,3 +256,56 @@ def get_listing_skills(job_listing):
     skills.sort(key=level, reverse=True)
 
     return skills
+
+
+@require_http_methods(["POST"])
+def update_skill_level(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        skill_id = data.get('skillId')
+        new_level = data.get('newLevel')
+
+        user = get_user(request.user)
+
+        if not all([skill_id, new_level]):
+            return JsonResponse({'error': 'Missing required fields'}, status=400)
+
+        try:
+            new_level = int(new_level)
+            if new_level not in range(1, 4):
+                return JsonResponse({'error': 'Skill level must be between 1 and 3'}, status=400)
+        except ValueError:
+            return JsonResponse({'error': 'Skill level must be an integer'}, status=400)
+
+        try:
+            skill = Skill.objects.get(id=skill_id)
+            user_skill = UserSkill.objects.get(user=user, skill=skill)
+            user_skill.level = new_level
+            user_skill.save()
+            return JsonResponse({'message': 'Skill level updated successfully'}, status=200)
+        except Skill.DoesNotExist:
+            return JsonResponse({'error': 'Skill does not exist'}, status=404)
+        except UserSkill.DoesNotExist:
+            return JsonResponse({'error': 'User does not have this skill'}, status=404)
+
+
+@require_http_methods(["POST"])
+def remove_skill(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        skill_id = data.get('id')
+
+        user = get_user(request.user)
+
+        if not skill_id:
+            return JsonResponse({'error': 'Missing skill ID'}, status=400)
+
+        try:
+            skill = Skill.objects.get(id=skill_id)
+            user_skill = UserSkill.objects.get(user=user, skill=skill)
+            user_skill.delete()
+            return JsonResponse({'message': 'Skill removed successfully'}, status=200)
+        except Skill.DoesNotExist:
+            return JsonResponse({'error': 'Skill does not exist'}, status=404)
+        except UserSkill.DoesNotExist:
+            return JsonResponse({'error': 'User does not have this skill'}, status=404)
