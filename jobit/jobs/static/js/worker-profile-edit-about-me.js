@@ -1,10 +1,16 @@
-const MAX_CHARS = 250;
+const ABOUT_ME_URL = "http://127.0.0.1:8000/update_about_me";
 
 function updateCharCounter() {
     const textarea = document.getElementById('aboutMeText');
     const counter = document.getElementById('charCounter');
-    const currentLength = textarea.value.length;
-    counter.textContent = `${currentLength}/250`;
+    const remaining = 250 - textarea.value.length;
+    counter.textContent = `${remaining} characters remaining`;
+    
+    if (remaining < 0) {
+        counter.classList.add('text-danger');
+    } else {
+        counter.classList.remove('text-danger');
+    }
 }
 
 function toggleAboutMeEdit() {
@@ -38,46 +44,79 @@ function cancelAboutMeEdit() {
     
     content.style.display = 'block';
     edit.style.display = 'none';
-    // Remove input event listener
     textarea.removeEventListener('input', updateCharCounter);
 }
 
 function saveAboutMe() {
-    const newAboutMe = document.getElementById('aboutMeText').value.trim();
+    const textarea = document.getElementById('aboutMeText');
     const content = document.getElementById('aboutMeContent');
     const edit = document.getElementById('aboutMeEdit');
-    const textarea = document.getElementById('aboutMeText');
     
-    fetch('/update_about_me', {
+    if (textarea.value.length > 250) {
+        showToast('About Me text cannot exceed 250 characters', 'danger');
+        return;
+    }
+    
+    fetch(ABOUT_ME_URL, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'X-CSRFToken': CSRF_TOKEN
+            'X-CSRFToken': getCookie('csrftoken')
         },
         body: JSON.stringify({
-            aboutMe: newAboutMe
+            aboutMe: textarea.value
         })
     })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Response was not ok');
-        }
-        return response.json();
-    })
+    .then(response => response.json())
     .then(data => {
-        console.log('Success:', data);
-        content.textContent = newAboutMe;
-        content.style.display = 'block';
-        edit.style.display = 'none';
-        // Remove input event listener
-        textarea.removeEventListener('input', updateCharCounter);
-        showToast("About Me updated successfully", "success");
+        if (data.error) {
+            showToast(data.error, 'danger');
+        } else {
+            content.textContent = textarea.value || 'No information provided yet.';
+            content.style.display = 'block';
+            edit.style.display = 'none';
+            textarea.removeEventListener('input', updateCharCounter);
+            showToast('About Me updated successfully', 'success');
+        }
     })
     .catch(error => {
-        console.error('ERROR:', error);
-        showToast("Failed to update About Me", "error");
+        console.error('Error:', error);
+        showToast('An error occurred while updating About Me', 'danger');
     });
 }
 
+function showToast(message, type = 'success') {
+    const toast = document.getElementById('customToast');
+    const toastMessage = document.getElementById('toastMessage');
+    
+    toastMessage.textContent = message;
+    toast.classList.remove('hidden');
+    toast.classList.add('show');
+    
+    setTimeout(() => {
+        toast.classList.remove('show');
+        toast.classList.add('hidden');
+    }, 3000);
+}
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
 document.addEventListener('DOMContentLoaded', function() {
+    const textarea = document.getElementById('aboutMeText');
+    if (textarea) {
+        textarea.addEventListener('input', updateCharCounter);
+    }
 }); 

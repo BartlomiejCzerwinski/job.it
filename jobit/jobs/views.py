@@ -29,8 +29,12 @@ def index(request):
 @login_required
 def worker_profile(request):
     skills = get_user_skills(request.user)
-    print(skills)
-    return render(request, 'jobs/worker_profile.html', {'skills': skills})
+    user = get_user(request.user)
+    about_me = user.about_me if user else ""
+    return render(request, 'jobs/worker_profile.html', {
+        'skills': skills,
+        'about_me': about_me
+    })
 
 
 @login_required

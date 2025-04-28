@@ -222,10 +222,11 @@
                                    onclick="toggleAboutMeEdit()"></i>
                             </h6>
                             <div id="aboutMeContent" class="about-me-content">
-                                Passionate Full Stack Developer with experience in building modern web applications. Skilled
-                                in Python,
-                                Django, Java, and front-end technologies. Always eager to learn and tackle new challenges in
-                                the IT industry.
+                                {% if about_me %}
+                                    {{ about_me }}
+                                {% else %}
+                                    Tell something about yourself!
+                                {% endif %}
                             </div>
                             <div id="aboutMeEdit" class="about-me-edit" style="display: none;">
                                 <textarea class="form-control" id="aboutMeText" rows="8" style="min-height: 200px; resize: vertical;" maxlength="250"></textarea>
