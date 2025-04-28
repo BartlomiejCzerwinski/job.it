@@ -15,4 +15,5 @@ urlpatterns = [
     path("listings/add_listing", views.add_listing_view, name="add_listing"),
     path('remove-skill', views.remove_skill, name='remove_skill'),
     path('update_skill_level', views.update_skill_level, name='update_skill_level'),
+    path('update_about_me', views.update_about_me, name='update_about_me'),
 ]

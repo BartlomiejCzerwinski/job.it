@@ -309,3 +309,25 @@ def remove_skill(request):
             return JsonResponse({'error': 'Skill does not exist'}, status=404)
         except UserSkill.DoesNotExist:
             return JsonResponse({'error': 'User does not have this skill'}, status=404)
+
+
+@require_http_methods(["POST"])
+def update_about_me(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        about_me = data.get('aboutMe')
+        
+        if about_me is None:
+            return JsonResponse({'error': 'Missing about_me field'}, status=400)
+            
+        if len(about_me) > 250:
+            return JsonResponse({'error': 'About Me text exceeds 250 characters'}, status=400)
+            
+        user = get_user(request.user)
+        if not user:
+            return JsonResponse({'error': 'User not found'}, status=404)
+            
+        user.about_me = about_me
+        user.save()
+        
+        return JsonResponse({'message': 'About Me updated successfully'}, status=200)
