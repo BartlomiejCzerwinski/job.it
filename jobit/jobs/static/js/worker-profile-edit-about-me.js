@@ -86,17 +86,22 @@ function saveAboutMe() {
 }
 
 function showToast(message, type = 'success') {
-    const toast = document.getElementById('customToast');
+    const toastElement = document.getElementById('customToast');
     const toastMessage = document.getElementById('toastMessage');
-    
+
     toastMessage.textContent = message;
-    toast.classList.remove('hidden');
-    toast.classList.add('show');
-    
-    setTimeout(() => {
-        toast.classList.remove('show');
-        toast.classList.add('hidden');
-    }, 3000);
+    toastElement.classList.remove('text-bg-primary', 'text-bg-success', 'text-bg-danger');
+
+    if (type === 'success') {
+        toastElement.classList.add('text-bg-success');
+    } else if (type === 'danger') {
+        toastElement.classList.add('text-bg-danger');
+    } else {
+        toastElement.classList.add('text-bg-primary');
+    }
+
+    const toast = new bootstrap.Toast(toastElement);
+    toast.show();
 }
 
 function getCookie(name) {
