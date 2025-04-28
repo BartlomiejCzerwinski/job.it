@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 
 class AppUser(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+    about_me = models.TextField(blank=True, null=True)
 
     RECRUITER = 'recruiter'
     WORKER = 'worker'
