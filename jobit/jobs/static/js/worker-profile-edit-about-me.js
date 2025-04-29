@@ -86,10 +86,14 @@ function saveAboutMe() {
 }
 
 function showToast(message, type = 'success') {
+    const toastContainer = document.getElementById('toastContainer');
     const toastElement = document.getElementById('customToast');
     const toastMessage = document.getElementById('toastMessage');
 
+    toastContainer.style.display = 'block';
+    
     toastMessage.textContent = message;
+    
     toastElement.classList.remove('text-bg-primary', 'text-bg-success', 'text-bg-danger');
 
     if (type === 'success') {
@@ -102,6 +106,10 @@ function showToast(message, type = 'success') {
 
     const toast = new bootstrap.Toast(toastElement);
     toast.show();
+
+    toastElement.addEventListener('hidden.bs.toast', function () {
+        toastContainer.style.display = 'none';
+    });
 }
 
 function getCookie(name) {
