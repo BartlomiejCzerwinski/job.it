@@ -173,7 +173,13 @@
                             <div id="fullNameEdit" style="display: none;">
                                 <input type="text" class="form-control" id="fullNameInput" value="Kenneth Valdez">
                             </div>
-                            <i class="bi bi-pencil" style="font-size: 1rem; color: black; cursor: pointer; margin-right: 10px;" onclick="toggleEdit('fullName')"></i>
+                            <div class="d-flex">
+                                <i class="bi bi-pencil edit-icon" style="font-size: 1rem; color: black; cursor: pointer;" onclick="toggleEdit('fullName')"></i>
+                                <div class="edit-buttons d-flex gap-3 d-none">
+                                    <button type="button" class="btn btn-secondary btn-sm" onclick="cancelEdit('fullName')">Cancel</button>
+                                    <button type="button" class="btn btn-primary btn-sm" onclick="saveEdit('fullName')">Save</button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <hr/>
@@ -186,7 +192,13 @@
                             <div id="emailEdit" style="display: none;">
                                 <input type="email" class="form-control" id="emailInput" value="fip@jukmuh.al">
                             </div>
-                            <i class="bi bi-pencil" style="font-size: 1rem; color: black; cursor: pointer; margin-right: 10px;" onclick="toggleEdit('email')"></i>
+                            <div class="d-flex">
+                                <i class="bi bi-pencil edit-icon" style="font-size: 1rem; color: black; cursor: pointer;" onclick="toggleEdit('email')"></i>
+                                <div class="edit-buttons d-flex gap-3 d-none">
+                                    <button type="button" class="btn btn-secondary btn-sm" onclick="cancelEdit('email')">Cancel</button>
+                                    <button type="button" class="btn btn-primary btn-sm" onclick="saveEdit('email')">Save</button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <hr/>
@@ -199,7 +211,13 @@
                             <div id="mobileEdit" style="display: none;">
                                 <input type="tel" class="form-control" id="mobileInput" value="(320) 380-4539">
                             </div>
-                            <i class="bi bi-pencil" style="font-size: 1rem; color: black; cursor: pointer; margin-right: 10px;" onclick="toggleEdit('mobile')"></i>
+                            <div class="d-flex">
+                                <i class="bi bi-pencil edit-icon" style="font-size: 1rem; color: black; cursor: pointer;" onclick="toggleEdit('mobile')"></i>
+                                <div class="edit-buttons d-flex gap-3 d-none">
+                                    <button type="button" class="btn btn-secondary btn-sm" onclick="cancelEdit('mobile')">Cancel</button>
+                                    <button type="button" class="btn btn-primary btn-sm" onclick="saveEdit('mobile')">Save</button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <hr/>
@@ -217,7 +235,13 @@
                                     <option value="3 months">3 months</option>
                                 </select>
                             </div>
-                            <i class="bi bi-pencil" style="font-size: 1rem; color: black; cursor: pointer; margin-right: 10px;" onclick="toggleEdit('startsIn')"></i>
+                            <div class="d-flex">
+                                <i class="bi bi-pencil edit-icon" style="font-size: 1rem; color: black; cursor: pointer;" onclick="toggleEdit('startsIn')"></i>
+                                <div class="edit-buttons d-flex gap-3 d-none">
+                                    <button type="button" class="btn btn-secondary btn-sm" onclick="cancelEdit('startsIn')">Cancel</button>
+                                    <button type="button" class="btn btn-primary btn-sm" onclick="saveEdit('startsIn')">Save</button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -420,7 +444,7 @@
             </div>
         </div>
     </div>
-    
+
     <script src="{% static 'js/worker-profile-add-skill-modal.js' %}"></script>
     <script src="{% static 'js/worker-profile-edit-skill.js' %}"></script>
     <script src="{% static 'js/worker-profile-common.js' %}"></script>
@@ -429,10 +453,14 @@
         function toggleEdit(field) {
             const contentDiv = document.getElementById(`${field}Content`);
             const editDiv = document.getElementById(`${field}Edit`);
+            const editIcon = contentDiv.parentElement.querySelector('.edit-icon');
+            const editButtons = contentDiv.parentElement.querySelector('.edit-buttons');
             
             if (contentDiv.style.display !== 'none') {
                 contentDiv.style.display = 'none';
                 editDiv.style.display = 'block';
+                editIcon.classList.add('d-none');
+                editButtons.classList.remove('d-none');
                 
                 const input = editDiv.querySelector('input, select');
                 if (input) {
@@ -441,30 +469,37 @@
             } else {
                 contentDiv.style.display = 'block';
                 editDiv.style.display = 'none';
+                editIcon.classList.remove('d-none');
+                editButtons.classList.add('d-none');
             }
         }
 
-        document.addEventListener('click', function(e) {
-            if (e.target.classList.contains('bi-pencil')) {
-                return; 
-            }
+        function cancelEdit(field) {
+            const contentDiv = document.getElementById(`${field}Content`);
+            const editDiv = document.getElementById(`${field}Edit`);
+            const editIcon = contentDiv.parentElement.querySelector('.edit-icon');
+            const editButtons = contentDiv.parentElement.querySelector('.edit-buttons');
             
-            const editDivs = document.querySelectorAll('[id$="Edit"]');
-            editDivs.forEach(editDiv => {
-                if (editDiv.style.display === 'block' && !editDiv.contains(e.target)) {
-                    const field = editDiv.id.replace('Edit', '');
-                    const contentDiv = document.getElementById(`${field}Content`);
-                    const input = editDiv.querySelector('input, select');
-                    
-                    if (input) {
-                        contentDiv.textContent = input.value;
-                        contentDiv.style.display = 'block';
-                        editDiv.style.display = 'none';
-                        
+            contentDiv.style.display = 'block';
+            editDiv.style.display = 'none';
+            editIcon.classList.remove('d-none');
+            editButtons.classList.add('d-none');
+        }
 
-                    }
-                }
-            });
-        });
+        function saveEdit(field) {
+            const contentDiv = document.getElementById(`${field}Content`);
+            const editDiv = document.getElementById(`${field}Edit`);
+            const editIcon = contentDiv.parentElement.querySelector('.edit-icon');
+            const editButtons = contentDiv.parentElement.querySelector('.edit-buttons');
+            const input = editDiv.querySelector('input, select');
+            
+            if (input) {
+                contentDiv.textContent = input.value;
+                contentDiv.style.display = 'block';
+                editDiv.style.display = 'none';
+                editIcon.classList.remove('d-none');
+                editButtons.classList.add('d-none');
+            }
+        }
     </script>
 {% endblock %}
