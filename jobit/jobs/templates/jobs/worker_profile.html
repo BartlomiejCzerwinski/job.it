@@ -31,7 +31,6 @@
                         <div class="mt-3">
                             <div class="d-flex align-items-center justify-content-center mb-1">
                                 <h4 class="mb-0 me-2">Firstname Lastname</h4>
-                                <i class="bi bi-pencil" style="font-size: 1rem; color: black; cursor: pointer;"></i>
                             </div>
                             <div class="d-flex align-items-center justify-content-center mb-1">
                                 <p class="text-secondary mb-0 me-2">Full Stack Developer</p>
@@ -170,9 +169,11 @@
                             <h6 class="mb-0">Full Name</h6>
                         </div>
                         <div class="col-sm-9 text-secondary d-flex justify-content-between">
-                            <span>Kenneth Valdez</span>
-                            <i class="bi bi-pencil"
-                               style="font-size: 1rem; color: black; cursor: pointer; margin-right: 10px;"></i>
+                            <div id="fullNameContent">Kenneth Valdez</div>
+                            <div id="fullNameEdit" style="display: none;">
+                                <input type="text" class="form-control" id="fullNameInput" value="Kenneth Valdez">
+                            </div>
+                            <i class="bi bi-pencil" style="font-size: 1rem; color: black; cursor: pointer; margin-right: 10px;" onclick="toggleEdit('fullName')"></i>
                         </div>
                     </div>
                     <hr/>
@@ -181,9 +182,11 @@
                             <h6 class="mb-0">Email</h6>
                         </div>
                         <div class="col-sm-9 text-secondary d-flex justify-content-between">
-                            <span>fip@jukmuh.al</span>
-                            <i class="bi bi-pencil"
-                               style="font-size: 1rem; color: black; cursor: pointer; margin-right: 10px;"></i>
+                            <div id="emailContent">fip@jukmuh.al</div>
+                            <div id="emailEdit" style="display: none;">
+                                <input type="email" class="form-control" id="emailInput" value="fip@jukmuh.al">
+                            </div>
+                            <i class="bi bi-pencil" style="font-size: 1rem; color: black; cursor: pointer; margin-right: 10px;" onclick="toggleEdit('email')"></i>
                         </div>
                     </div>
                     <hr/>
@@ -192,9 +195,11 @@
                             <h6 class="mb-0">Mobile</h6>
                         </div>
                         <div class="col-sm-9 text-secondary d-flex justify-content-between">
-                            <span>(320) 380-4539</span>
-                            <i class="bi bi-pencil"
-                               style="font-size: 1rem; color: black; cursor: pointer; margin-right: 10px;"></i>
+                            <div id="mobileContent">(320) 380-4539</div>
+                            <div id="mobileEdit" style="display: none;">
+                                <input type="tel" class="form-control" id="mobileInput" value="(320) 380-4539">
+                            </div>
+                            <i class="bi bi-pencil" style="font-size: 1rem; color: black; cursor: pointer; margin-right: 10px;" onclick="toggleEdit('mobile')"></i>
                         </div>
                     </div>
                     <hr/>
@@ -203,9 +208,16 @@
                             <h6 class="mb-0">Starts in</h6>
                         </div>
                         <div class="col-sm-9 text-secondary d-flex justify-content-between">
-                            <span>ASAP</span>
-                            <i class="bi bi-pencil"
-                               style="font-size: 1rem; color: black; cursor: pointer; margin-right: 10px;"></i>
+                            <div id="startsInContent">ASAP</div>
+                            <div id="startsInEdit" style="display: none;">
+                                <select class="form-select" id="startsInSelect">
+                                    <option value="ASAP">ASAP</option>
+                                    <option value="2 weeks">2 weeks</option>
+                                    <option value="1 month">1 month</option>
+                                    <option value="3 months">3 months</option>
+                                </select>
+                            </div>
+                            <i class="bi bi-pencil" style="font-size: 1rem; color: black; cursor: pointer; margin-right: 10px;" onclick="toggleEdit('startsIn')"></i>
                         </div>
                     </div>
                 </div>
@@ -413,4 +425,46 @@
     <script src="{% static 'js/worker-profile-edit-skill.js' %}"></script>
     <script src="{% static 'js/worker-profile-common.js' %}"></script>
     <script src="{% static 'js/worker-profile-edit-about-me.js' %}"></script>
+    <script>
+        function toggleEdit(field) {
+            const contentDiv = document.getElementById(`${field}Content`);
+            const editDiv = document.getElementById(`${field}Edit`);
+            
+            if (contentDiv.style.display !== 'none') {
+                contentDiv.style.display = 'none';
+                editDiv.style.display = 'block';
+                
+                const input = editDiv.querySelector('input, select');
+                if (input) {
+                    input.value = contentDiv.textContent.trim();
+                }
+            } else {
+                contentDiv.style.display = 'block';
+                editDiv.style.display = 'none';
+            }
+        }
+
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('bi-pencil')) {
+                return; 
+            }
+            
+            const editDivs = document.querySelectorAll('[id$="Edit"]');
+            editDivs.forEach(editDiv => {
+                if (editDiv.style.display === 'block' && !editDiv.contains(e.target)) {
+                    const field = editDiv.id.replace('Edit', '');
+                    const contentDiv = document.getElementById(`${field}Content`);
+                    const input = editDiv.querySelector('input, select');
+                    
+                    if (input) {
+                        contentDiv.textContent = input.value;
+                        contentDiv.style.display = 'block';
+                        editDiv.style.display = 'none';
+                        
+
+                    }
+                }
+            });
+        });
+    </script>
 {% endblock %}
