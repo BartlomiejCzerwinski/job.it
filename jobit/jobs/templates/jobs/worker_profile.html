@@ -33,13 +33,35 @@
                                 <h4 class="mb-0 me-2">Firstname Lastname</h4>
                             </div>
                             <div class="d-flex align-items-center justify-content-center mb-1">
-                                <p class="text-secondary mb-0 me-2">Full Stack Developer</p>
-                                <i class="bi bi-pencil" style="font-size: 1rem; color: black; cursor: pointer;"></i>
+                                <div id="positionContent" class="text-secondary mb-0 me-2">Full Stack Developer</div>
+                                <div id="positionEdit" style="display: none;">
+                                    <div class="d-flex flex-column align-items-center">
+                                        <input type="text" class="form-control mb-2" id="positionInput" value="Full Stack Developer">
+                                        <div class="d-flex gap-3">
+                                            <button type="button" class="btn btn-secondary btn-sm" onclick="cancelEdit('position')">Cancel</button>
+                                            <button type="button" class="btn btn-primary btn-sm" onclick="saveEdit('position')">Save</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="d-flex">
+                                    <i class="bi bi-pencil edit-icon" style="font-size: 1rem; color: black; cursor: pointer;" onclick="toggleEdit('position')"></i>
+                                </div>
                             </div>
 
                             <div class="d-flex align-items-center justify-content-center mb-2">
-                                <p class="text-muted font-size-sm mb-0 me-2">Bay Area, San Francisco, CA</p>
-                                <i class="bi bi-pencil" style="font-size: 1rem; color: black; cursor: pointer;"></i>
+                                <div id="locationContent" class="text-muted font-size-sm mb-0 me-2">Bay Area, San Francisco, CA</div>
+                                <div id="locationEdit" style="display: none;">
+                                    <div class="d-flex flex-column align-items-center">
+                                        <input type="text" class="form-control mb-2" id="locationInput" value="Bay Area, San Francisco, CA">
+                                        <div class="d-flex gap-3">
+                                            <button type="button" class="btn btn-secondary btn-sm" onclick="cancelEdit('location')">Cancel</button>
+                                            <button type="button" class="btn btn-primary btn-sm" onclick="saveEdit('location')">Save</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="d-flex">
+                                    <i class="bi bi-pencil edit-icon" style="font-size: 1rem; color: black; cursor: pointer;" onclick="toggleEdit('location')"></i>
+                                </div>
                             </div>
                             <!--
                             <button class="btn btn-primary">Follow</button>
