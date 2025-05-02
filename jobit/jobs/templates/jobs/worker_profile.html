@@ -53,6 +53,12 @@
                                 <div id="locationEdit" style="display: none;">
                                     <div class="d-flex flex-column align-items-center">
                                         <input type="text" class="form-control mb-2" id="locationInput" value="Bay Area, San Francisco, CA">
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" id="remoteCheck">
+                                            <label class="form-check-label" for="remoteCheck">
+                                                Remote
+                                            </label>
+                                        </div>
                                         <div class="d-flex gap-3">
                                             <button type="button" class="btn btn-secondary btn-sm" onclick="cancelEdit('location')">Cancel</button>
                                             <button type="button" class="btn btn-primary btn-sm" onclick="saveEdit('location')">Save</button>
