@@ -49,19 +49,25 @@
                             </div>
 
                             <div class="d-flex align-items-center justify-content-center mb-2">
-                                <div id="locationContent" class="text-muted font-size-sm mb-0 me-2">Bay Area, San Francisco, CA</div>
+                                <div class="d-flex flex-column align-items-center">
+                                    <div id="locationContent" class="text-muted font-size-sm mb-0">Bay Area, San Francisco, CA</div>
+                                    <div id="locationBadges" class="d-flex gap-2 mt-1">
+                                        <span class="badge bg-success" id="remoteBadge" style="display: none;">Remote</span>
+                                        <span class="badge bg-warning" id="hybridBadge" style="display: none;">Hybrid</span>
+                                    </div>
+                                </div>
                                 <div id="locationEdit" style="display: none;">
                                     <div class="d-flex flex-column align-items-center">
                                         <input type="text" class="form-control mb-2" id="locationInput" value="Bay Area, San Francisco, CA">
                                         <div class="d-flex gap-3 mb-2">
                                             <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" id="remoteCheck">
+                                                <input class="form-check-input" type="checkbox" id="remoteCheck" onchange="updateLocationBadges()">
                                                 <label class="form-check-label" for="remoteCheck">
                                                     Remote
                                                 </label>
                                             </div>
                                             <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" id="hybridCheck">
+                                                <input class="form-check-input" type="checkbox" id="hybridCheck" onchange="updateLocationBadges()">
                                                 <label class="form-check-label" for="hybridCheck">
                                                     Hybrid
                                                 </label>
@@ -486,6 +492,14 @@
     <script src="{% static 'js/worker-profile-common.js' %}"></script>
     <script src="{% static 'js/worker-profile-edit-about-me.js' %}"></script>
     <script>
+        function updateLocationBadges() {
+            const remoteCheck = document.getElementById('remoteCheck');
+            const hybridCheck = document.getElementById('hybridCheck');
+            const remoteBadge = document.getElementById('remoteBadge');
+            const hybridBadge = document.getElementById('hybridBadge');
+
+        }
+
         function toggleEdit(field) {
             const contentDiv = document.getElementById(`${field}Content`);
             const editDiv = document.getElementById(`${field}Edit`);
@@ -501,6 +515,18 @@
                 const input = editDiv.querySelector('input, select');
                 if (input) {
                     input.value = contentDiv.textContent.trim();
+                }
+
+                if (field === 'location') {
+                    const remoteCheck = document.getElementById('remoteCheck');
+                    const hybridCheck = document.getElementById('hybridCheck');
+                    const remoteBadge = document.getElementById('remoteBadge');
+                    const hybridBadge = document.getElementById('hybridBadge');
+
+                    remoteCheck.checked = remoteBadge.style.display !== 'none';
+                    hybridCheck.checked = hybridBadge.style.display !== 'none';
+                    remoteBadge.style.display = 'none';
+                    hybridBadge.style.display = 'none';
                 }
             } else {
                 contentDiv.style.display = 'block';
@@ -520,9 +546,63 @@
             editDiv.style.display = 'none';
             editIcon.classList.remove('d-none');
             editButtons.classList.add('d-none');
+
+            if (field === 'location') {
+                const remoteCheck = document.getElementById('remoteCheck');
+                const hybridCheck = document.getElementById('hybridCheck');
+                const remoteBadge = document.getElementById('remoteBadge');
+                const hybridBadge = document.getElementById('hybridBadge');
+
+                remoteCheck.checked = remoteBadge.style.display !== 'none';
+                hybridCheck.checked = hybridBadge.style.display !== 'none';
+                updateLocationBadges();
+            }
+        }
+
+        function updateBadgesAfterSave() {
+            console.log('updateBadgesAfterSave called');
+            
+            const remoteCheck = document.getElementById('remoteCheck');
+            const hybridCheck = document.getElementById('hybridCheck');
+            const remoteBadge = document.getElementById('remoteBadge');
+            const hybridBadge = document.getElementById('hybridBadge');
+            const locationBadges = document.getElementById('locationBadges');
+
+            console.log('Elements found:', {
+                remoteCheck: remoteCheck,
+                hybridCheck: hybridCheck,
+                remoteBadge: remoteBadge,
+                hybridBadge: hybridBadge,
+                locationBadges: locationBadges
+            });
+
+            locationBadges.style.display = 'flex';
+            
+            if (remoteCheck.checked) {
+                remoteBadge.style.display = 'inline-block';
+                remoteBadge.style.visibility = 'visible';
+            } else {
+                remoteBadge.style.display = 'none';
+                remoteBadge.style.visibility = 'hidden';
+            }
+            
+            if (hybridCheck.checked) {
+                hybridBadge.style.display = 'inline-block';
+                hybridBadge.style.visibility = 'visible';
+            } else {
+                hybridBadge.style.display = 'none';
+                hybridBadge.style.visibility = 'hidden';
+            }
+
+            console.log('Remote checked:', remoteCheck.checked);
+            console.log('Hybrid checked:', hybridCheck.checked);
+            console.log('Remote badge display:', remoteBadge.style.display);
+            console.log('Hybrid badge display:', hybridBadge.style.display);
         }
 
         function saveEdit(field) {
+            console.log('saveEdit called for field:', field);
+            
             const contentDiv = document.getElementById(`${field}Content`);
             const editDiv = document.getElementById(`${field}Edit`);
             const editIcon = contentDiv.parentElement.querySelector('.edit-icon');
@@ -535,7 +615,26 @@
                 editDiv.style.display = 'none';
                 editIcon.classList.remove('d-none');
                 editButtons.classList.add('d-none');
+
+                if (field === 'location') {
+                    console.log('Location field detected, calling updateBadgesAfterSave');
+                    setTimeout(() => {
+                        updateBadgesAfterSave();
+                    }, 0);
+                }
             }
         }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const saveButton = document.querySelector('button[onclick="saveEdit(\'location\')"]');
+            if (saveButton) {
+                saveButton.addEventListener('click', function() {
+                    console.log('Save button clicked');
+                    setTimeout(() => {
+                        updateBadgesAfterSave();
+                    }, 0);
+                });
+            }
+        });
     </script>
 {% endblock %}
