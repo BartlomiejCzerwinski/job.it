@@ -530,8 +530,8 @@
         function toggleEdit(field) {
             const contentDiv = document.getElementById(`${field}Content`);
             const editDiv = document.getElementById(`${field}Edit`);
-            const editIcon = contentDiv.closest('.d-flex.align-items-center.justify-content-center.mb-2').querySelector('.edit-icon');
-            const editButtons = contentDiv.closest('.d-flex.align-items-center.justify-content-center.mb-2').querySelector('.edit-buttons');
+            const editIcon = contentDiv.closest('.d-flex').querySelector('.edit-icon');
+            const editButtons = contentDiv.closest('.d-flex').querySelector('.edit-buttons');
             
             if (contentDiv.style.display !== 'none') {
                 contentDiv.style.display = 'none';
@@ -577,8 +577,8 @@
         function cancelEdit(field) {
             const contentDiv = document.getElementById(`${field}Content`);
             const editDiv = document.getElementById(`${field}Edit`);
-            const editIcon = contentDiv.closest('.d-flex.align-items-center.justify-content-center.mb-2').querySelector('.edit-icon');
-            const editButtons = contentDiv.closest('.d-flex.align-items-center.justify-content-center.mb-2').querySelector('.edit-buttons');
+            const editIcon = contentDiv.closest('.d-flex').querySelector('.edit-icon');
+            const editButtons = contentDiv.closest('.d-flex').querySelector('.edit-buttons');
             
             contentDiv.style.display = 'block';
             editDiv.style.display = 'none';
@@ -639,12 +639,10 @@
         }
 
         function saveEdit(field) {
-            console.log('saveEdit called for field:', field);
-            
             const contentDiv = document.getElementById(`${field}Content`);
             const editDiv = document.getElementById(`${field}Edit`);
-            const editIcon = contentDiv.closest('.d-flex.align-items-center.justify-content-center.mb-2').querySelector('.edit-icon');
-            const editButtons = contentDiv.closest('.d-flex.align-items-center.justify-content-center.mb-2').querySelector('.edit-buttons');
+            const editIcon = contentDiv.closest('.d-flex').querySelector('.edit-icon');
+            const editButtons = contentDiv.closest('.d-flex').querySelector('.edit-buttons');
             const input = editDiv.querySelector('input, select');
             
             if (input) {
@@ -655,7 +653,6 @@
                 editButtons.classList.add('d-none');
 
                 if (field === 'location') {
-                    console.log('Location field detected, calling updateBadgesAfterSave');
                     setTimeout(() => {
                         updateBadgesAfterSave();
                     }, 0);
