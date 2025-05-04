@@ -503,8 +503,8 @@
         function toggleEdit(field) {
             const contentDiv = document.getElementById(`${field}Content`);
             const editDiv = document.getElementById(`${field}Edit`);
-            const editIcon = contentDiv.parentElement.querySelector('.edit-icon');
-            const editButtons = contentDiv.parentElement.querySelector('.edit-buttons');
+            const editIcon = contentDiv.closest('.d-flex.align-items-center.justify-content-center.mb-2').querySelector('.edit-icon');
+            const editButtons = contentDiv.closest('.d-flex.align-items-center.justify-content-center.mb-2').querySelector('.edit-buttons');
             
             if (contentDiv.style.display !== 'none') {
                 contentDiv.style.display = 'none';
@@ -533,14 +533,25 @@
                 editDiv.style.display = 'none';
                 editIcon.classList.remove('d-none');
                 editButtons.classList.add('d-none');
+
+                if (field === 'location') {
+                    const remoteCheck = document.getElementById('remoteCheck');
+                    const hybridCheck = document.getElementById('hybridCheck');
+                    const remoteBadge = document.getElementById('remoteBadge');
+                    const hybridBadge = document.getElementById('hybridBadge');
+
+                    remoteCheck.checked = remoteBadge.style.display !== 'none';
+                    hybridCheck.checked = hybridBadge.style.display !== 'none';
+                    updateLocationBadges();
+                }
             }
         }
 
         function cancelEdit(field) {
             const contentDiv = document.getElementById(`${field}Content`);
             const editDiv = document.getElementById(`${field}Edit`);
-            const editIcon = contentDiv.parentElement.querySelector('.edit-icon');
-            const editButtons = contentDiv.parentElement.querySelector('.edit-buttons');
+            const editIcon = contentDiv.closest('.d-flex.align-items-center.justify-content-center.mb-2').querySelector('.edit-icon');
+            const editButtons = contentDiv.closest('.d-flex.align-items-center.justify-content-center.mb-2').querySelector('.edit-buttons');
             
             contentDiv.style.display = 'block';
             editDiv.style.display = 'none';
@@ -605,8 +616,8 @@
             
             const contentDiv = document.getElementById(`${field}Content`);
             const editDiv = document.getElementById(`${field}Edit`);
-            const editIcon = contentDiv.parentElement.querySelector('.edit-icon');
-            const editButtons = contentDiv.parentElement.querySelector('.edit-buttons');
+            const editIcon = contentDiv.closest('.d-flex.align-items-center.justify-content-center.mb-2').querySelector('.edit-icon');
+            const editButtons = contentDiv.closest('.d-flex.align-items-center.justify-content-center.mb-2').querySelector('.edit-buttons');
             const input = editDiv.querySelector('input, select');
             
             if (input) {
