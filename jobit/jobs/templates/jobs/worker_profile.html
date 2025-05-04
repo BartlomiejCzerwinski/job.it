@@ -487,6 +487,33 @@
         </div>
     </div>
 
+    <div class="modal fade" id="profilePhotoModal" tabindex="-1" aria-labelledby="profilePhotoModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="profilePhotoModalLabel">Change Profile Photo</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="dropZone" class="border rounded p-5 text-center mb-3" style="border-style: dashed !important; cursor: pointer;">
+                        <i class="bi bi-cloud-upload fs-1 mb-2"></i>
+                        <h5>Drag and drop your photo here</h5>
+                        <p class="text-muted">or</p>
+                        <input type="file" id="fileInput" accept="image/*" style="display: none;">
+                        <button class="btn btn-primary" onclick="document.getElementById('fileInput').click()">Browse Files</button>
+                    </div>
+                    <div id="previewContainer" class="text-center" style="display: none;">
+                        <img id="imagePreview" class="img-fluid rounded mb-3" style="max-height: 200px;">
+                        <div class="d-flex justify-content-center gap-2">
+                            <button class="btn btn-secondary" onclick="resetUpload()">Cancel</button>
+                            <button class="btn btn-primary" onclick="uploadPhoto()">Upload</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="{% static 'js/worker-profile-add-skill-modal.js' %}"></script>
     <script src="{% static 'js/worker-profile-edit-skill.js' %}"></script>
     <script src="{% static 'js/worker-profile-common.js' %}"></script>
@@ -647,5 +674,91 @@
                 });
             }
         });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const dropZone = document.getElementById('dropZone');
+            const fileInput = document.getElementById('fileInput');
+            const profileImg = document.querySelector('.profile-img');
+            const overlay = document.querySelector('.overlay');
+
+            profileImg.parentElement.addEventListener('click', function() {
+                const modal = new bootstrap.Modal(document.getElementById('profilePhotoModal'));
+                modal.show();
+            });
+
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                dropZone.addEventListener(eventName, preventDefaults, false);
+            });
+
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropZone.addEventListener(eventName, highlight, false);
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropZone.addEventListener(eventName, unhighlight, false);
+            });
+
+            function highlight(e) {
+                dropZone.classList.add('bg-light');
+            }
+
+            function unhighlight(e) {
+                dropZone.classList.remove('bg-light');
+            }
+
+            dropZone.addEventListener('drop', handleDrop, false);
+            fileInput.addEventListener('change', handleFileSelect, false);
+
+            function handleDrop(e) {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                handleFiles(files);
+            }
+
+            function handleFileSelect(e) {
+                const files = e.target.files;
+                handleFiles(files);
+            }
+
+            function handleFiles(files) {
+                if (files.length > 0) {
+                    const file = files[0];
+                    if (file.type.startsWith('image/')) {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            document.getElementById('imagePreview').src = e.target.result;
+                            document.getElementById('previewContainer').style.display = 'block';
+                            dropZone.style.display = 'none';
+                        }
+                        reader.readAsDataURL(file);
+                    } else {
+                        alert('Please select an image file.');
+                    }
+                }
+            }
+        });
+
+        function resetUpload() {
+            document.getElementById('fileInput').value = '';
+            document.getElementById('previewContainer').style.display = 'none';
+            document.getElementById('dropZone').style.display = 'block';
+        }
+
+        function uploadPhoto() {
+            // TODO: Upload photo to server
+            const preview = document.getElementById('imagePreview');
+            const profileImg = document.querySelector('.profile-img');
+            profileImg.src = preview.src;
+            
+            const modal = bootstrap.Modal.getInstance(document.getElementById('profilePhotoModal'));
+            modal.hide();
+            
+            resetUpload();
+        }
     </script>
 {% endblock %}
