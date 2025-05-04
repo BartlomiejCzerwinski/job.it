@@ -49,14 +49,8 @@
                             </div>
 
                             <div class="d-flex align-items-center justify-content-center mb-2">
-                                <div class="d-flex flex-column align-items-center">
-                                    <div id="locationContent" class="text-muted font-size-sm mb-0">Bay Area, San Francisco, CA</div>
-                                    <div id="locationBadges" class="d-flex gap-2 mt-1">
-                                        <span class="badge bg-success" id="remoteBadge" style="display: none;">Remote</span>
-                                        <span class="badge bg-warning" id="hybridBadge" style="display: none;">Hybrid</span>
-                                    </div>
-                                </div>
-                                <div id="locationEdit" style="display: none;" class="ms-2">
+                                <div id="locationContent" class="text-muted font-size-sm mb-0 me-2">Bay Area, San Francisco, CA</div>
+                                <div id="locationEdit" style="display: none;">
                                     <div class="d-flex flex-column align-items-center">
                                         <input type="text" class="form-control mb-2" id="locationInput" value="Bay Area, San Francisco, CA">
                                         <div class="d-flex gap-3 mb-2">
@@ -79,8 +73,14 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="d-flex ms-2">
+                                <div class="d-flex">
                                     <i class="bi bi-pencil edit-icon" style="font-size: 1rem; color: black; cursor: pointer;" onclick="toggleEdit('location')"></i>
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-center">
+                                <div id="locationBadges" class="d-flex gap-2 mt-1">
+                                    <span class="badge bg-success" id="remoteBadge" style="display: none;">Remote</span>
+                                    <span class="badge bg-warning" id="hybridBadge" style="display: none;">Hybrid</span>
                                 </div>
                             </div>
                             <!--
