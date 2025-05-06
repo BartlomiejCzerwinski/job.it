@@ -524,7 +524,25 @@
             const hybridCheck = document.getElementById('hybridCheck');
             const remoteBadge = document.getElementById('remoteBadge');
             const hybridBadge = document.getElementById('hybridBadge');
+            const locationBadges = document.getElementById('locationBadges');
 
+            locationBadges.style.display = 'flex';
+            
+            if (remoteCheck.checked) {
+                remoteBadge.style.display = 'inline-block';
+                remoteBadge.style.visibility = 'visible';
+            } else {
+                remoteBadge.style.display = 'none';
+                remoteBadge.style.visibility = 'hidden';
+            }
+            
+            if (hybridCheck.checked) {
+                hybridBadge.style.display = 'inline-block';
+                hybridBadge.style.visibility = 'visible';
+            } else {
+                hybridBadge.style.display = 'none';
+                hybridBadge.style.visibility = 'hidden';
+            }
         }
 
         function toggleEdit(field) {
@@ -552,25 +570,13 @@
 
                     remoteCheck.checked = remoteBadge.style.display !== 'none';
                     hybridCheck.checked = hybridBadge.style.display !== 'none';
-                    remoteBadge.style.display = 'none';
-                    hybridBadge.style.display = 'none';
+                    updateLocationBadges();
                 }
             } else {
                 contentDiv.style.display = 'block';
                 editDiv.style.display = 'none';
                 editIcon.classList.remove('d-none');
                 editButtons.classList.add('d-none');
-
-                if (field === 'location') {
-                    const remoteCheck = document.getElementById('remoteCheck');
-                    const hybridCheck = document.getElementById('hybridCheck');
-                    const remoteBadge = document.getElementById('remoteBadge');
-                    const hybridBadge = document.getElementById('hybridBadge');
-
-                    remoteCheck.checked = remoteBadge.style.display !== 'none';
-                    hybridCheck.checked = hybridBadge.style.display !== 'none';
-                    updateLocationBadges();
-                }
             }
         }
 
@@ -597,47 +603,6 @@
             }
         }
 
-        function updateBadgesAfterSave() {
-            console.log('updateBadgesAfterSave called');
-            
-            const remoteCheck = document.getElementById('remoteCheck');
-            const hybridCheck = document.getElementById('hybridCheck');
-            const remoteBadge = document.getElementById('remoteBadge');
-            const hybridBadge = document.getElementById('hybridBadge');
-            const locationBadges = document.getElementById('locationBadges');
-
-            console.log('Elements found:', {
-                remoteCheck: remoteCheck,
-                hybridCheck: hybridCheck,
-                remoteBadge: remoteBadge,
-                hybridBadge: hybridBadge,
-                locationBadges: locationBadges
-            });
-
-            locationBadges.style.display = 'flex';
-            
-            if (remoteCheck.checked) {
-                remoteBadge.style.display = 'inline-block';
-                remoteBadge.style.visibility = 'visible';
-            } else {
-                remoteBadge.style.display = 'none';
-                remoteBadge.style.visibility = 'hidden';
-            }
-            
-            if (hybridCheck.checked) {
-                hybridBadge.style.display = 'inline-block';
-                hybridBadge.style.visibility = 'visible';
-            } else {
-                hybridBadge.style.display = 'none';
-                hybridBadge.style.visibility = 'hidden';
-            }
-
-            console.log('Remote checked:', remoteCheck.checked);
-            console.log('Hybrid checked:', hybridCheck.checked);
-            console.log('Remote badge display:', remoteBadge.style.display);
-            console.log('Hybrid badge display:', hybridBadge.style.display);
-        }
-
         function saveEdit(field) {
             const contentDiv = document.getElementById(`${field}Content`);
             const editDiv = document.getElementById(`${field}Edit`);
@@ -653,22 +618,16 @@
                 editButtons.classList.add('d-none');
 
                 if (field === 'location') {
-                    setTimeout(() => {
-                        updateBadgesAfterSave();
-                    }, 0);
+                    updateLocationBadges();
                 }
             }
         }
 
         document.addEventListener('DOMContentLoaded', function() {
-            const saveButton = document.querySelector('button[onclick="saveEdit(\'location\')"]');
-            if (saveButton) {
-                saveButton.addEventListener('click', function() {
-                    console.log('Save button clicked');
-                    setTimeout(() => {
-                        updateBadgesAfterSave();
-                    }, 0);
-                });
+            const remoteCheck = document.getElementById('remoteCheck');
+            const hybridCheck = document.getElementById('hybridCheck');
+            if (remoteCheck && hybridCheck) {
+                updateLocationBadges();
             }
         });
 
