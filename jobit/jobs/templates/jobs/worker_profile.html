@@ -415,7 +415,7 @@
     </div>
 
     <div class="modal fade" id="socialLinksModal" tabindex="-1" aria-labelledby="socialLinksModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="socialLinksModalLabel">Manage Social Links</h5>
@@ -654,8 +654,8 @@
         };
 
         let socialLinks = [
-            { platform: 'github', value: 'bart-dev' },
-            { platform: 'linkedin', value: 'linkedin.com/in/bart-dev' }
+            { platform: 'github', value: 'https://github.com/BartlomiejCzerwinski', displayName: '@BartlomiejCzerwinski' },
+            { platform: 'linkedin', value: 'https://www.linkedin.com/in/bartlomiej-czerwinski/', displayName: 'Bartłomiej Czerwiński' }
         ];
 
         function renderSocialLinksList() {
@@ -669,9 +669,11 @@
                 li.innerHTML = `
                     <h6 class="mb-0">
                         <i class="bi bi-${platform.icon} ${platform.color} me-2"></i>
-                        ${link.platform === 'other' ? (link.customLabel || platform.label) : platform.label}
+                        ${platform.label}
                     </h6>
-                    <span class="text-secondary">${link.value}</span>
+                    <a href="${link.value}" target="_blank" class="text-secondary text-decoration-none">
+                        ${link.displayName}
+                    </a>
                 `;
                 list.appendChild(li);
             });
@@ -697,18 +699,17 @@
                             </select>
                         </div>
                         <div class="flex-grow-1">
-                            <label class="form-label">Value</label>
-                            <input type="text" class="form-control" value="${link.value}" 
-                                   onchange="updateValue(${index}, this.value)">
+                            <label class="form-label">URL</label>
+                            <input type="url" class="form-control" value="${link.value}" 
+                                   onchange="updateValue(${index}, this.value)"
+                                   placeholder="https://...">
                         </div>
-                        ${link.platform === 'other' ? `
-                            <div class="flex-grow-1">
-                                <label class="form-label">Custom Label</label>
-                                <input type="text" class="form-control" value="${link.customLabel || ''}" 
-                                       onchange="updateCustomLabel(${index}, this.value)"
-                                       placeholder="Enter custom label">
-                            </div>
-                        ` : ''}
+                        <div class="flex-grow-1">
+                            <label class="form-label">Display Name</label>
+                            <input type="text" class="form-control" value="${link.displayName || ''}" 
+                                   onchange="updateDisplayName(${index}, this.value)"
+                                   placeholder="How it should appear">
+                        </div>
                         <div class="d-flex align-items-end">
                             <button type="button" class="btn btn-outline-danger btn-sm mb-1" 
                                     onclick="removeLink(${index})">
@@ -722,7 +723,7 @@
         }
 
         function addNewLinkField() {
-            socialLinks.push({ platform: 'other', value: '', customLabel: '' });
+            socialLinks.push({ platform: 'other', value: '', displayName: '' });
             renderSocialLinksForm();
         }
 
@@ -733,9 +734,6 @@
 
         function updatePlatform(index, platform) {
             socialLinks[index].platform = platform;
-            if (platform !== 'other') {
-                delete socialLinks[index].customLabel;
-            }
             renderSocialLinksForm();
         }
 
@@ -743,8 +741,8 @@
             socialLinks[index].value = value;
         }
 
-        function updateCustomLabel(index, label) {
-            socialLinks[index].customLabel = label;
+        function updateDisplayName(index, name) {
+            socialLinks[index].displayName = name;
         }
 
         function saveSocialLinks() {
