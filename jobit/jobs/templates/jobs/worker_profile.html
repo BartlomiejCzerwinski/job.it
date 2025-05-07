@@ -261,17 +261,47 @@
                 <div class="col-sm-12 mb-3">
                     <div class="card shadow h-100">
                         <div class="card-body">
-                            <h6 class="d-flex align-items-center mb-3"><i
-                                    class="material-icons text-info mr-2">Projects</i></h6>
-                            <p>Here you can list your projects or any relevant work you've done.</p>
-                            <ul class="list-group">
-                                <li class="list-group-item">Project 1 - <small class="text-muted">Description of project
-                                    1</small></li>
-                                <li class="list-group-item">Project 2 - <small class="text-muted">Description of project
-                                    2</small></li>
-                                <li class="list-group-item">Project 3 - <small class="text-muted">Description of project
-                                    3</small></li>
-                            </ul>
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h6 class="d-flex align-items-center mb-0">
+                                    <i class="material-icons text-info mr-2">Projects</i>
+                                </h6>
+                                <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addProjectModal">
+                                    <i class="bi bi-plus-lg"></i> Add Project
+                                </button>
+                            </div>
+                            <div id="projectsList">
+                                <div class="card mb-3 project-card">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                            <h5 class="card-title mb-0">E-commerce Platform</h5>
+                                            <div class="dropdown">
+                                                <button class="btn btn-link text-dark p-0" type="button" data-bs-toggle="dropdown">
+                                                    <i class="bi bi-three-dots-vertical"></i>
+                                                </button>
+                                                <ul class="dropdown-menu">
+                                                    <li><a class="dropdown-item" href="#" onclick="editProject(1)"><i class="bi bi-pencil me-2"></i>Edit</a></li>
+                                                    <li><a class="dropdown-item text-danger" href="#" onclick="deleteProject(1)"><i class="bi bi-trash me-2"></i>Delete</a></li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        <p class="card-text text-muted">A full-featured e-commerce platform with user authentication, product management, shopping cart, and payment integration.</p>
+                                        <div class="mb-3">
+                                            <span class="badge bg-primary me-1">React</span>
+                                            <span class="badge bg-success me-1">Node.js</span>
+                                            <span class="badge bg-info me-1">MongoDB</span>
+                                            <span class="badge bg-warning me-1">Express</span>
+                                        </div>
+                                        <div class="d-flex gap-2">
+                                            <a href="#" class="btn btn-outline-primary btn-sm" target="_blank">
+                                                <i class="bi bi-github me-1"></i>GitHub
+                                            </a>
+                                            <a href="#" class="btn btn-outline-secondary btn-sm" target="_blank">
+                                                <i class="bi bi-globe me-1"></i>Live Demo
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
