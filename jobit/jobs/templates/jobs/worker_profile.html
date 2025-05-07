@@ -479,11 +479,17 @@
                     <form id="addProjectForm">
                         <div class="mb-3">
                             <label for="projectTitle" class="form-label">Project Title</label>
-                            <input type="text" class="form-control" id="projectTitle" required>
+                            <input type="text" class="form-control" id="projectTitle" maxlength="100" required>
+                            <div class="d-flex justify-content-between align-items-center mt-1">
+                                <small class="text-muted" id="titleCharCounter">100 characters remaining</small>
+                            </div>
                         </div>
                         <div class="mb-3">
                             <label for="projectDescription" class="form-label">Description</label>
-                            <textarea class="form-control" id="projectDescription" rows="3" required></textarea>
+                            <textarea class="form-control" id="projectDescription" rows="3" maxlength="250" required></textarea>
+                            <div class="d-flex justify-content-between align-items-center mt-1">
+                                <small class="text-muted" id="descriptionCharCounter">250 characters remaining</small>
+                            </div>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Technologies</label>
@@ -918,6 +924,8 @@
             document.getElementById('addProjectForm').reset();
             technologies.clear();
             document.getElementById('technologiesList').innerHTML = '';
+            document.getElementById('titleCharCounter').textContent = '100 characters remaining';
+            document.getElementById('descriptionCharCounter').textContent = '250 characters remaining';
             
             const modal = bootstrap.Modal.getInstance(document.getElementById('addProjectModal'));
             modal.hide();
@@ -974,6 +982,10 @@
             document.getElementById('projectDescription').value = project.description;
             document.getElementById('githubLink').value = project.githubLink || '';
             document.getElementById('demoLink').value = project.demoLink || '';
+            const titleRemaining = 100 - project.title.length;
+            const descriptionRemaining = 250 - project.description.length;
+            document.getElementById('titleCharCounter').textContent = `${titleRemaining} characters remaining`;
+            document.getElementById('descriptionCharCounter').textContent = `${descriptionRemaining} characters remaining`;
             
             technologies.clear();
             document.getElementById('technologiesList').innerHTML = '';
@@ -1012,7 +1024,18 @@
             }
         }
 
-        // Initialize with example project
+        document.getElementById('projectTitle').addEventListener('input', function() {
+            const maxLength = 100;
+            const remaining = maxLength - this.value.length;
+            document.getElementById('titleCharCounter').textContent = `${remaining} characters remaining`;
+        });
+
+        document.getElementById('projectDescription').addEventListener('input', function() {
+            const maxLength = 250;
+            const remaining = maxLength - this.value.length;
+            document.getElementById('descriptionCharCounter').textContent = `${remaining} characters remaining`;
+        });
+
         projects.push({
             id: 1,
             title: 'TakeCar',
