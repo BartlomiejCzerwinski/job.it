@@ -1,4 +1,5 @@
 from django import forms
+from .models import AppUser
 
 
 class LoginForm(forms.Form):
@@ -42,4 +43,38 @@ class RegisterForm(forms.Form):
         label='Role',
         widget=forms.Select(attrs={'class': 'form-select'}),
         required=True
+    )
+    position = forms.CharField(
+        label='Position',
+        max_length=255,
+        required=False,
+        widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
+    location = forms.CharField(
+        label='Location',
+        max_length=255,
+        required=False,
+        widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
+    mobile = forms.CharField(
+        label='Mobile',
+        max_length=20,
+        required=False,
+        widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
+    starts_in = forms.ChoiceField(
+        choices=AppUser.STARTS_IN_CHOICES,
+        label='Starts in',
+        required=False,
+        widget=forms.Select(attrs={'class': 'form-select'})
+    )
+    is_remote = forms.BooleanField(
+        label='Remote',
+        required=False,
+        widget=forms.CheckboxInput(attrs={'class': 'form-check-input'})
+    )
+    is_hybrid = forms.BooleanField(
+        label='Hybrid',
+        required=False,
+        widget=forms.CheckboxInput(attrs={'class': 'form-check-input'})
     )

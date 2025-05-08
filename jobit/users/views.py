@@ -37,7 +37,7 @@ def register(request):
     if request.method == 'POST':
         form = RegisterForm(request.POST)
         if form.is_valid():
-            first_name, last_name, email, password, repeated_password, role = extract_registration_form_data(form)
+            first_name, last_name, email, password, repeated_password, role, position, location, mobile, starts_in, is_remote, is_hybrid = extract_registration_form_data(form)
             if not is_password_valid(password, repeated_password):
                 messages.error(request, "Wrong repeated password")
                 form = RegisterForm()
@@ -48,7 +48,7 @@ def register(request):
                 form = RegisterForm()
                 return render(request, 'users/register.html', {'form': form})
 
-            create_user(first_name, last_name, email, password, role)
+            create_user(first_name, last_name, email, password, role, position, location, mobile, starts_in, is_remote, is_hybrid)
             query_string = '?registration=ture'
             return HttpResponseRedirect('login' + query_string)
 
@@ -57,11 +57,20 @@ def register(request):
     return render(request, 'users/register.html', {'form': form})
 
 
-def create_user(first_name, last_name, email, password, role):
+def create_user(first_name, last_name, email, password, role, position=None, location=None, mobile=None, starts_in=None, is_remote=False, is_hybrid=False):
     user = User.objects.create(username=email, first_name=first_name, last_name=last_name, email=email,
                                password=make_password(password))
     user.save()
-    app_user = AppUser.objects.create(user=user, role=role)
+    app_user = AppUser.objects.create(
+        user=user,
+        role=role,
+        position=position,
+        location=location,
+        mobile=mobile,
+        starts_in=starts_in,
+        is_remote=is_remote,
+        is_hybrid=is_hybrid
+    )
     app_user.save()
 
 
@@ -71,7 +80,13 @@ def extract_registration_form_data(form):
         form.cleaned_data.get('email'), \
         form.cleaned_data.get('password'), \
         form.cleaned_data.get('repeated_password'), \
-        form.cleaned_data.get('role')
+        form.cleaned_data.get('role'), \
+        form.cleaned_data.get('position'), \
+        form.cleaned_data.get('location'), \
+        form.cleaned_data.get('mobile'), \
+        form.cleaned_data.get('starts_in'), \
+        form.cleaned_data.get('is_remote'), \
+        form.cleaned_data.get('is_hybrid')
 
 
 def is_password_valid(password, repeated_password):
