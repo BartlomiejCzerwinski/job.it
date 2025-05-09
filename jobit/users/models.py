@@ -48,3 +48,25 @@ class UserSkill(models.Model):
     user = models.ForeignKey(AppUser, on_delete=models.CASCADE)
     skill = models.ForeignKey(Skill, on_delete=models.CASCADE)
     level = models.PositiveIntegerField()
+
+
+class SocialLink(models.Model):
+    PLATFORM_CHOICES = [
+        ('website', 'Personal Website'),
+        ('github', 'GitHub'),
+        ('linkedin', 'LinkedIn'),
+        ('gitlab', 'GitLab'),
+        ('stackoverflow', 'Stack Overflow'),
+        ('medium', 'Medium'),
+        ('devto', 'Dev.to'),
+        ('portfolio', 'Portfolio'),
+        ('other', 'Other')
+    ]
+
+    user = models.ForeignKey(AppUser, on_delete=models.CASCADE, related_name='social_links')
+    platform = models.CharField(max_length=20, choices=PLATFORM_CHOICES)
+    url = models.URLField()
+    display_name = models.CharField(max_length=255, blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.user.user.email}'s {self.platform} link"
