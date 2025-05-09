@@ -37,6 +37,7 @@
                                 <div id="positionEdit" style="display: none;">
                                     <div class="d-flex flex-column align-items-center">
                                         <input type="text" class="form-control mb-2" id="positionInput" value="{{ user.position }}" required>
+                                        <div class="invalid-feedback">Position is required</div>
                                         <div class="d-flex gap-3">
                                             <button type="button" class="btn btn-secondary btn-sm" onclick="cancelEdit('position')">Cancel</button>
                                             <button type="button" class="btn btn-primary btn-sm" onclick="saveEdit('position')">Save</button>
@@ -131,9 +132,9 @@
                             <h6 class="mb-0">Email</h6>
                         </div>
                         <div class="col-sm-9 text-secondary d-flex justify-content-between">
-                            <div id="emailContent">fip@jukmuh.al</div>
+                            <div id="emailContent">{{ user.user.email }}</div>
                             <div id="emailEdit" style="display: none;">
-                                <input type="email" class="form-control" id="emailInput" value="fip@jukmuh.al">
+                                <input type="email" class="form-control" id="emailInput" value="{{ user.user.email }}">
                             </div>
                             <div class="d-flex">
                                 <i class="bi bi-pencil edit-icon" style="font-size: 1rem; color: black; cursor: pointer;" onclick="toggleEdit('email')"></i>
@@ -150,9 +151,9 @@
                             <h6 class="mb-0">Mobile</h6>
                         </div>
                         <div class="col-sm-9 text-secondary d-flex justify-content-between">
-                            <div id="mobileContent">(320) 380-4539</div>
+                            <div id="mobileContent">{{ user.mobile }}</div>
                             <div id="mobileEdit" style="display: none;">
-                                <input type="tel" class="form-control" id="mobileInput" value="(320) 380-4539">
+                                <input type="tel" class="form-control" id="mobileInput" value="{{ user.mobile }}">
                             </div>
                             <div class="d-flex">
                                 <i class="bi bi-pencil edit-icon" style="font-size: 1rem; color: black; cursor: pointer;" onclick="toggleEdit('mobile')"></i>
