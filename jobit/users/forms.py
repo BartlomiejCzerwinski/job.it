@@ -105,6 +105,7 @@ class RegisterForm(forms.Form):
     )
     is_remote = forms.BooleanField(
         label='Remote',
+        required=False,
         widget=forms.CheckboxInput(attrs={
             'class': 'form-check-input',
             'title': 'Check if you are open to remote work'
@@ -112,6 +113,7 @@ class RegisterForm(forms.Form):
     )
     is_hybrid = forms.BooleanField(
         label='Hybrid',
+        required=False,
         widget=forms.CheckboxInput(attrs={
             'class': 'form-check-input',
             'title': 'Check if you are open to hybrid work'
