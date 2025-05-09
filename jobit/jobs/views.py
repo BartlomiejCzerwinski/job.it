@@ -33,7 +33,8 @@ def worker_profile(request):
     about_me = user.about_me if user else ""
     return render(request, 'jobs/worker_profile.html', {
         'skills': skills,
-        'about_me': about_me
+        'about_me': about_me,
+        'user': user
     })
 
 
