@@ -11,12 +11,14 @@ const socialPlatforms = {
 };
 
 let socialLinks = [];
+let tempLinks = []; // Temporary storage for form changes
 
 function loadSocialLinks() {
     fetch('/social-links')
         .then(response => response.json())
         .then(links => {
             socialLinks = links;
+            tempLinks = [...links]; // Create a copy for form editing
             renderSocialLinksList();
         })
         .catch(error => console.error('Error loading social links:', error));
@@ -49,14 +51,14 @@ function renderSocialLinksForm() {
     const form = document.getElementById('socialLinksForm');
     form.innerHTML = '';
     
-    socialLinks.forEach((link, index) => {
+    tempLinks.forEach((link, index) => {
         const div = document.createElement('div');
         div.className = 'mb-3 position-relative';
         div.innerHTML = `
             <div class="d-flex gap-2">
                 <div class="flex-grow-1">
                     <label class="form-label">Platform</label>
-                    <select class="form-select" onchange="updatePlatform(${index}, this.value)">
+                    <select class="form-select" onchange="updateTempLink(${index}, 'platform', this.value)">
                         ${Object.keys(socialPlatforms).map(platform => 
                             `<option value="${platform}" ${platform === link.platform ? 'selected' : ''}>
                                 ${socialPlatforms[platform].label}
@@ -67,18 +69,18 @@ function renderSocialLinksForm() {
                 <div class="flex-grow-1">
                     <label class="form-label">URL</label>
                     <input type="url" class="form-control" value="${link.url}" 
-                           onchange="updateValue(${index}, this.value)"
+                           onchange="updateTempLink(${index}, 'url', this.value)"
                            placeholder="https://...">
                 </div>
                 <div class="flex-grow-1">
                     <label class="form-label">Display Name</label>
                     <input type="text" class="form-control" value="${link.display_name || ''}" 
-                           onchange="updateDisplayName(${index}, this.value)"
+                           onchange="updateTempLink(${index}, 'display_name', this.value)"
                            placeholder="How it should appear">
                 </div>
                 <div class="d-flex align-items-end">
                     <button type="button" class="btn btn-outline-danger btn-sm mb-1" 
-                            onclick="removeLink(${index})">
+                            onclick="removeTempLink(${index})">
                         <i class="bi bi-trash"></i>
                     </button>
                 </div>
@@ -86,147 +88,106 @@ function renderSocialLinksForm() {
         `;
         form.appendChild(div);
     });
+
+    const addLinkBtn = document.querySelector('#socialLinksModal .btn-outline-primary');
+    if (addLinkBtn) {
+        addLinkBtn.onclick = addNewLinkField;
+    }
 }
 
 function addNewLinkField() {
-    const newLink = { platform: 'other', url: '', display_name: '' };
-    fetch('/social-links/add', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': CSRF_TOKEN
-        },
-        body: JSON.stringify(newLink)
-    })
-    .then(response => response.json())
-    .then(link => {
-        socialLinks.push(link);
-        renderSocialLinksForm();
-    })
-    .catch(error => console.error('Error adding social link:', error));
+    tempLinks.push({
+        platform: 'other',
+        url: '',
+        display_name: '',
+        isNew: true // Flag to identify new links
+    });
+    renderSocialLinksForm();
 }
 
-function removeLink(index) {
-    const link = socialLinks[index];
-    if (!link || !link.id) {
-        console.error('Invalid link or missing ID');
-        return;
-    }
-
-    fetch(`/social-links/${link.id}/delete`, {
-        method: 'DELETE',
-        headers: {
-            'X-CSRFToken': CSRF_TOKEN
-        }
-    })
-    .then(response => {
-        if (response.ok) {
-            socialLinks.splice(index, 1);
-            renderSocialLinksForm();
-        } else {
-            throw new Error('Failed to delete social link');
-        }
-    })
-    .catch(error => console.error('Error deleting social link:', error));
+function removeTempLink(index) {
+    tempLinks.splice(index, 1);
+    renderSocialLinksForm();
 }
 
-function updatePlatform(index, platform) {
-    const link = socialLinks[index];
-    if (!link || !link.id) {
-        console.error('Invalid link or missing ID');
-        return;
-    }
-
-    const formData = {
-        platform: platform,
-        url: link.url,
-        display_name: link.display_name
-    };
-    
-    fetch(`/social-links/${link.id}`, {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': CSRF_TOKEN
-        },
-        body: JSON.stringify(formData)
-    })
-    .then(response => response.json())
-    .then(updatedLink => {
-        socialLinks[index] = updatedLink;
-        renderSocialLinksForm();
-    })
-    .catch(error => console.error('Error updating platform:', error));
-}
-
-function updateValue(index, value) {
-    const link = socialLinks[index];
-    if (!link || !link.id) {
-        console.error('Invalid link or missing ID');
-        return;
-    }
-
-    const formData = {
-        platform: link.platform,
-        url: value,
-        display_name: link.display_name
-    };
-    
-    fetch(`/social-links/${link.id}`, {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': CSRF_TOKEN
-        },
-        body: JSON.stringify(formData)
-    })
-    .then(response => response.json())
-    .then(updatedLink => {
-        socialLinks[index] = updatedLink;
-        renderSocialLinksForm();
-    })
-    .catch(error => console.error('Error updating URL:', error));
-}
-
-function updateDisplayName(index, name) {
-    const link = socialLinks[index];
-    if (!link || !link.id) {
-        console.error('Invalid link or missing ID');
-        return;
-    }
-
-    const formData = {
-        platform: link.platform,
-        url: link.url,
-        display_name: name
-    };
-    
-    fetch(`/social-links/${link.id}`, {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': CSRF_TOKEN
-        },
-        body: JSON.stringify(formData)
-    })
-    .then(response => response.json())
-    .then(updatedLink => {
-        socialLinks[index] = updatedLink;
-        renderSocialLinksForm();
-    })
-    .catch(error => console.error('Error updating display name:', error));
+function updateTempLink(index, field, value) {
+    tempLinks[index][field] = value;
 }
 
 function saveSocialLinks() {
-    renderSocialLinksList();
-    const modal = bootstrap.Modal.getInstance(document.getElementById('socialLinksModal'));
-    modal.hide();
+    const promises = [];
+
+    const deletedLinks = socialLinks.filter(link => 
+        !tempLinks.some(tempLink => tempLink.id === link.id)
+    );
+    
+    deletedLinks.forEach(link => {
+        promises.push(
+            fetch(`/social-links/${link.id}/delete`, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRFToken': CSRF_TOKEN
+                }
+            })
+        );
+    });
+
+    // Handle updates and new links
+    tempLinks.forEach(link => {
+        if (link.isNew) {
+            // Create new link
+            promises.push(
+                fetch('/social-links/add', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': CSRF_TOKEN
+                    },
+                    body: JSON.stringify({
+                        platform: link.platform,
+                        url: link.url,
+                        display_name: link.display_name
+                    })
+                }).then(response => response.json())
+            );
+        } else {
+            // Update existing link
+            promises.push(
+                fetch(`/social-links/${link.id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': CSRF_TOKEN
+                    },
+                    body: JSON.stringify({
+                        platform: link.platform,
+                        url: link.url,
+                        display_name: link.display_name
+                    })
+                }).then(response => response.json())
+            );
+        }
+    });
+
+    // Wait for all operations to complete
+    Promise.all(promises)
+        .then(() => {
+            loadSocialLinks(); // Reload links to get updated data
+            const modal = bootstrap.Modal.getInstance(document.getElementById('socialLinksModal'));
+            modal.hide();
+        })
+        .catch(error => {
+            console.error('Error saving social links:', error);
+            alert('There was an error saving your changes. Please try again.');
+        });
 }
 
+// Initialize social links functionality
 document.addEventListener('DOMContentLoaded', function() {
     loadSocialLinks();
-    
+    // Add modal event listener
     document.getElementById('socialLinksModal').addEventListener('show.bs.modal', function () {
+        tempLinks = [...socialLinks]; // Reset temp links when opening modal
         renderSocialLinksForm();
     });
 }); 
