@@ -30,13 +30,13 @@
 
                         <div class="mt-3">
                             <div class="d-flex align-items-center justify-content-center mb-1">
-                                <h4 class="mb-0 me-2">{{ user.user.first_name }} {{ user.user.last_name }}</h4>
+                                <h4 class="mb-0 me-2">{{ user_data.first_name }} {{ user_data.last_name }}</h4>
                             </div>
                             <div class="d-flex align-items-center justify-content-center mb-1">
-                                <div id="positionContent" class="text-secondary mb-0 me-2">{{ user.position }}</div>
+                                <div id="positionContent" class="text-secondary mb-0 me-2">{{ user_data.position }}</div>
                                 <div id="positionEdit" style="display: none;">
                                     <div class="d-flex flex-column align-items-center">
-                                        <input type="text" class="form-control mb-2" id="positionInput" value="{{ user.position }}" required>
+                                        <input type="text" class="form-control mb-2" id="positionInput" value="{{ user_data.position }}" required>
                                         <div class="invalid-feedback">Position is required</div>
                                         <div class="d-flex gap-3">
                                             <button type="button" class="btn btn-secondary btn-sm" onclick="cancelEdit('position')">Cancel</button>
@@ -50,20 +50,20 @@
                             </div>
 
                             <div class="d-flex align-items-center justify-content-center mb-2">
-                                <div id="locationContent" class="text-muted font-size-sm mb-0 me-2">{{ user.location }}</div>
+                                <div id="locationContent" class="text-muted font-size-sm mb-0 me-2">{{ user_data.location }}</div>
                                 <div id="locationEdit" style="display: none;">
                                     <div class="d-flex flex-column align-items-center">
-                                        <input type="text" class="form-control mb-2" id="locationInput" value="{{ user.location }}" required>
+                                        <input type="text" class="form-control mb-2" id="locationInput" value="{{ user_data.location }}" required>
                                         <div class="invalid-feedback">Location is required</div>
                                         <div class="d-flex gap-3 mb-2">
                                             <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" id="remoteCheck" onchange="updateLocationBadges()" {% if user.is_remote %}checked{% endif %}>
+                                                <input class="form-check-input" type="checkbox" id="remoteCheck" onchange="updateLocationBadges()" {% if user_data.is_remote %}checked{% endif %}>
                                                 <label class="form-check-label" for="remoteCheck">
                                                     Remote
                                                 </label>
                                             </div>
                                             <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" id="hybridCheck" onchange="updateLocationBadges()" {% if user.is_hybrid %}checked{% endif %}>
+                                                <input class="form-check-input" type="checkbox" id="hybridCheck" onchange="updateLocationBadges()" {% if user_data.is_hybrid %}checked{% endif %}>
                                                 <label class="form-check-label" for="hybridCheck">
                                                     Hybrid
                                                 </label>
@@ -81,8 +81,16 @@
                             </div>
                             <div class="d-flex justify-content-center">
                                 <div id="locationBadges" class="d-flex gap-2 mt-1">
-                                    <span class="badge bg-success" id="remoteBadge" style="display: {% if user.is_remote %}inline-block{% else %}none{% endif %};">Remote</span>
-                                    <span class="badge bg-warning" id="hybridBadge" style="display: {% if user.is_hybrid %}inline-block{% else %}none{% endif %};">Hybrid</span>
+                                    {% if user_data.is_remote %}
+                                        <span class="badge bg-success" id="remoteBadge">Remote</span>
+                                    {% else %}
+                                        <span class="badge bg-success" id="remoteBadge" style="display: none;">Remote</span>
+                                    {% endif %}
+                                    {% if user_data.is_hybrid %}
+                                        <span class="badge bg-warning" id="hybridBadge">Hybrid</span>
+                                    {% else %}
+                                        <span class="badge bg-warning" id="hybridBadge" style="display: none;">Hybrid</span>
+                                    {% endif %}
                                 </div>
                             </div>
                             <!--
@@ -113,9 +121,9 @@
                             <h6 class="mb-0">Full Name</h6>
                         </div>
                         <div class="col-sm-9 text-secondary d-flex justify-content-between">
-                            <div id="fullNameContent">{{ user.user.first_name }} {{ user.user.last_name }}</div>
+                            <div id="fullNameContent">{{ user_data.first_name }} {{ user_data.last_name }}</div>
                             <div id="fullNameEdit" style="display: none;">
-                                <input type="text" class="form-control" id="fullNameInput" value="{{ user.user.first_name }} {{ user.user.last_name }}">
+                                <input type="text" class="form-control" id="fullNameInput" value="{{ user_data.first_name }} {{ user_data.last_name }}">
                             </div>
                             <div class="d-flex">
                                 <i class="bi bi-pencil edit-icon" style="font-size: 1rem; color: black; cursor: pointer;" onclick="toggleEdit('fullName')"></i>
@@ -132,9 +140,9 @@
                             <h6 class="mb-0">Email</h6>
                         </div>
                         <div class="col-sm-9 text-secondary d-flex justify-content-between">
-                            <div id="emailContent">{{ user.user.email }}</div>
+                            <div id="emailContent">{{ user_data.email }}</div>
                             <div id="emailEdit" style="display: none;">
-                                <input type="email" class="form-control" id="emailInput" value="{{ user.user.email }}">
+                                <input type="email" class="form-control" id="emailInput" value="{{ user_data.email }}">
                             </div>
                             <div class="d-flex">
                                 <i class="bi bi-pencil edit-icon" style="font-size: 1rem; color: black; cursor: pointer;" onclick="toggleEdit('email')"></i>
@@ -151,9 +159,9 @@
                             <h6 class="mb-0">Mobile</h6>
                         </div>
                         <div class="col-sm-9 text-secondary d-flex justify-content-between">
-                            <div id="mobileContent">{{ user.mobile }}</div>
+                            <div id="mobileContent">{{ user_data.mobile }}</div>
                             <div id="mobileEdit" style="display: none;">
-                                <input type="tel" class="form-control" id="mobileInput" value="{{ user.mobile }}">
+                                <input type="tel" class="form-control" id="mobileInput" value="{{ user_data.mobile }}">
                             </div>
                             <div class="d-flex">
                                 <i class="bi bi-pencil edit-icon" style="font-size: 1rem; color: black; cursor: pointer;" onclick="toggleEdit('mobile')"></i>
@@ -457,7 +465,7 @@
                     <div id="socialLinksForm">
                     </div>
                     <div class="mt-3">
-                        <button type="button" class="btn btn-outline-primary btn-sm" onclick="addNewLinkField()">
+                        <button type="button" class="btn btn-outline-primary btn-sm">
                             <i class="bi bi-plus-lg"></i> Add New Link
                         </button>
                     </div>

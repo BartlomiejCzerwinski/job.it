@@ -28,13 +28,22 @@ def index(request):
 
 @login_required
 def worker_profile(request):
-    skills = get_user_skills(request.user)
-    user = get_user(request.user)
-    about_me = user.about_me if user else ""
+    user = request.user
+    profile = get_user(request.user)
+    user_data = {
+        "first_name": user.first_name,
+        "last_name": user.last_name,
+        "email": user.email,
+        "position": getattr(profile, "position", ""),
+        "location": getattr(profile, "location", ""),
+        "is_remote": getattr(profile, "is_remote"),
+        "is_hybrid": getattr(profile, "is_hybrid"),
+        "mobile": getattr(profile, "mobile", "")
+    }
+    skills = get_user_skills(user)
     return render(request, 'jobs/worker_profile.html', {
         'skills': skills,
-        'about_me': about_me,
-        'user': user
+        'user_data': user_data
     })
 
 
