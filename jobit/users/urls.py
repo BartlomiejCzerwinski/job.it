@@ -7,4 +7,8 @@ urlpatterns = [
     path("register", views.register, name="register"),
     path("get-current-user", views.get_current_user, name="get-current-user"),
     path("remove-skill", views.remove_skill, name="remove-skill"),
+    path("social-links", views.get_social_links, name="get-social-links"),
+    path("social-links/add", views.add_social_link, name="add-social-link"),
+    path("social-links/<int:link_id>", views.update_social_link, name="update-social-link"),
+    path("social-links/<int:link_id>/delete", views.delete_social_link, name="delete-social-link"),
 ]

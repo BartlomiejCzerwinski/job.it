@@ -2,13 +2,17 @@ import json
 
 from django.shortcuts import render
 from django.views.decorators.http import require_http_methods
-from users.models import AppUser, UserSkill, Skill
+from users.models import AppUser, UserSkill, Skill, SocialLink
 from .forms import LoginForm, RegisterForm
 from django.contrib.auth.hashers import make_password
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
+from .serializers import SocialLinkSerializer
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework import status
 
 
 def login_view(request):
@@ -163,3 +167,62 @@ def remove_user_skill(email, skill_id):
     user_skill.delete()
 
     return JsonResponse({'message': 'Skill deleted successfully'}, status=201)
+
+
+@api_view(['POST'])
+def add_social_link(request):
+    if not request.user.is_authenticated:
+        return Response({'error': 'Authentication required'}, status=status.HTTP_401_UNAUTHORIZED)
+    
+    app_user = get_user(request.user)
+    if not app_user:
+        return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+    
+    serializer = SocialLinkSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save(user=app_user)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET'])
+def get_social_links(request):
+    if not request.user.is_authenticated:
+        return Response({'error': 'Authentication required'}, status=status.HTTP_401_UNAUTHORIZED)
+    
+    app_user = get_user(request.user)
+    if not app_user:
+        return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+    
+    social_links = SocialLink.objects.filter(user=app_user)
+    serializer = SocialLinkSerializer(social_links, many=True)
+    return Response(serializer.data)
+
+
+@api_view(['DELETE'])
+def delete_social_link(request, link_id):
+    if not request.user.is_authenticated:
+        return Response({'error': 'Authentication required'}, status=status.HTTP_401_UNAUTHORIZED)
+    
+    try:
+        social_link = SocialLink.objects.get(id=link_id, user__user=request.user)
+        social_link.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    except SocialLink.DoesNotExist:
+        return Response({'error': 'Social link not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['PUT'])
+def update_social_link(request, link_id):
+    if not request.user.is_authenticated:
+        return Response({'error': 'Authentication required'}, status=status.HTTP_401_UNAUTHORIZED)
+    
+    try:
+        social_link = SocialLink.objects.get(id=link_id, user__user=request.user)
+        serializer = SocialLinkSerializer(social_link, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    except SocialLink.DoesNotExist:
+        return Response({'error': 'Social link not found'}, status=status.HTTP_404_NOT_FOUND)
