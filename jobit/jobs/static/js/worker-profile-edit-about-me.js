@@ -22,7 +22,8 @@ function toggleAboutMeEdit() {
         // Switch to edit mode
         content.style.display = 'none';
         edit.style.display = 'block';
-        textarea.value = content.textContent.trim();
+        // Get the original text content with preserved whitespace
+        textarea.value = content.textContent;
         textarea.focus();
         // Initialize counter with current text length
         updateCharCounter();
@@ -72,6 +73,7 @@ function saveAboutMe() {
         if (data.error) {
             showToast(data.error, 'danger');
         } else {
+            // Set the content with preserved whitespace
             content.textContent = textarea.value || 'No information provided yet.';
             content.style.display = 'block';
             edit.style.display = 'none';

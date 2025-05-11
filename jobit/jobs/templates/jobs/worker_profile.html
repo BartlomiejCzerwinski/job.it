@@ -209,7 +209,7 @@
                             </h6>
                             <div id="aboutMeContent" class="about-me-content">
                                 {% if about_me %}
-                                    {{ about_me }}
+                                    {{ about_me|linebreaks }}
                                 {% else %}
                                     Tell something about yourself!
                                 {% endif %}

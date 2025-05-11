@@ -43,7 +43,8 @@ def worker_profile(request):
     skills = get_user_skills(user)
     return render(request, 'jobs/worker_profile.html', {
         'skills': skills,
-        'user_data': user_data
+        'user_data': user_data,
+        'about_me': getattr(profile, "about_me", "")
     })
 
 
