@@ -7,6 +7,7 @@
         </button>
     </div>
 {% endblock %} {% block content %}
+    {% csrf_token %}
     <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1050; display: none;" id="toastContainer">
         <div id="customToast" class="toast align-items-center text-bg-primary border-0 d-flex justify-content-between" role="alert" aria-live="assertive" aria-atomic="true">
             <div id="toastMessage" class="toast-body"></div>
@@ -118,18 +119,37 @@
                 <div class="card-body">
                     <div class="row align-items-center mb-2">
                         <div class="col-sm-3">
-                            <h6 class="mb-0">Full Name</h6>
+                            <h6 class="mb-0">First Name</h6>
                         </div>
                         <div class="col-sm-9 text-secondary d-flex justify-content-between">
-                            <div id="fullNameContent">{{ user_data.first_name }} {{ user_data.last_name }}</div>
-                            <div id="fullNameEdit" style="display: none;">
-                                <input type="text" class="form-control" id="fullNameInput" value="{{ user_data.first_name }} {{ user_data.last_name }}">
+                            <div id="firstNameContent">{{ user_data.first_name }}</div>
+                            <div id="firstNameEdit" style="display: none;">
+                                <input type="text" class="form-control" id="firstNameInput" value="{{ user_data.first_name }}">
                             </div>
                             <div class="d-flex">
-                                <i class="bi bi-pencil edit-icon" style="font-size: 1rem; color: black; cursor: pointer;" onclick="toggleEdit('fullName')"></i>
+                                <i class="bi bi-pencil edit-icon" style="font-size: 1rem; color: black; cursor: pointer;" onclick="toggleEdit('firstName')"></i>
                                 <div class="edit-buttons d-flex gap-3 d-none">
-                                    <button type="button" class="btn btn-secondary btn-sm" onclick="cancelEdit('fullName')">Cancel</button>
-                                    <button type="button" class="btn btn-primary btn-sm" onclick="saveEdit('fullName')">Save</button>
+                                    <button type="button" class="btn btn-secondary btn-sm" onclick="cancelEdit('firstName')">Cancel</button>
+                                    <button type="button" class="btn btn-primary btn-sm" onclick="saveEdit('firstName')">Save</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr/>
+                    <div class="row align-items-center mb-2">
+                        <div class="col-sm-3">
+                            <h6 class="mb-0">Last Name</h6>
+                        </div>
+                        <div class="col-sm-9 text-secondary d-flex justify-content-between">
+                            <div id="lastNameContent">{{ user_data.last_name }}</div>
+                            <div id="lastNameEdit" style="display: none;">
+                                <input type="text" class="form-control" id="lastNameInput" value="{{ user_data.last_name }}">
+                            </div>
+                            <div class="d-flex">
+                                <i class="bi bi-pencil edit-icon" style="font-size: 1rem; color: black; cursor: pointer;" onclick="toggleEdit('lastName')"></i>
+                                <div class="edit-buttons d-flex gap-3 d-none">
+                                    <button type="button" class="btn btn-secondary btn-sm" onclick="cancelEdit('lastName')">Cancel</button>
+                                    <button type="button" class="btn btn-primary btn-sm" onclick="saveEdit('lastName')">Save</button>
                                 </div>
                             </div>
                         </div>
@@ -637,22 +657,83 @@
             }
         }
 
-        function saveEdit(field) {
+        function showToast(message, isSuccess = true) {
+            const toastContainer = document.getElementById('toastContainer');
+            const toast = document.getElementById('customToast');
+            const toastMessage = document.getElementById('toastMessage');
+            
+            toastContainer.style.display = 'block';
+            toast.className = `toast align-items-center text-bg-${isSuccess ? 'success' : 'danger'} border-0 d-flex justify-content-between`;
+            toastMessage.textContent = message;
+            
+            const bsToast = new bootstrap.Toast(toast);
+            bsToast.show();
+            
+            toast.addEventListener('hidden.bs.toast', function () {
+                toastContainer.style.display = 'none';
+            });
+        }
+
+        async function saveEdit(field) {
             const contentDiv = document.getElementById(`${field}Content`);
             const editDiv = document.getElementById(`${field}Edit`);
             const editIcon = contentDiv.closest('.d-flex').querySelector('.edit-icon');
             const editButtons = contentDiv.closest('.d-flex').querySelector('.edit-buttons');
-            const input = editDiv.querySelector('input, select');
+            const input = editDiv.querySelector('input');
             
             if (input) {
-                contentDiv.textContent = input.value;
-                contentDiv.style.display = 'block';
-                editDiv.style.display = 'none';
-                editIcon.classList.remove('d-none');
-                editButtons.classList.add('d-none');
+                const value = input.value.trim();
+                if (!value) {
+                    showToast('Field cannot be empty', false);
+                    return;
+                }
 
-                if (field === 'location') {
-                    updateLocationBadges();
+                if (field === 'firstName' || field === 'lastName') {
+                    try {
+                        const response = await fetch('/update_full_name', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                            },
+                            body: JSON.stringify({
+                                first_name: field === 'firstName' ? value : document.getElementById('firstNameContent').textContent,
+                                last_name: field === 'lastName' ? value : document.getElementById('lastNameContent').textContent
+                            })
+                        });
+
+                        const data = await response.json();
+                        
+                        if (response.ok) {
+                            contentDiv.textContent = value;
+                            contentDiv.style.display = 'block';
+                            editDiv.style.display = 'none';
+                            editIcon.classList.remove('d-none');
+                            editButtons.classList.add('d-none');
+                            
+                            // Update name under profile photo
+                            const profileName = document.querySelector('.profile-img-wrapper').nextElementSibling.querySelector('h4');
+                            const firstName = field === 'firstName' ? value : document.getElementById('firstNameContent').textContent;
+                            const lastName = field === 'lastName' ? value : document.getElementById('lastNameContent').textContent;
+                            profileName.textContent = `${firstName} ${lastName}`;
+                            
+                            showToast('Name updated successfully');
+                        } else {
+                            showToast(data.error || 'Failed to update name', false);
+                        }
+                    } catch (error) {
+                        showToast('An error occurred while updating name', false);
+                    }
+                } else {
+                    contentDiv.textContent = value;
+                    contentDiv.style.display = 'block';
+                    editDiv.style.display = 'none';
+                    editIcon.classList.remove('d-none');
+                    editButtons.classList.add('d-none');
+
+                    if (field === 'location') {
+                        updateLocationBadges();
+                    }
                 }
             }
         }
