@@ -6,7 +6,7 @@ from django.http import HttpResponseRedirect, JsonResponse
 from django.views.decorators.http import require_http_methods
 
 from jobs.forms import JobListingForm
-from users.models import Skill, UserSkill, AppUser
+from users.models import Skill, UserSkill, AppUser, User
 from users.views import get_user_role, get_user, get_user_skills
 from django.contrib.auth import logout
 from users.views import get_user
@@ -382,5 +382,31 @@ def update_last_name(request):
         user.save()
         
         return JsonResponse({'message': 'Last name updated successfully'}, status=200)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+
+@login_required
+@require_http_methods(["POST"])
+def update_email(request):
+    try:
+        data = json.loads(request.body)
+        email = data.get('email')
+        
+        if not email:
+            return JsonResponse({'error': 'Email is required'}, status=400)
+            
+        if not '@' in email or not '.' in email:
+            return JsonResponse({'error': 'Invalid email format'}, status=400)
+            
+        if User.objects.filter(email=email).exclude(id=request.user.id).exists():
+            return JsonResponse({'error': 'Email is already taken'}, status=400)
+            
+        user = request.user
+        user.email = email
+        user.username = email
+        user.save()
+        
+        return JsonResponse({'message': 'Email updated successfully'}, status=200)
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)

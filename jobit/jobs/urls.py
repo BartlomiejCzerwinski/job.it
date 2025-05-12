@@ -18,4 +18,5 @@ urlpatterns = [
     path('update_about_me', views.update_about_me, name='update_about_me'),
     path('update_first_name', views.update_first_name, name='update_first_name'),
     path('update_last_name', views.update_last_name, name='update_last_name'),
+    path('update_email', views.update_email, name='update_email'),
 ]
