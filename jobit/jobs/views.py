@@ -346,3 +346,41 @@ def update_about_me(request):
         user.save()
         
         return JsonResponse({'message': 'About Me updated successfully'}, status=200)
+
+
+@login_required
+@require_http_methods(["POST"])
+def update_first_name(request):
+    try:
+        data = json.loads(request.body)
+        first_name = data.get('first_name')
+        
+        if not first_name:
+            return JsonResponse({'error': 'First name is required'}, status=400)
+            
+        user = request.user
+        user.first_name = first_name
+        user.save()
+        
+        return JsonResponse({'message': 'First name updated successfully'}, status=200)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+
+@login_required
+@require_http_methods(["POST"])
+def update_last_name(request):
+    try:
+        data = json.loads(request.body)
+        last_name = data.get('last_name')
+        
+        if not last_name:
+            return JsonResponse({'error': 'Last name is required'}, status=400)
+            
+        user = request.user
+        user.last_name = last_name
+        user.save()
+        
+        return JsonResponse({'message': 'Last name updated successfully'}, status=200)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
