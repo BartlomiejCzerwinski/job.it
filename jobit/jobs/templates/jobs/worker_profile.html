@@ -197,7 +197,7 @@
                             <h6 class="mb-0">Starts in</h6>
                         </div>
                         <div class="col-sm-9 text-secondary d-flex justify-content-between">
-                            <div id="startsInContent">ASAP</div>
+                            <div id="startsInContent">{{ user_data.starts_in }}</div>
                             <div id="startsInEdit" style="display: none;">
                                 <select class="form-select" id="startsInSelect">
                                     <option value="ASAP">ASAP</option>
@@ -703,7 +703,7 @@
             const editDiv = document.getElementById(`${field}Edit`);
             const editIcon = contentDiv.closest('.d-flex').querySelector('.edit-icon');
             const editButtons = contentDiv.closest('.d-flex').querySelector('.edit-buttons');
-            const input = editDiv.querySelector('input');
+            const input = editDiv.querySelector('input, select');
             
             if (input) {
                 const value = input.value.trim();
@@ -712,7 +712,36 @@
                     return;
                 }
 
-                if (field === 'mobile') {
+                if (field === 'startsIn') {
+                    try {
+                        const response = await fetch('/update_starts_in', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRFToken': CSRF_TOKEN
+                            },
+                            body: JSON.stringify({
+                                starts_in: value
+                            })
+                        });
+
+                        const data = await response.json();
+                        
+                        if (response.ok) {
+                            contentDiv.textContent = value;
+                            contentDiv.style.display = 'block';
+                            editDiv.style.display = 'none';
+                            editIcon.classList.remove('d-none');
+                            editButtons.classList.add('d-none');
+                            
+                            showToast('Starts in updated successfully');
+                        } else {
+                            showToast(data.error || 'Failed to update starts in', false);
+                        }
+                    } catch (error) {
+                        showToast('An error occurred while updating starts in', false);
+                    }
+                } else if (field === 'mobile') {
                     if (!validatePhoneNumber(value)) {
                         showToast('Phone number must be in format: xxx xxx xxx', false);
                         return;
@@ -830,6 +859,13 @@
             const hybridCheck = document.getElementById('hybridCheck');
             if (remoteCheck && hybridCheck) {
                 updateLocationBadges();
+            }
+
+            // Set initial value for startsIn select
+            const startsInSelect = document.getElementById('startsInSelect');
+            const startsInContent = document.getElementById('startsInContent');
+            if (startsInSelect && startsInContent) {
+                startsInSelect.value = startsInContent.textContent.trim();
             }
         });
 

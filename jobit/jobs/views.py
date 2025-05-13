@@ -39,7 +39,8 @@ def worker_profile(request):
         "location": getattr(profile, "location", ""),
         "is_remote": getattr(profile, "is_remote"),
         "is_hybrid": getattr(profile, "is_hybrid"),
-        "mobile": getattr(profile, "mobile", "")
+        "mobile": getattr(profile, "mobile", ""),
+        "starts_in": getattr(profile, "starts_in")
     }
     skills = get_user_skills(user)
     return render(request, 'jobs/worker_profile.html', {
