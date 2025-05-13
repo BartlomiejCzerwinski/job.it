@@ -1,4 +1,5 @@
 import json
+import re
 
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
@@ -408,5 +409,31 @@ def update_email(request):
         user.save()
         
         return JsonResponse({'message': 'Email updated successfully'}, status=200)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+
+@login_required
+@require_http_methods(["POST"])
+def update_mobile(request):
+    try:
+        data = json.loads(request.body)
+        mobile = data.get('mobile')
+        
+        if not mobile:
+            return JsonResponse({'error': 'Mobile number is required'}, status=400)
+            
+        # Validate mobile number format (xxx xxx xxx)
+        if not re.match(r'^\d{3} \d{3} \d{3}$', mobile):
+            return JsonResponse({'error': 'Phone number must be in format: xxx xxx xxx'}, status=400)
+            
+        user = get_user(request.user)
+        if not user:
+            return JsonResponse({'error': 'User not found'}, status=404)
+            
+        user.mobile = mobile
+        user.save()
+        
+        return JsonResponse({'message': 'Mobile number updated successfully'}, status=200)
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
