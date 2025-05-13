@@ -437,3 +437,29 @@ def update_mobile(request):
         return JsonResponse({'message': 'Mobile number updated successfully'}, status=200)
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
+
+
+@login_required
+@require_http_methods(["POST"])
+def update_starts_in(request):
+    try:
+        data = json.loads(request.body)
+        starts_in = data.get('starts_in')
+        
+        if not starts_in:
+            return JsonResponse({'error': 'Starts in value is required'}, status=400)
+            
+        valid_choices = ['ASAP', '2 weeks', '1 month', '3 months']
+        if starts_in not in valid_choices:
+            return JsonResponse({'error': 'Invalid starts in value'}, status=400)
+            
+        user = get_user(request.user)
+        if not user:
+            return JsonResponse({'error': 'User not found'}, status=404)
+            
+        user.starts_in = starts_in
+        user.save()
+        
+        return JsonResponse({'message': 'Starts in updated successfully'}, status=200)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
