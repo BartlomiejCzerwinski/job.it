@@ -673,6 +673,31 @@
             });
         }
 
+        function formatPhoneNumber(input) {
+            let value = input.value.replace(/\D/g, '');
+            if (value.length > 9) value = value.slice(0, 9);
+            if (value.length > 6) {
+                value = value.slice(0, 6) + ' ' + value.slice(6);
+            }
+            if (value.length > 3) {
+                value = value.slice(0, 3) + ' ' + value.slice(3);
+            }
+            input.value = value;
+        }
+
+        function validatePhoneNumber(value) {
+            return /^\d{3} \d{3} \d{3}$/.test(value);
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileInput = document.getElementById('mobileInput');
+            if (mobileInput) {
+                mobileInput.addEventListener('input', function() {
+                    formatPhoneNumber(this);
+                });
+            }
+        });
+
         async function saveEdit(field) {
             const contentDiv = document.getElementById(`${field}Content`);
             const editDiv = document.getElementById(`${field}Edit`);
@@ -687,7 +712,41 @@
                     return;
                 }
 
-                if (field === 'firstName' || field === 'lastName') {
+                if (field === 'mobile') {
+                    if (!validatePhoneNumber(value)) {
+                        showToast('Phone number must be in format: xxx xxx xxx', false);
+                        return;
+                    }
+
+                    try {
+                        const response = await fetch('/update_mobile', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRFToken': CSRF_TOKEN
+                            },
+                            body: JSON.stringify({
+                                mobile: value
+                            })
+                        });
+
+                        const data = await response.json();
+                        
+                        if (response.ok) {
+                            contentDiv.textContent = value;
+                            contentDiv.style.display = 'block';
+                            editDiv.style.display = 'none';
+                            editIcon.classList.remove('d-none');
+                            editButtons.classList.add('d-none');
+                            
+                            showToast('Mobile number updated successfully');
+                        } else {
+                            showToast(data.error || 'Failed to update mobile number', false);
+                        }
+                    } catch (error) {
+                        showToast('An error occurred while updating mobile number', false);
+                    }
+                } else if (field === 'firstName' || field === 'lastName') {
                     try {
                         const endpoint = field === 'firstName' ? '/update_first_name' : '/update_last_name';
                         const response = await fetch(endpoint, {
