@@ -249,3 +249,29 @@ def update_position(request):
         return JsonResponse({'message': 'Position updated successfully'}, status=200)
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
+
+
+@login_required
+@require_http_methods(["POST"])
+def update_location(request):
+    try:
+        data = json.loads(request.body)
+        location = data.get('location')
+        is_remote = data.get('is_remote', False)
+        is_hybrid = data.get('is_hybrid', False)
+        
+        if not location:
+            return JsonResponse({'error': 'Location is required'}, status=400)
+            
+        user = get_user(request.user)
+        if not user:
+            return JsonResponse({'error': 'User not found'}, status=404)
+            
+        user.location = location
+        user.is_remote = is_remote
+        user.is_hybrid = is_hybrid
+        user.save()
+        
+        return JsonResponse({'message': 'Location updated successfully'}, status=200)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
