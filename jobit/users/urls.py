@@ -11,4 +11,5 @@ urlpatterns = [
     path("social-links/add", views.add_social_link, name="add-social-link"),
     path("social-links/<int:link_id>", views.update_social_link, name="update-social-link"),
     path("social-links/<int:link_id>/delete", views.delete_social_link, name="delete-social-link"),
+    path("update-position", views.update_position, name="update-position"),
 ]

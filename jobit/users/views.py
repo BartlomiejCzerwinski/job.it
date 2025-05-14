@@ -13,6 +13,7 @@ from .serializers import SocialLinkSerializer
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
+from django.contrib.auth.decorators import login_required
 
 
 def login_view(request):
@@ -226,3 +227,25 @@ def update_social_link(request, link_id):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     except SocialLink.DoesNotExist:
         return Response({'error': 'Social link not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
+@login_required
+@require_http_methods(["POST"])
+def update_position(request):
+    try:
+        data = json.loads(request.body)
+        position = data.get('position')
+        
+        if not position:
+            return JsonResponse({'error': 'Position is required'}, status=400)
+            
+        user = get_user(request.user)
+        if not user:
+            return JsonResponse({'error': 'User not found'}, status=404)
+            
+        user.position = position
+        user.save()
+        
+        return JsonResponse({'message': 'Position updated successfully'}, status=200)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
