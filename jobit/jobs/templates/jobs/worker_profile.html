@@ -840,6 +840,35 @@
                     } catch (error) {
                         showToast('An error occurred while updating email', false);
                     }
+                } else if (field === 'position') {
+                    try {
+                        const response = await fetch('/update-position', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRFToken': CSRF_TOKEN
+                            },
+                            body: JSON.stringify({
+                                position: value
+                            })
+                        });
+
+                        const data = await response.json();
+                        
+                        if (response.ok) {
+                            contentDiv.textContent = value;
+                            contentDiv.style.display = 'block';
+                            editDiv.style.display = 'none';
+                            editIcon.classList.remove('d-none');
+                            if (editButtons) editButtons.classList.add('d-none');
+                            
+                            showToast('Position updated successfully');
+                        } else {
+                            showToast(data.error || 'Failed to update position', false);
+                        }
+                    } catch (error) {
+                        showToast('An error occurred while updating position', false);
+                    }
                 } else {
                     contentDiv.textContent = value;
                     contentDiv.style.display = 'block';
