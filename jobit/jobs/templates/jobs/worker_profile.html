@@ -869,6 +869,42 @@
                     } catch (error) {
                         showToast('An error occurred while updating position', false);
                     }
+                } else if (field === 'location') {
+                    try {
+                        const locationInput = document.getElementById('locationInput');
+                        const remoteCheck = document.getElementById('remoteCheck');
+                        const hybridCheck = document.getElementById('hybridCheck');
+
+                        const response = await fetch('/update-location', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRFToken': CSRF_TOKEN
+                            },
+                            body: JSON.stringify({
+                                location: locationInput.value.trim(),
+                                is_remote: remoteCheck.checked,
+                                is_hybrid: hybridCheck.checked
+                            })
+                        });
+
+                        const data = await response.json();
+                        
+                        if (response.ok) {
+                            contentDiv.textContent = locationInput.value.trim();
+                            contentDiv.style.display = 'block';
+                            editDiv.style.display = 'none';
+                            editIcon.classList.remove('d-none');
+                            if (editButtons) editButtons.classList.add('d-none');
+                            
+                            updateLocationBadges();
+                            showToast('Location updated successfully');
+                        } else {
+                            showToast(data.error || 'Failed to update location', false);
+                        }
+                    } catch (error) {
+                        showToast('An error occurred while updating location', false);
+                    }
                 } else {
                     contentDiv.textContent = value;
                     contentDiv.style.display = 'block';
