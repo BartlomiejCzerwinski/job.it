@@ -1,5 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.core.validators import URLValidator
+from django.contrib.postgres.fields import ArrayField
+import json
 
 
 class AppUser(models.Model):
@@ -70,3 +73,27 @@ class SocialLink(models.Model):
 
     def __str__(self):
         return f"{self.user.user.email}'s {self.platform} link"
+
+
+class Project(models.Model):
+    user = models.ForeignKey(AppUser, on_delete=models.CASCADE, related_name='projects')
+    title = models.CharField(max_length=100)
+    description = models.TextField(max_length=250)
+    technologies = models.TextField(null=True, blank=True)  # Store as JSON string
+    github_link = models.URLField(blank=True, null=True, validators=[URLValidator()])
+    demo_link = models.URLField(blank=True, null=True, validators=[URLValidator()])
+    order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ['order']
+
+    def __str__(self):
+        return f"{self.user.user.email}'s project: {self.title}"
+
+    def get_technologies(self):
+        if not self.technologies:
+            return []
+        return json.loads(self.technologies)
+
+    def set_technologies(self, tech_list):
+        self.technologies = json.dumps(tech_list)
