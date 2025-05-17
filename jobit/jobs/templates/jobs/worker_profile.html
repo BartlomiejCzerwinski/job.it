@@ -1084,38 +1084,84 @@
             }
         }
 
-        function saveProject() {
+        async function saveProject() {
             const title = document.getElementById('projectTitle').value;
             const description = document.getElementById('projectDescription').value;
             const githubLink = document.getElementById('githubLink').value;
             const demoLink = document.getElementById('demoLink').value;
             
             if (!title || !description) {
-                alert('Please fill in all required fields');
+                showToast('Please fill in all required fields', false);
                 return;
             }
 
-            const project = {
-                id: Date.now(),
+            const projectData = {
                 title,
                 description,
                 technologies: Array.from(technologies),
-                githubLink,
-                demoLink
+                github_link: githubLink,
+                demo_link: demoLink,
+                order: projects.length // Set order based on current number of projects
             };
 
-            projects.push(project);
-            renderProjects();
-            
-            document.getElementById('addProjectForm').reset();
-            technologies.clear();
-            document.getElementById('technologiesList').innerHTML = '';
-            document.getElementById('titleCharCounter').textContent = '100 characters remaining';
-            document.getElementById('descriptionCharCounter').textContent = '250 characters remaining';
-            
-            const modal = bootstrap.Modal.getInstance(document.getElementById('addProjectModal'));
-            modal.hide();
+            try {
+                const response = await fetch('/projects/add', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': CSRF_TOKEN
+                    },
+                    body: JSON.stringify(projectData)
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    // Add the new project to the list
+                    projects.push({
+                        id: data.id,
+                        title: data.title,
+                        description: data.description,
+                        technologies: data.technologies,
+                        githubLink: data.github_link,
+                        demoLink: data.demo_link
+                    });
+                    
+                    renderProjects();
+                    
+                    // Reset form
+                    document.getElementById('addProjectForm').reset();
+                    technologies.clear();
+                    document.getElementById('technologiesList').innerHTML = '';
+                    document.getElementById('titleCharCounter').textContent = '100 characters remaining';
+                    document.getElementById('descriptionCharCounter').textContent = '250 characters remaining';
+                    
+                    // Close modal
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('addProjectModal'));
+                    modal.hide();
+                    
+                    showToast('Project added successfully');
+                } else {
+                    showToast(data.error || 'Failed to add project', false);
+                }
+            } catch (error) {
+                console.error('Error adding project:', error);
+                showToast('An error occurred while adding the project', false);
+            }
         }
+
+        // Add character counter event listeners for project title and description
+        document.getElementById('projectTitle').addEventListener('input', function() {
+            const maxLength = 100;
+            const remaining = maxLength - this.value.length;
+            document.getElementById('titleCharCounter').textContent = `${remaining} characters remaining`;
+        });
+
+        document.getElementById('projectDescription').addEventListener('input', function() {
+            const maxLength = 250;
+            const remaining = maxLength - this.value.length;
+            document.getElementById('descriptionCharCounter').textContent = `${remaining} characters remaining`;
+        });
 
         function renderProjects() {
             const container = document.getElementById('projectsList');
