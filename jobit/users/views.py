@@ -2,14 +2,14 @@ import json
 
 from django.shortcuts import render
 from django.views.decorators.http import require_http_methods
-from users.models import AppUser, UserSkill, Skill, SocialLink
+from users.models import AppUser, UserSkill, Skill, SocialLink, Project
 from .forms import LoginForm, RegisterForm
 from django.contrib.auth.hashers import make_password
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
-from .serializers import SocialLinkSerializer
+from .serializers import SocialLinkSerializer, ProjectSerializer
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
@@ -275,3 +275,19 @@ def update_location(request):
         return JsonResponse({'message': 'Location updated successfully'}, status=200)
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
+
+
+@api_view(['POST'])
+def add_project(request):
+    if not request.user.is_authenticated:
+        return Response({'error': 'Authentication required'}, status=status.HTTP_401_UNAUTHORIZED)
+    
+    app_user = get_user(request.user)
+    if not app_user:
+        return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+    
+    serializer = ProjectSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save(user=app_user)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
