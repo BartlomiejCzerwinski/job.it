@@ -299,37 +299,6 @@
                                 </button>
                             </div>
                             <div id="projectsList">
-                                <div class="card mb-3 project-card">
-                                    <div class="card-body">
-                                        <div class="d-flex justify-content-between align-items-start mb-2">
-                                            <h5 class="card-title mb-0">E-commerce Platform</h5>
-                                            <div class="dropdown">
-                                                <button class="btn btn-link text-dark p-0" type="button" data-bs-toggle="dropdown">
-                                                    <i class="bi bi-three-dots-vertical"></i>
-                                                </button>
-                                                <ul class="dropdown-menu">
-                                                    <li><a class="dropdown-item" href="#" onclick="editProject(1)"><i class="bi bi-pencil me-2"></i>Edit</a></li>
-                                                    <li><a class="dropdown-item text-danger" href="javascript:void(0)" onclick="deleteProject(1)"><i class="bi bi-trash me-2"></i>Delete</a></li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                        <p class="card-text text-muted">A full-featured e-commerce platform with user authentication, product management, shopping cart, and payment integration.</p>
-                                        <div class="mb-3">
-                                            <span class="badge bg-primary me-1">React</span>
-                                            <span class="badge bg-success me-1">Node.js</span>
-                                            <span class="badge bg-info me-1">MongoDB</span>
-                                            <span class="badge bg-warning me-1">Express</span>
-                                        </div>
-                                        <div class="d-flex gap-2">
-                                            <a href="#" class="btn btn-outline-primary btn-sm" target="_blank">
-                                                <i class="bi bi-github me-1"></i>GitHub
-                                            </a>
-                                            <a href="#" class="btn btn-outline-secondary btn-sm" target="_blank">
-                                                <i class="bi bi-globe me-1"></i>Live Demo
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -1325,14 +1294,5 @@
             }
         });
 
-        projects.push({
-            id: 1,
-            title: 'TakeCar',
-            description: 'Android car rental application that connects car owners with people looking to rent cars. Built using Java with Android SDK and Firebase (Authentication, Realtime Database, Storage). Features include user registration, car management, rental system, and income calculations.',
-            technologies: ['Java', 'Android SDK', 'Firebase', 'Firebase Authentication', 'Firebase Realtime Database', 'Firebase Storage'],
-            githubLink: 'https://github.com/BartlomiejCzerwinski/TakeCar',
-            demoLink: ''
-        });
-        renderProjects();
     </script>
 {% endblock %}
