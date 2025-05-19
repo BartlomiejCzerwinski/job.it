@@ -43,10 +43,12 @@ def worker_profile(request):
         "starts_in": getattr(profile, "starts_in")
     }
     skills = get_user_skills(user)
+    projects = profile.projects.all()  
     return render(request, 'jobs/worker_profile.html', {
         'skills': skills,
         'user_data': user_data,
-        'about_me': getattr(profile, "about_me", "")
+        'about_me': getattr(profile, "about_me", ""),
+        'projects': projects
     })
 
 

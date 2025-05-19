@@ -299,6 +299,42 @@
                                 </button>
                             </div>
                             <div id="projectsList">
+                                {% for project in projects %}
+                                    <div class="card mb-3 project-card">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                                <h5 class="card-title mb-0">{{ project.title }}</h5>
+                                                <div class="dropdown">
+                                                    <button class="btn btn-link text-dark p-0" type="button" data-bs-toggle="dropdown">
+                                                        <i class="bi bi-three-dots-vertical"></i>
+                                                    </button>
+                                                    <ul class="dropdown-menu">
+                                                        <li><a class="dropdown-item" href="javascript:void(0)" onclick="editProject({{ project.id }})"><i class="bi bi-pencil me-2"></i>Edit</a></li>
+                                                        <li><a class="dropdown-item text-danger" href="javascript:void(0)" onclick="deleteProject({{ project.id }})"><i class="bi bi-trash me-2"></i>Delete</a></li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                            <p class="card-text text-muted">{{ project.description }}</p>
+                                            <div class="mb-3">
+                                                {% for tech in project.get_technologies %}
+                                                    <span class="badge bg-primary me-1">{{ tech }}</span>
+                                                {% endfor %}
+                                            </div>
+                                            <div class="d-flex gap-2">
+                                                {% if project.github_link %}
+                                                    <a href="{{ project.github_link }}" class="btn btn-outline-primary btn-sm" target="_blank">
+                                                        <i class="bi bi-github me-1"></i>GitHub
+                                                    </a>
+                                                {% endif %}
+                                                {% if project.demo_link %}
+                                                    <a href="{{ project.demo_link }}" class="btn btn-outline-secondary btn-sm" target="_blank">
+                                                        <i class="bi bi-globe me-1"></i>Live Demo
+                                                    </a>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
                             </div>
                         </div>
                     </div>
@@ -1062,7 +1098,18 @@
             resetUpload();
         }
 
-        let projects = [];
+        let projects = [
+            {% for project in projects %}
+            {
+                id: {{ project.id }},
+                title: "{{ project.title }}",
+                description: "{{ project.description }}",
+                technologies: {{ project.get_technologies|safe }},
+                githubLink: "{{ project.github_link|default:'' }}",
+                demoLink: "{{ project.demo_link|default:'' }}"
+            }{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ];
         let technologies = new Set();
         let projectToDelete = null;
 
