@@ -1360,15 +1360,33 @@
         }
 
         document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById('confirmDeleteProjectButton').addEventListener('click', function() {
+            document.getElementById('confirmDeleteProjectButton').addEventListener('click', async function() {
                 if (projectToDelete !== null) {
-                    projects = projects.filter(p => p.id !== projectToDelete);
-                    renderProjects();
-                    
-                    const modal = bootstrap.Modal.getInstance(document.getElementById('confirmDeleteProjectModal'));
-                    modal.hide();
-                    
-                    showToast('Project deleted successfully');
+                    try {
+                        const response = await fetch(`/projects/delete/${projectToDelete}`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRFToken': CSRF_TOKEN
+                            }
+                        });
+
+                        const data = await response.json();
+                        
+                        if (response.ok) {
+                            projects = projects.filter(p => p.id !== projectToDelete);
+                            renderProjects();
+                            
+                            const modal = bootstrap.Modal.getInstance(document.getElementById('confirmDeleteProjectModal'));
+                            modal.hide();
+                            
+                            showToast('Project deleted successfully');
+                        } else {
+                            showToast(data.error || 'Failed to delete project', false);
+                        }
+                    } catch (error) {
+                        showToast('An error occurred while deleting the project', false);
+                    }
                     projectToDelete = null;
                 }
             });
