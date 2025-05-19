@@ -14,4 +14,5 @@ urlpatterns = [
     path("update-position", views.update_position, name="update-position"),
     path("update-location", views.update_location, name="update-location"),
     path("projects/add", views.add_project, name="add-project"),
+    path('projects/delete/<int:project_id>', views.delete_project, name='delete_project'),
 ]

@@ -291,3 +291,22 @@ def add_project(request):
         serializer.save(user=app_user)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@login_required
+@require_http_methods(["POST"])
+def delete_project(request, project_id):
+    try:
+        user = get_user(request.user)
+        if not user:
+            return JsonResponse({'error': 'User not found'}, status=404)
+            
+        try:
+            project = user.projects.get(id=project_id)
+            project.delete()
+            return JsonResponse({'message': 'Project deleted successfully'}, status=200)
+        except user.projects.model.DoesNotExist:
+            return JsonResponse({'error': 'Project not found'}, status=404)
+            
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
