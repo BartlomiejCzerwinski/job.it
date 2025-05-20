@@ -1,6 +1,6 @@
 import json
 
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.views.decorators.http import require_http_methods
 from users.models import AppUser, UserSkill, Skill, SocialLink, Project
 from .forms import LoginForm, RegisterForm
@@ -308,5 +308,46 @@ def delete_project(request, project_id):
         except user.projects.model.DoesNotExist:
             return JsonResponse({'error': 'Project not found'}, status=404)
             
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+
+@login_required
+@require_http_methods(["POST"])
+def update_project(request, project_id):
+    try:
+        data = json.loads(request.body)
+        project = get_object_or_404(Project, id=project_id, user=get_user(request.user))
+        
+        if 'title' in data:
+            project.title = data['title']
+        if 'description' in data:
+            project.description = data['description']
+        if 'technologies' in data:
+            project.set_technologies(data['technologies'])
+        if 'githubLink' in data:
+            project.github_link = data['githubLink']
+        if 'demoLink' in data:
+            project.demo_link = data['demoLink']
+        if 'order' in data:
+            project.order = data['order']
+            
+        project.save()
+        
+        return JsonResponse({
+            'message': 'Project updated successfully',
+            'project': {
+                'id': project.id,
+                'title': project.title,
+                'description': project.description,
+                'technologies': project.get_technologies(),
+                'githubLink': project.github_link,
+                'demoLink': project.demo_link,
+                'order': project.order
+            }
+        })
+        
+    except json.JSONDecodeError:
+        return JsonResponse({'error': 'Invalid JSON data'}, status=400)
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
