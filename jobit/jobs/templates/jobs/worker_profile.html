@@ -1253,6 +1253,8 @@
             });
         }
 
+        let editTechnologies = new Set();
+
         function editProject(id) {
             const project = projects.find(p => p.id === id);
             if (!project) return;
@@ -1270,7 +1272,7 @@
             
             // Clear existing technologies
             document.getElementById('editTechnologiesList').innerHTML = '';
-            editTechnologies = new Set();
+            editTechnologies = new Set(project.technologies);
             
             // Add existing technologies
             project.technologies.forEach(tech => {
@@ -1309,37 +1311,64 @@
 
         function updateProject() {
             const id = parseInt(document.getElementById('editProjectId').value);
-            const title = document.getElementById('editProjectTitle').value;
-            const description = document.getElementById('editProjectDescription').value;
-            const githubLink = document.getElementById('editGithubLink').value;
-            const demoLink = document.getElementById('editDemoLink').value;
+            const title = document.getElementById('editProjectTitle').value.trim();
+            const description = document.getElementById('editProjectDescription').value.trim();
+            const githubLink = document.getElementById('editGithubLink').value.trim();
+            const demoLink = document.getElementById('editDemoLink').value.trim();
             
             if (!title || !description) {
-                alert('Please fill in all required fields');
+                showToast('Please fill in all required fields', false);
                 return;
             }
 
-            const projectIndex = projects.findIndex(p => p.id === id);
-            if (projectIndex !== -1) {
-                projects[projectIndex] = {
-                    id,
-                    title,
-                    description,
-                    technologies: Array.from(editTechnologies),
-                    githubLink,
-                    demoLink
-                };
+            const projectData = {
+                title,
+                description,
+                technologies: Array.from(editTechnologies),
+                githubLink: githubLink || null,
+                demoLink: demoLink || null
+            };
 
-                renderProjects();
-                
-                const modal = bootstrap.Modal.getInstance(document.getElementById('editProjectModal'));
-                modal.hide();
-                
-                showToast('Project updated successfully');
-            }
+            fetch(`/projects/update/${id}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify(projectData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    showToast(data.error, false);
+                } else {
+                    // Update the project in the local array
+                    const index = projects.findIndex(p => p.id === id);
+                    if (index !== -1) {
+                        projects[index] = {
+                            id,
+                            title: data.project.title,
+                            description: data.project.description,
+                            technologies: data.project.technologies,
+                            githubLink: data.project.github_link,
+                            demoLink: data.project.demo_link
+                        };
+                    }
+                    
+                    // Update the UI
+                    renderProjects();
+                    showToast('Project updated successfully');
+                    
+                    // Close the modal
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('editProjectModal'));
+                    modal.hide();
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('Failed to update project', false);
+            });
         }
-
-        let editTechnologies = new Set();
 
         document.getElementById('editProjectTitle').addEventListener('input', function() {
             const maxLength = 100;
