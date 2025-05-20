@@ -680,7 +680,7 @@
             const contentDiv = document.getElementById(`${field}Content`);
             const editDiv = document.getElementById(`${field}Edit`);
             const editIcon = contentDiv.closest('.d-flex').querySelector('.edit-icon');
-            const editButtons = contentDiv.closest('.d-none');
+            const editButtons = editIcon.nextElementSibling;
             
             if (contentDiv.style.display !== 'none') {
                 contentDiv.style.display = 'none';
@@ -715,7 +715,7 @@
             const contentDiv = document.getElementById(`${field}Content`);
             const editDiv = document.getElementById(`${field}Edit`);
             const editIcon = contentDiv.closest('.d-flex').querySelector('.edit-icon');
-            const editButtons = contentDiv.closest('.d-none');
+            const editButtons = editIcon.nextElementSibling;
             
             contentDiv.style.display = 'block';
             editDiv.style.display = 'none';
@@ -780,7 +780,7 @@
             const contentDiv = document.getElementById(`${field}Content`);
             const editDiv = document.getElementById(`${field}Edit`);
             const editIcon = contentDiv.closest('.d-flex').querySelector('.edit-icon');
-            const editButtons = contentDiv.closest('.d-none');
+            const editButtons = editIcon.nextElementSibling;
             const input = editDiv.querySelector('input, select');
             
             if (input) {
@@ -938,7 +938,7 @@
                             contentDiv.style.display = 'block';
                             editDiv.style.display = 'none';
                             editIcon.classList.remove('d-none');
-                            if (editButtons) editButtons.classList.add('d-none');
+                            editButtons.classList.add('d-none');
                             
                             showToast('Position updated successfully');
                         } else {
@@ -973,7 +973,7 @@
                             contentDiv.style.display = 'block';
                             editDiv.style.display = 'none';
                             editIcon.classList.remove('d-none');
-                            if (editButtons) editButtons.classList.add('d-none');
+                            editButtons.classList.add('d-none');
                             
                             updateLocationBadges();
                             showToast('Location updated successfully');
@@ -982,16 +982,6 @@
                         }
                     } catch (error) {
                         showToast('An error occurred while updating location', false);
-                    }
-                } else {
-                    contentDiv.textContent = value;
-                    contentDiv.style.display = 'block';
-                    editDiv.style.display = 'none';
-                    editIcon.classList.remove('d-none');
-                    editButtons.classList.add('d-none');
-
-                    if (field === 'location') {
-                        updateLocationBadges();
                     }
                 }
             }
