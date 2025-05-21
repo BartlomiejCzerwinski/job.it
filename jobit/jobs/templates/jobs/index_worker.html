@@ -11,6 +11,12 @@
 {% endblock %}
 
 {% block content %}
+    <!-- Floating AI Chat Button -->
+    <div class="position-fixed bottom-0 end-0 p-4" style="z-index: 1000;">
+        <button class="btn btn-primary rounded-circle shadow-lg" style="width: 60px; height: 60px;" onclick="openAIChat()">
+            <i class="bi bi-robot" style="font-size: 1.5rem;"></i>
+        </button>
+    </div>
 
     <div class="card shadow mx-auto my-5 p-5 text-center">
         <h1 class="fw-semibold mb-4">
@@ -242,6 +248,10 @@
         function scrollContainer(id, offset) {
             const el = document.getElementById(id);
             el.scrollLeft += offset;
+        }
+
+        function openAIChat() {
+            alert('AI Chat feature coming soon!');
         }
     </script>
 {% endblock %}
