@@ -28,6 +28,35 @@ def index(request):
 
 
 @login_required
+def search_results_view(request):
+    search_query = request.GET.get('q', '').strip()
+    if search_query:
+        job_listings = JobListing.objects.filter(
+            job_title__icontains=search_query
+        ) | JobListing.objects.filter(
+            company_name__icontains=search_query
+        )
+    else:
+        job_listings = JobListing.objects.all()
+    job_list = []
+    for job in job_listings:
+        skills = get_listing_skills(job)
+        job_list.append({
+            'id': job.id,
+            'job_title': job.job_title,
+            'job_location': job.job_location,
+            'company_name': job.company_name,
+            'salary_min': job.salary_min,
+            'salary_max': job.salary_max,
+            'salary_currency': job.salary_currency,
+            'skills': skills,
+            'is_remote': job.job_model == 'REMOTE',
+            'is_hybrid': job.job_model == 'HYBRID',
+        })
+    return render(request, 'jobs/search_results.html', {'job_listings': job_list, 'search_query': search_query})
+
+
+@login_required
 def worker_profile(request):
     user = request.user
     profile = get_user(request.user)

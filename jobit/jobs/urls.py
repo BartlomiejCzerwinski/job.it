@@ -21,4 +21,5 @@ urlpatterns = [
     path('update_email', views.update_email, name='update_email'),
     path('update_mobile', views.update_mobile, name='update_mobile'),
     path('update_starts_in', views.update_starts_in, name='update_starts_in'),
+    path('search', views.search_results_view, name='search_results'),
 ]
