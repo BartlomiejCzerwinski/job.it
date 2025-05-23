@@ -10,60 +10,65 @@
 {% endblock %}
 
 {% block content %}
-    <div class="container my-5">
-        <div class="row justify-content-center mb-4">
-            <div class="col-md-8">
-                <div class="input-group input-group-lg">
-                    <input type="text" class="form-control" placeholder="Search job titles, technologies..." value="{{ search_query|default:'' }}">
-                    <button class="btn btn-outline-secondary" type="button"><i class="bi bi-search"></i></button>
-                    <button class="btn btn-outline-info" type="button"><i class="bi bi-sliders"></i> Filters</button>
-                </div>
-                {% if job_listings %}
-                    {% for job in job_listings %}
-                        <div class="job-tile card shadow-sm mb-4 mt-4 w-100" style="cursor:pointer; border-radius: 1.25rem; min-height: 180px; height: 180px; display: flex;" onclick="window.location.href='/listings/{{ job.id }}'">
-                            <div class="card-body d-flex flex-column h-100 p-4">
-                                <div class="d-flex justify-content-between align-items-start mb-2 flex-wrap">
-                                    <div class="pe-3" style="min-width: 0;">
-                                        <h4 class="fw-bold text-primary mb-1 text-truncate" style="max-width: 350px;">{{ job.job_title }}</h4>
-                                        <div class="mb-1 mt-2" style="white-space: normal;">
-                                            {% for skill in job.skills %}
-                                                {% if skill.level == 3 %}
-                                                    <span class="badge bg-danger">{{ skill.name }}</span>
-                                                {% elif skill.level == 2 %}
-                                                    <span class="badge bg-warning">{{ skill.name }}</span>
-                                                {% elif skill.level == 1 %}
-                                                    <span class="badge bg-success">{{ skill.name }}</span>
-                                                {% endif %}
-                                            {% endfor %}
+    <div class="position-relative my-5">
+        <a href="javascript:history.back()" class="btn btn-outline-dark position-absolute top-0 start-0 ms-3 mt-2" style="z-index: 10;">
+            ← Go Back
+        </a>
+        <div class="container my-5">
+            <div class="row justify-content-center mb-4">
+                <div class="col-md-8">
+                    <div class="input-group input-group-lg">
+                        <input type="text" class="form-control" placeholder="Search job titles, technologies..." value="{{ search_query|default:'' }}">
+                        <button class="btn btn-outline-secondary" type="button"><i class="bi bi-search"></i></button>
+                        <button class="btn btn-outline-info" type="button"><i class="bi bi-sliders"></i> Filters</button>
+                    </div>
+                    {% if job_listings %}
+                        {% for job in job_listings %}
+                            <div class="job-tile card shadow-sm mb-4 mt-4 w-100" style="cursor:pointer; border-radius: 1.25rem; min-height: 180px; height: 180px; display: flex;" onclick="window.location.href='/listings/{{ job.id }}'">
+                                <div class="card-body d-flex flex-column h-100 p-4">
+                                    <div class="d-flex justify-content-between align-items-start mb-2 flex-wrap">
+                                        <div class="pe-3" style="min-width: 0;">
+                                            <h4 class="fw-bold text-primary mb-1 text-truncate" style="max-width: 350px;">{{ job.job_title }}</h4>
+                                            <div class="mb-1 mt-2" style="white-space: normal;">
+                                                {% for skill in job.skills %}
+                                                    {% if skill.level == 3 %}
+                                                        <span class="badge bg-danger">{{ skill.name }}</span>
+                                                    {% elif skill.level == 2 %}
+                                                        <span class="badge bg-warning">{{ skill.name }}</span>
+                                                    {% elif skill.level == 1 %}
+                                                        <span class="badge bg-success">{{ skill.name }}</span>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                        <div class="text-end ps-3" style="min-width: 160px;">
+                                            <span class="text-secondary small d-block"><strong><i class="bi bi-geo-alt"></i></strong> {{ job.job_location }}</span>
+                                            <span class="text-secondary small d-block"><i class="bi bi-buildings"></i> {{ job.company_name }}</span>
+                                            {% if job.is_remote %}
+                                                <span class="badge bg-success ms-1">Remote</span>
+                                            {% endif %}
+                                            {% if job.is_hybrid %}
+                                                <span class="badge bg-warning ms-1">Hybrid</span>
+                                            {% endif %}
                                         </div>
                                     </div>
-                                    <div class="text-end ps-3" style="min-width: 160px;">
-                                        <span class="text-secondary small d-block"><strong><i class="bi bi-geo-alt"></i></strong> {{ job.job_location }}</span>
-                                        <span class="text-secondary small d-block"><i class="bi bi-buildings"></i> {{ job.company_name }}</span>
-                                        {% if job.is_remote %}
-                                            <span class="badge bg-success ms-1">Remote</span>
-                                        {% endif %}
-                                        {% if job.is_hybrid %}
-                                            <span class="badge bg-warning ms-1">Hybrid</span>
+                                    <div class="d-flex justify-content-end align-items-end mt-auto">
+                                        {% if job.salary_min and job.salary_max %}
+                                            <span class="fw-bold text-success" style="font-size: 1.2rem;">{{ job.salary_min }} - {{ job.salary_max }} {{ job.salary_currency }}</span>
+                                        {% else %}
+                                            <span class="fw-bold text-muted">Salary not specified</span>
                                         {% endif %}
                                     </div>
                                 </div>
-                                <div class="d-flex justify-content-end align-items-end mt-auto">
-                                    {% if job.salary_min and job.salary_max %}
-                                        <span class="fw-bold text-success" style="font-size: 1.2rem;">{{ job.salary_min }} - {{ job.salary_max }} {{ job.salary_currency }}</span>
-                                    {% else %}
-                                        <span class="fw-bold text-muted">Salary not specified</span>
-                                    {% endif %}
-                                </div>
                             </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="col-12 text-center">
+                            <i class="bi bi-exclamation-diamond text-muted" style="font-size: 6rem;"></i>
+                            <h2 class="text-muted fw-semibold mt-3">No jobs found for your search.</h2>
                         </div>
-                    {% endfor %}
-                {% else %}
-                    <div class="col-12 text-center">
-                        <i class="bi bi-exclamation-diamond text-muted" style="font-size: 6rem;"></i>
-                        <h2 class="text-muted fw-semibold mt-3">No jobs found for your search.</h2>
-                    </div>
-                {% endif %}
+                    {% endif %}
+                </div>
             </div>
         </div>
     </div>
