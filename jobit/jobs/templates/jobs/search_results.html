@@ -32,6 +32,9 @@
                                     {% endif %}
                                 </div>
                                 <input type="text" name="q" class="form-control border-0 flex-grow-1" placeholder="Search job titles, technologies..." value="{{ search_query|default:'' }}" style="min-width: 200px;">
+                                <button id="clearAllTagsBtn" type="button" class="btn btn-link p-0 ms-2" style="display: none; font-size: 1.5rem; color: #888; text-decoration: none;" tabindex="-1" aria-label="Clear all tags">
+                                    <i class="bi bi-x-circle"></i>
+                                </button>
                             </div>
                         </div>
                         <button class="btn btn-primary" type="submit">
@@ -257,6 +260,33 @@
         // Update on DOM changes (when tags are added/removed)
         const observer = new MutationObserver(updatePlaceholder);
         observer.observe(document.getElementById('selectedSkills'), { childList: true, subtree: true });
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        function updateClearAllBtn() {
+            const selectedSkills = document.querySelectorAll('#selectedSkills input[name="skills"]');
+            const clearAllBtn = document.getElementById('clearAllTagsBtn');
+            if (selectedSkills.length > 0) {
+                if (clearAllBtn) clearAllBtn.style.display = '';
+            } else {
+                if (clearAllBtn) clearAllBtn.style.display = 'none';
+            }
+        }
+        updateClearAllBtn();
+        // Update on DOM changes (when tags are added/removed)
+        const observer = new MutationObserver(updateClearAllBtn);
+        observer.observe(document.getElementById('selectedSkills'), { childList: true, subtree: true });
+
+        // Clear all tags button logic
+        const clearAllBtn = document.getElementById('clearAllTagsBtn');
+        if (clearAllBtn) {
+            clearAllBtn.addEventListener('click', function() {
+                const selectedSkills = document.getElementById('selectedSkills');
+                selectedSkills.innerHTML = '';
+                // Submit the form to update results
+                document.querySelector('form[action="/search"]').submit();
+            });
+        }
     });
     </script>
 {% endblock %} 
