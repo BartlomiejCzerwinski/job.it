@@ -3,6 +3,9 @@ from django.http import JsonResponse
 from jobs.views import get_all_listings, get_listing_skills
 from users.views import get_user_skills
 from .vectorizer import JobMatchingVectorizer
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
+import json
 
 
 def knn_match(request):
@@ -29,4 +32,17 @@ def knn_match(request):
     
     return JsonResponse({
         'matches': matches
+    })
+
+@csrf_exempt
+@require_POST
+def chat_endpoint(request):
+    try:
+        data = json.loads(request.body.decode('utf-8'))
+        user_message = data.get('message', '')
+    except Exception:
+        user_message = ''
+    # Placeholder response
+    return JsonResponse({
+        'reply': "[Placeholder] This is a response from the server. You said: '" + user_message + "'"
     })
