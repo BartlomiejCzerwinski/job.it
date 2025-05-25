@@ -242,5 +242,21 @@
             }
         });
     });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        function updatePlaceholder() {
+            const selectedSkills = document.querySelectorAll('#selectedSkills input[name="skills"]');
+            const searchInput = document.querySelector('input[name="q"]');
+            if (selectedSkills.length > 0) {
+                searchInput.placeholder = '';
+            } else {
+                searchInput.placeholder = 'Search job titles, technologies...';
+            }
+        }
+        updatePlaceholder();
+        // Update on DOM changes (when tags are added/removed)
+        const observer = new MutationObserver(updatePlaceholder);
+        observer.observe(document.getElementById('selectedSkills'), { childList: true, subtree: true });
+    });
     </script>
 {% endblock %} 
