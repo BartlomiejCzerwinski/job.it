@@ -8,7 +8,7 @@ from .vectorizer import JobMatchingVectorizer
 def knn_match(request):
     listings = get_all_listings()
     user_skills = get_user_skills(request.user)
-    vectorizer = JobMatchingVectorizer()
+    vectorizer = JobMatchingVectorizer(n_neighbors=3)
     
     # Create normalized user skill vector
     user_vector = vectorizer.create_skill_vector(user_skills)
