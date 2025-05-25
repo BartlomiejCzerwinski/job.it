@@ -5,7 +5,7 @@ from users.views import get_user_skills
 from .vectorizer import JobMatchingVectorizer
 
 
-def match(request):
+def knn_match(request):
     listings = get_all_listings()
     user_skills = get_user_skills(request.user)
     vectorizer = JobMatchingVectorizer()
@@ -24,7 +24,9 @@ def match(request):
             'vector': job_vector
         })
     
+    # Find best matches using KNN
+    matches = vectorizer.find_matches(user_vector, job_vectors)
+    
     return JsonResponse({
-        'user_vector': user_vector,
-        'job_vectors': job_vectors
+        'matches': matches
     })
