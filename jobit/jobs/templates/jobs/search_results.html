@@ -57,6 +57,11 @@
                         <div class="card card-body">
                             <form action="/search" method="get" class="row g-3">
                                 <input type="hidden" name="q" value="{{ search_query|default:'' }}">
+                                {% if filters.skills %}
+                                    {% for skill in filters.skills %}
+                                        <input type="hidden" name="skills" value="{{ skill }}">
+                                    {% endfor %}
+                                {% endif %}
                                 <div class="col-md-4">
                                     <label class="form-label">Job Model</label>
                                     <select name="model" class="form-select">

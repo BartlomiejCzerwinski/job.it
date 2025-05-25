@@ -44,6 +44,7 @@ def search_results_view(request):
     salary_min = request.GET.get('salary_min')
     salary_max = request.GET.get('salary_max')
     currency = request.GET.get('currency', '')
+    skills = request.GET.getlist('skills')  # Get list of skills from query params
 
     # Start with all job listings
     job_listings = JobListing.objects.all()
@@ -70,22 +71,34 @@ def search_results_view(request):
     if currency:
         job_listings = job_listings.filter(salary_currency=currency)
 
-    # Convert to list format for template
+    # Convert to list format for template and apply skill-based ranking
     job_list = []
     for job in job_listings:
-        skills = get_listing_skills(job)
-        job_list.append({
-            'id': job.id,
-            'job_title': job.job_title,
-            'job_location': job.job_location,
-            'company_name': job.company_name,
-            'salary_min': job.salary_min,
-            'salary_max': job.salary_max,
-            'salary_currency': job.salary_currency,
-            'skills': skills,
-            'is_remote': job.job_model == 'REMOTE',
-            'is_hybrid': job.job_model == 'HYBRID',
-        })
+        job_skills = get_listing_skills(job)
+        job_skill_names = {skill['name'] for skill in job_skills}
+        
+        # Count how many requested skills this job has
+        matching_skills = sum(1 for skill in skills if skill in job_skill_names)
+        
+        # Only include jobs that have at least one matching skill if skills were specified
+        if not skills or matching_skills > 0:
+            job_list.append({
+                'id': job.id,
+                'job_title': job.job_title,
+                'job_location': job.job_location,
+                'company_name': job.company_name,
+                'salary_min': job.salary_min,
+                'salary_max': job.salary_max,
+                'salary_currency': job.salary_currency,
+                'skills': job_skills,
+                'is_remote': job.job_model == 'REMOTE',
+                'is_hybrid': job.job_model == 'HYBRID',
+                'matching_skills_count': matching_skills  # Add this for sorting
+            })
+
+    # Sort jobs by number of matching skills (descending)
+    if skills:  # Only sort by matching skills if skills were specified
+        job_list.sort(key=lambda x: x['matching_skills_count'], reverse=True)
 
     return render(request, 'jobs/search_results.html', {
         'job_listings': job_list,
@@ -94,7 +107,8 @@ def search_results_view(request):
             'model': job_model,
             'salary_min': salary_min,
             'salary_max': salary_max,
-            'currency': currency
+            'currency': currency,
+            'skills': skills
         }
     })
 
