@@ -21,8 +21,18 @@ ROLE_RECRUITER = "recruiter"
 def index(request):
     role = get_user_role(request.user)
     if role == ROLE_WORKER:
-        job_listings = get_all_listings_for_tiles(4)
-        return render(request, 'jobs/index_worker.html', {"job_listings": job_listings})
+        # Get regular job listings
+        job_listings = get_all_listings()
+        all_tiles = get_listings_tiles(job_listings, 4)
+        
+        # Get KNN matched jobs and convert to tiles
+        knn_matched_jobs = get_knn_matches(request)
+        knn_tiles = get_listings_tiles(knn_matched_jobs, 3)
+        
+        return render(request, 'jobs/index_worker.html', {
+            "job_listings": all_tiles,
+            "knn_matches": knn_tiles
+        })
     elif role == ROLE_RECRUITER:
         return render(request, 'jobs/index_recruiter.html')
 
@@ -193,8 +203,7 @@ def get_recruiter_listings(email):
     return job_listings
 
 
-def get_all_listings_for_tiles(number_of_skills_per_tile):
-    job_listings = get_all_listings()
+def get_listings_tiles(job_listings, number_of_skills_per_tile):
     result = []
     for job_listing in job_listings:
         skills = get_listing_skills(job_listing)[:number_of_skills_per_tile]
@@ -211,7 +220,6 @@ def get_all_listings_for_tiles(number_of_skills_per_tile):
             "is_hybrid": job_listing.job_model == 'HYBRID'
         })
     return result
-
 
 
 def get_all_listings():
@@ -495,3 +503,17 @@ def update_starts_in(request):
         return JsonResponse({'message': 'Starts in updated successfully'}, status=200)
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
+
+
+def get_knn_matches(request):
+    from matching.views import knn_match
+    response = knn_match(request)
+    matches = json.loads(response.content)['matches']
+    
+    # Get job listings for matched jobs
+    matched_jobs = []
+    for match in matches:
+        job = JobListing.objects.get(id=match['listing_id'])
+        matched_jobs.append(job)
+    print(matched_jobs)
+    return matched_jobs
