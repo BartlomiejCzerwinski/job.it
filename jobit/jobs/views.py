@@ -24,6 +24,10 @@ def index(request):
         # Get regular job listings
         job_listings = get_all_listings()
         all_tiles = get_listings_tiles(job_listings, 4)
+
+        # Filter remote offers only
+        remote_job_listings = [job for job in job_listings if job.job_model == 'REMOTE']
+        remote_tiles = get_listings_tiles(remote_job_listings, 4)
         
         # Get KNN matched jobs and convert to tiles
         knn_matched_jobs = get_knn_matches(request)
@@ -31,7 +35,8 @@ def index(request):
         
         return render(request, 'jobs/index_worker.html', {
             "job_listings": all_tiles,
-            "knn_matches": knn_tiles
+            "knn_matches": knn_tiles,
+            "remote_offers": remote_tiles
         })
     elif role == ROLE_RECRUITER:
         return render(request, 'jobs/index_recruiter.html')
