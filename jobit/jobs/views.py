@@ -40,14 +40,37 @@ def index(request):
 @login_required
 def search_results_view(request):
     search_query = request.GET.get('q', '').strip()
+    job_model = request.GET.get('model', '')
+    salary_min = request.GET.get('salary_min')
+    salary_max = request.GET.get('salary_max')
+    currency = request.GET.get('currency', '')
+
+    # Start with all job listings
+    job_listings = JobListing.objects.all()
+
+    # Apply search query filter
     if search_query:
-        job_listings = JobListing.objects.filter(
+        job_listings = job_listings.filter(
             job_title__icontains=search_query
-        ) | JobListing.objects.filter(
+        ) | job_listings.filter(
             company_name__icontains=search_query
         )
-    else:
-        job_listings = JobListing.objects.all()
+
+    # Apply job model filter
+    if job_model:
+        job_listings = job_listings.filter(job_model=job_model)
+
+    # Apply salary range filter
+    if salary_min:
+        job_listings = job_listings.filter(salary_min__gte=salary_min)
+    if salary_max:
+        job_listings = job_listings.filter(salary_max__lte=salary_max)
+
+    # Apply currency filter
+    if currency:
+        job_listings = job_listings.filter(salary_currency=currency)
+
+    # Convert to list format for template
     job_list = []
     for job in job_listings:
         skills = get_listing_skills(job)
@@ -63,7 +86,17 @@ def search_results_view(request):
             'is_remote': job.job_model == 'REMOTE',
             'is_hybrid': job.job_model == 'HYBRID',
         })
-    return render(request, 'jobs/search_results.html', {'job_listings': job_list, 'search_query': search_query})
+
+    return render(request, 'jobs/search_results.html', {
+        'job_listings': job_list,
+        'search_query': search_query,
+        'filters': {
+            'model': job_model,
+            'salary_min': salary_min,
+            'salary_max': salary_max,
+            'currency': currency
+        }
+    })
 
 
 @login_required
