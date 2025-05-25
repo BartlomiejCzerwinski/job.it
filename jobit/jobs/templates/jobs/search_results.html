@@ -18,7 +18,22 @@
             <div class="row justify-content-center mb-4">
                 <div class="col-md-8">
                     <form class="d-flex w-100" action="/search" method="get" style="gap: 0.5rem;">
-                        <input type="text" name="q" class="form-control form-control-lg" placeholder="Search job titles, technologies..." value="{{ search_query|default:'' }}">
+                        <div class="position-relative flex-grow-1">
+                            <div class="d-flex align-items-center gap-2 p-2 border rounded" style="min-height: 48px; background: white;">
+                                <div id="selectedSkills" class="d-flex align-items-center gap-2">
+                                    {% if filters.skills %}
+                                        {% for skill in filters.skills %}
+                                            <span class="badge bg-primary d-flex align-items-center" style="font-size: 0.9rem; padding: 0.5rem 0.75rem;">
+                                                {{ skill }}
+                                                <input type="hidden" name="skills" value="{{ skill }}">
+                                                <i class="bi bi-x ms-1" style="cursor: pointer;" onclick="removeSkill(this)"></i>
+                                            </span>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                                <input type="text" name="q" class="form-control border-0 flex-grow-1" placeholder="Search job titles, technologies..." value="{{ search_query|default:'' }}" style="min-width: 200px;">
+                            </div>
+                        </div>
                         <button class="btn btn-primary" type="submit">
                             <i class="bi bi-search"></i> Search
                         </button>
@@ -26,6 +41,18 @@
                             <i class="bi bi-sliders"></i> Filters
                         </button>
                     </form>
+                    <div class="d-flex flex-wrap gap-2 mt-2">
+                        <span class="badge bg-light text-dark" style="cursor: pointer; font-size: 0.9rem;" onclick="addToSearch('Java')">Java</span>
+                        <span class="badge bg-light text-dark" style="cursor: pointer; font-size: 0.9rem;" onclick="addToSearch('Python')">Python</span>
+                        <span class="badge bg-light text-dark" style="cursor: pointer; font-size: 0.9rem;" onclick="addToSearch('JavaScript')">JavaScript</span>
+                        <span class="badge bg-light text-dark" style="cursor: pointer; font-size: 0.9rem;" onclick="addToSearch('React')">React</span>
+                        <span class="badge bg-light text-dark" style="cursor: pointer; font-size: 0.9rem;" onclick="addToSearch('Angular')">Angular</span>
+                        <span class="badge bg-light text-dark" style="cursor: pointer; font-size: 0.9rem;" onclick="addToSearch('Vue.js')">Vue.js</span>
+                        <span class="badge bg-light text-dark" style="cursor: pointer; font-size: 0.9rem;" onclick="addToSearch('Node.js')">Node.js</span>
+                        <span class="badge bg-light text-dark" style="cursor: pointer; font-size: 0.9rem;" onclick="addToSearch('Django')">Django</span>
+                        <span class="badge bg-light text-dark" style="cursor: pointer; font-size: 0.9rem;" onclick="addToSearch('Flask')">Flask</span>
+                        <span class="badge bg-light text-dark" style="cursor: pointer; font-size: 0.9rem;" onclick="addToSearch('Spring')">Spring</span>
+                    </div>
                     <div class="collapse mt-3" id="filterCollapse">
                         <div class="card card-body">
                             <form action="/search" method="get" class="row g-3">
@@ -127,5 +154,88 @@
             text-overflow: ellipsis;
             white-space: nowrap;
         }
+        .form-control:focus {
+            box-shadow: none;
+        }
+        #selectedSkills .badge {
+            transition: all 0.2s;
+        }
+        #selectedSkills .badge:hover {
+            opacity: 0.9;
+        }
+        #selectedSkills .badge i {
+            opacity: 0.7;
+        }
+        #selectedSkills .badge i:hover {
+            opacity: 1;
+        }
     </style>
+    <script>
+    function addToSearch(skill) {
+        const searchInput = document.querySelector('input[name="q"]');
+        const selectedSkills = document.getElementById('selectedSkills');
+        const searchForm = document.querySelector('form[action="/search"]');
+        
+        // Check if skill is already selected
+        const existingSkills = selectedSkills.querySelectorAll('input[name="skills"]');
+        for (let existingSkill of existingSkills) {
+            if (existingSkill.value === skill) {
+                return;
+            }
+        }
+
+        // Add the skill as a tile
+        const skillBadge = document.createElement('span');
+        skillBadge.className = 'badge bg-primary d-flex align-items-center';
+        skillBadge.style.fontSize = '0.9rem';
+        skillBadge.style.padding = '0.5rem 0.75rem';
+        skillBadge.innerHTML = `
+            ${skill}
+            <input type="hidden" name="skills" value="${skill}">
+            <i class="bi bi-x ms-1" style="cursor: pointer;" onclick="removeSkill(this)"></i>
+        `;
+        selectedSkills.appendChild(skillBadge);
+        
+        // Submit the form
+        searchForm.submit();
+    }
+
+    function removeSkill(element) {
+        element.parentElement.remove();
+        // Submit the form after removing a skill
+        document.querySelector('form[action="/search"]').submit();
+    }
+
+    // Add event listener for Enter key
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.querySelector('input[name="q"]');
+        
+        searchInput.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault(); // Prevent form submission
+                
+                const text = this.value.trim();
+                if (text) {
+                    // Create a new label with the same style as predefined labels
+                    const selectedSkills = document.getElementById('selectedSkills');
+                    const skillBadge = document.createElement('span');
+                    skillBadge.className = 'badge bg-primary d-flex align-items-center';
+                    skillBadge.style.fontSize = '0.9rem';
+                    skillBadge.style.padding = '0.5rem 0.75rem';
+                    skillBadge.innerHTML = `
+                        ${text}
+                        <input type="hidden" name="skills" value="${text}">
+                        <i class="bi bi-x ms-1" style="cursor: pointer;" onclick="removeSkill(this)"></i>
+                    `;
+                    selectedSkills.appendChild(skillBadge);
+                    
+                    this.value = ''; // Clear the input after adding the label
+                    
+                    // Submit the form
+                    document.querySelector('form[action="/search"]').submit();
+                }
+            }
+        });
+    });
+    </script>
 {% endblock %} 
