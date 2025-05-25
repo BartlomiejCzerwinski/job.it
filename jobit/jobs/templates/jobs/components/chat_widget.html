@@ -158,10 +158,22 @@ function sendMessage() {
         addMessage(message, 'user');
         messageInput.value = '';
         showTypingIndicator();
-        setTimeout(() => {
+        fetch('/chat/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ message }),
+        })
+        .then(response => response.json())
+        .then(data => {
             removeTypingIndicator();
-            addMessage("I'm here to help you with your job search! What would you like to know?", 'ai');
-        }, 1500);
+            addMessage(data.reply, 'ai');
+        })
+        .catch(() => {
+            removeTypingIndicator();
+            addMessage('[Error] Error occurred while sending message. Please, try again later.', 'ai');
+        });
     }
 }
 function addMessage(text, sender) {
