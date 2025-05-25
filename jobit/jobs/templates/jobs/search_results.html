@@ -19,11 +19,13 @@
                 <div class="col-md-8">
                     <form class="d-flex w-100" action="/search" method="get" style="gap: 0.5rem;">
                         <div class="position-relative flex-grow-1">
-                            <div class="d-flex align-items-center gap-2 p-2 border rounded" style="min-height: 48px; background: white;">
+                            <div class="d-flex align-items-center gap-2 p-2 border rounded"
+                                 style="height: 48px; min-height: 48px; max-height: 48px; background: white;">
                                 <div id="selectedSkills" class="d-flex align-items-center gap-2">
                                     {% if filters.skills %}
                                         {% for skill in filters.skills %}
-                                            <span class="badge bg-primary d-flex align-items-center" style="font-size: 0.9rem; padding: 0.5rem 0.75rem;">
+                                            <span class="badge bg-primary d-flex align-items-center"
+                                                  style="font-size: 0.9rem; height: 32px; line-height: 32px; margin: 0; padding: 0 0.75rem; box-sizing: border-box;">
                                                 {{ skill }}
                                                 <input type="hidden" name="skills" value="{{ skill }}">
                                                 <i class="bi bi-x ms-1" style="cursor: pointer;" onclick="removeSkill(this)"></i>
@@ -31,7 +33,10 @@
                                         {% endfor %}
                                     {% endif %}
                                 </div>
-                                <input type="text" name="q" class="form-control border-0 flex-grow-1" placeholder="Search job titles, technologies..." value="{{ search_query|default:'' }}" style="min-width: 200px;">
+                                <input type="text" name="q" class="form-control border-0 flex-grow-1"
+                                       placeholder="Search job titles, technologies..."
+                                       value="{{ search_query|default:'' }}"
+                                       style="min-width: 200px; height: 32px; line-height: 32px; box-sizing: border-box;">
                                 <button id="clearAllTagsBtn" type="button" class="btn btn-link p-0 ms-2" style="display: none; font-size: 1.5rem; color: #888; text-decoration: none;" tabindex="-1" aria-label="Clear all tags">
                                     <i class="bi bi-x-circle"></i>
                                 </button>
@@ -166,7 +171,13 @@
             box-shadow: none;
         }
         #selectedSkills .badge {
-            transition: all 0.2s;
+            height: 32px;
+            line-height: 1;
+            margin: 0;
+            padding-top: 0.5rem;
+            padding-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
         }
         #selectedSkills .badge:hover {
             opacity: 0.9;
@@ -196,7 +207,11 @@
         const skillBadge = document.createElement('span');
         skillBadge.className = 'badge bg-primary d-flex align-items-center';
         skillBadge.style.fontSize = '0.9rem';
-        skillBadge.style.padding = '0.5rem 0.75rem';
+        skillBadge.style.height = '32px';
+        skillBadge.style.lineHeight = '32px';
+        skillBadge.style.margin = '0';
+        skillBadge.style.padding = '0 0.75rem';
+        skillBadge.style.boxSizing = 'border-box';
         skillBadge.innerHTML = `
             ${skill}
             <input type="hidden" name="skills" value="${skill}">
@@ -229,7 +244,11 @@
                     const skillBadge = document.createElement('span');
                     skillBadge.className = 'badge bg-primary d-flex align-items-center';
                     skillBadge.style.fontSize = '0.9rem';
-                    skillBadge.style.padding = '0.5rem 0.75rem';
+                    skillBadge.style.height = '32px';
+                    skillBadge.style.lineHeight = '32px';
+                    skillBadge.style.margin = '0';
+                    skillBadge.style.padding = '0 0.75rem';
+                    skillBadge.style.boxSizing = 'border-box';
                     skillBadge.innerHTML = `
                         ${text}
                         <input type="hidden" name="skills" value="${text}">
