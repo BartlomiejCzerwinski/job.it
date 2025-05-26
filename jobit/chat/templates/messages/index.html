@@ -3,11 +3,12 @@
 {% block title %}Messages - Job.it{% endblock %}
 
 {% block content %}
-<div class="container">
-    <div class="row">
-        <div class="col-12">
-            <div class="card shadow">
-                <div class="card-header bg-white py-3">
+<div class="container-fluid">
+    <div class="row" style="height: calc(100vh - 156px);">
+        <!-- Contacts List -->
+        <div class="col-md-4 col-lg-3 border-end p-0" style="height: 100%;">
+            <div class="d-flex flex-column h-100">
+                <div class="p-3 border-bottom">
                     <div class="d-flex justify-content-between align-items-center">
                         <h5 class="mb-0">Messages</h5>
                         <button class="btn btn-primary btn-sm">
@@ -15,7 +16,7 @@
                         </button>
                     </div>
                 </div>
-                <div class="card-body p-0">
+                <div class="overflow-auto flex-grow-1">
                     <div class="list-group list-group-flush">
                         <!-- Placeholder for messages -->
                         <div class="list-group-item list-group-item-action p-3">
@@ -52,6 +53,51 @@
                                 </div>
                             </div>
                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chat Area -->
+        <div class="col-md-8 col-lg-9 p-0" style="height: 100%;">
+            <div class="d-flex flex-column h-100">
+                <!-- Chat Header -->
+                <div class="p-3 border-bottom">
+                    <div class="d-flex align-items-center">
+                        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px;">
+                            <i class="bi bi-person-fill fs-4"></i>
+                        </div>
+                        <div>
+                            <h5 class="mb-0">John Doe</h5>
+                            <small class="text-muted">Online</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Messages Area -->
+                <div class="flex-grow-1 overflow-auto p-3">
+                    <!-- Placeholder for chat messages -->
+                    <div class="d-flex justify-content-start mb-3">
+                        <div class="bg-light rounded p-3" style="max-width: 75%;">
+                            <p class="mb-0">Hello! How are you?</p>
+                            <small class="text-muted">10:30 AM</small>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-end mb-3">
+                        <div class="bg-primary text-white rounded p-3" style="max-width: 75%;">
+                            <p class="mb-0">I'm good, thanks! How about you?</p>
+                            <small class="text-white-50">10:31 AM</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Message Input -->
+                <div class="p-3 border-top">
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Type a message...">
+                        <button class="btn btn-primary">
+                            <i class="bi bi-send"></i>
+                        </button>
                     </div>
                 </div>
             </div>
