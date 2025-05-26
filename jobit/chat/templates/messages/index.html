@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}Messages - Job.it{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header bg-white py-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Messages</h5>
+                        <button class="btn btn-primary btn-sm">
+                            <i class="bi bi-pencil-square me-1"></i>New Message
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        <!-- Placeholder for messages -->
+                        <div class="list-group-item list-group-item-action p-3">
+                            <div class="d-flex w-100 justify-content-between align-items-center">
+                                <div class="d-flex align-items-center">
+                                    <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px;">
+                                        <i class="bi bi-person-fill fs-4"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="mb-1">John Doe</h6>
+                                        <p class="mb-1 text-muted small">Last message preview...</p>
+                                    </div>
+                                </div>
+                                <div class="text-end">
+                                    <small class="text-muted">2h ago</small>
+                                    <span class="badge bg-primary rounded-pill ms-2">2</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="list-group-item list-group-item-action p-3">
+                            <div class="d-flex w-100 justify-content-between align-items-center">
+                                <div class="d-flex align-items-center">
+                                    <div class="rounded-circle bg-success text-white d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px;">
+                                        <i class="bi bi-person-fill fs-4"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="mb-1">Jane Smith</h6>
+                                        <p class="mb-1 text-muted small">Another message preview...</p>
+                                    </div>
+                                </div>
+                                <div class="text-end">
+                                    <small class="text-muted">5h ago</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

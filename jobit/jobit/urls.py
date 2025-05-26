@@ -23,5 +23,5 @@ urlpatterns = [
     path("", include("jobs.urls")),
     path("", include("matching.urls")),
     path("applications/", include("applications.urls")),
-    path("messages/", include("messages.urls")),
+    path("messages/", include("chat.urls")),
 ]
