@@ -27,6 +27,18 @@
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownArrow">
                     <li>
+                        <a class="dropdown-item" href="#">
+                            <i class="bi bi-chat-dots me-1"></i> Messages
+                        </a>
+                    </li>
+                    {% if user.appuser.role == 'worker' %}
+                    <li>
+                        <a class="dropdown-item" href="#">
+                            <i class="bi bi-briefcase me-1"></i> My Applications
+                        </a>
+                    </li>
+                    {% endif %}
+                    <li>
                         <a class="dropdown-item" href="{% url 'settings' %}">
                             <i class="bi bi-gear me-1"></i> Settings
                         </a>
