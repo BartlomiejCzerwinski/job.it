@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block title %}My Applications - Job.it{% endblock %}
+
+{% block navbar_extra %}
+    {% if user.appuser.role == 'worker' %}
+        <div class="position-absolute top-50 start-50 translate-middle">
+            <button type="button" class="btn btn-secondary me-2" onclick="window.location.href='/'">Search Jobs</button>
+            <button type="button" class="btn btn-secondary" onclick="window.location.href='/worker_profile'">My Profile</button>
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+    <div class="position-relative my-5">
+        <a href="javascript:history.back()" class="btn btn-outline-dark position-absolute top-0 start-0 ms-3 mt-2" style="z-index: 10;">
+            ← Go Back
+        </a>
+
+        <div class="card shadow mx-auto p-4" style="max-width: 800px;">
+            <h2 class="mb-4">My Applications</h2>
+            
+            {% if applications %}
+                <div class="row g-4">
+                    {% for application in applications %}
+                        <div class="col-12">
+                            <div class="card h-100 border-0 shadow-sm">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start mb-3">
+                                        <div>
+                                            <h5 class="card-title mb-1">{{ application.job_listing.job_title }}</h5>
+                                            <h6 class="card-subtitle text-muted">{{ application.job_listing.company_name }}</h6>
+                                        </div>
+                                        <span class="badge {% if application.status == 'ACCEPTED' %}bg-success{% elif application.status == 'REJECTED' %}bg-danger{% else %}bg-warning{% endif %}">
+                                            {{ application.status }}
+                                        </span>
+                                    </div>
+                                    
+                                    <p class="card-text text-muted mb-3">
+                                        <i class="bi bi-calendar3 me-2"></i>Applied on {{ application.applied_at|date:"F j, Y" }}
+                                    </p>
+                                    
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <a href="{% url 'listing_details' application.job_listing.id %}" class="btn btn-outline-primary">
+                                            <i class="bi bi-eye me-2"></i>View Job Details
+                                        </a>
+                                        {% if application.status == 'PENDING' %}
+                                            <button class="btn btn-outline-danger" disabled>
+                                                <i class="bi bi-x-circle me-2"></i>Withdraw Application
+                                            </button>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="bi bi-briefcase display-1 text-muted mb-3"></i>
+                    <h4 class="text-muted mb-3">No Applications Yet</h4>
+                    <p class="text-muted mb-4">You haven't applied to any jobs yet. Start exploring opportunities!</p>
+                    <a href="/" class="btn btn-primary">
+                        <i class="bi bi-search me-2"></i>Browse Jobs
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %} 
