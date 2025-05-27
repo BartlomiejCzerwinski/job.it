@@ -11,7 +11,8 @@ from users.models import Skill, UserSkill, AppUser, User
 from users.views import get_user_role, get_user, get_user_skills
 from django.contrib.auth import logout
 from users.views import get_user
-from .models import JobListing, JobListingSkill, Application
+from .models import JobListing, JobListingSkill
+from applications.models import Application
 from django.db.utils import IntegrityError
 ROLE_WORKER = "worker"
 ROLE_RECRUITER = "recruiter"
@@ -175,31 +176,6 @@ def listing_details_view(request, id):
         'has_applied': has_applied,
         'is_success': is_success
     })
-
-
-@login_required
-def apply(request, id):
-    job_listing = get_object_or_404(JobListing, id=id)
-    user_role = get_user_role(request.user)
-    
-    if user_role != ROLE_WORKER:
-        return redirect('listing_details', id=id)
-    
-    if job_listing.status != 'ACTIVE':
-        return redirect('listing_details', id=id)
-    
-    existing_application = Application.objects.filter(job_listing=job_listing, candidate=get_user(request.user)).first()
-    if existing_application:
-        return redirect('listing_details', id=id)
-
-    try:
-        Application.objects.create(
-            job_listing=job_listing,
-            candidate=get_user(request.user)
-        )
-        return redirect(f'/listings/{id}?success=True')
-    except Exception as e:
-        return redirect(f'/listings/{id}?success=False')
 
 
 @login_required
