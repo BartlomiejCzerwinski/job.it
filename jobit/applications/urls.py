@@ -5,5 +5,5 @@ from . import views
 app_name = 'applications'
 
 urlpatterns = [
-    # Add your application URLs here
+    path('apply/<int:job_id>/', views.apply, name='apply'),
 ]
