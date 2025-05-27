@@ -48,9 +48,3 @@ class JobListingSkill(models.Model):
         constraints = [
             models.UniqueConstraint(fields=['job_listing', 'skill'], name='unique_job_listing_skill')
         ]
-
-
-class Application(models.Model):
-    job_listing = models.ForeignKey(JobListing, on_delete=models.CASCADE)
-    candidate = models.ForeignKey(AppUser, on_delete=models.CASCADE, null=True, blank=True)
-    applied_at = models.DateTimeField(auto_now=True)
