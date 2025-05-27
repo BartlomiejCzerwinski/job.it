@@ -6,4 +6,5 @@ app_name = 'applications'
 
 urlpatterns = [
     path('apply/<int:job_id>/', views.apply, name='apply'),
+    path('my-applications/', views.my_applications, name='my_applications'),
 ]

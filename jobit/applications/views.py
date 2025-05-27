@@ -37,3 +37,12 @@ def apply(request, job_id):
         return redirect(f'/listings/{job_id}?success=True')
     except Exception as e:
         return redirect(f'/listings/{job_id}?success=False')
+
+@login_required
+def my_applications(request):
+    user = get_user(request.user)
+    applications = Application.objects.filter(candidate=user).select_related('job_listing')
+    return render(request, 'applications/my_applications.html', {
+        'applications': applications
+    })
+

@@ -33,7 +33,7 @@
                     </li>
                     {% if user.appuser.role == 'worker' %}
                     <li>
-                        <a class="dropdown-item" href="#">
+                        <a class="dropdown-item" href="{% url 'applications:my_applications' %}">
                             <i class="bi bi-briefcase me-1"></i> My Applications
                         </a>
                     </li>

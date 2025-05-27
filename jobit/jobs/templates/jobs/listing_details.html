@@ -103,6 +103,9 @@
                         <a href="/listings" class="btn btn-outline-secondary"><i class="bi bi-arrow-left"></i> Back to
                             Listings</a>
                         <div class="d-flex gap-3">
+                            <a href="{% url 'applications:manage_applications' job.id %}" class="btn btn-info">
+                                <i class="bi bi-people"></i> View Applications
+                            </a>
                             <button type="button" class="btn btn-warning"
                                     onclick="window.location.href='/close/{{ job.id }}'">
                                 Close Offer <i class="bi bi-x-circle"></i>
@@ -167,7 +170,7 @@
                                 </button>
                             {% elif job.status == 'ACTIVE' %}
                                 <button type="button" class="btn btn-primary"
-                                        onclick="window.location.href='/listings/apply/{{ job.id }}'">
+                                        onclick="window.location.href='/applications/apply/{{ job.id }}/'">
                                     Apply <i class="bi bi-send"></i>
                                 </button>
                             {% else %}
