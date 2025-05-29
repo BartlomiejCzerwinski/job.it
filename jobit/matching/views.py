@@ -5,7 +5,18 @@ from users.views import get_user_skills
 from .vectorizer import JobMatchingVectorizer
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
+from openai import OpenAI
 import json
+import os
+
+def load_api_key():
+    try:
+        api_key_path = os.path.join(os.path.dirname(__file__), 'api_key.txt')
+        with open(api_key_path, 'r') as file:
+            api_key = file.read().strip()
+            return api_key if api_key else None
+    except (FileNotFoundError, IOError):
+        return None
 
 
 def knn_match(request):
@@ -42,7 +53,15 @@ def chat_endpoint(request):
         user_message = data.get('message', '')
     except Exception:
         user_message = ''
-    # Placeholder response
+        
+    client = OpenAI(api_key=load_api_key())
+    completion = client.chat.completions.create(
+        model="gpt-4o-mini",
+        store=True,
+        messages=[
+            {"role": "user", "content": user_message}
+        ]
+    )
     return JsonResponse({
-        'reply': "[Placeholder] This is a response from the server. You said: '" + user_message + "'"
+        'reply': completion.choices[0].message.content
     })
