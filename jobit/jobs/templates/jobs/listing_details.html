@@ -6,70 +6,159 @@
     {% if role == 'recruiter' %}
         <div class="position-absolute top-50 start-50 translate-middle">
             <button type="button" class="btn btn-secondary me-2" onclick="window.location.href='/'">Candidates</button>
-            <button type="button" class="btn btn-secondary" onclick="window.location.href='/listings'">My Listings
-            </button>
+            <button type="button" class="btn btn-secondary" onclick="window.location.href='/listings'">My Listings</button>
         </div>
-
     {% elif role == 'worker' %}
         <div class="position-absolute top-50 start-50 translate-middle">
             <button type="button" class="btn btn-secondary me-2" onclick="window.location.href='/'">Search Jobs</button>
-            <button type="button" class="btn btn-secondary" onclick="window.location.href='/worker_profile'">My Profile
-            </button>
+            <button type="button" class="btn btn-secondary" onclick="window.location.href='/worker_profile'">My Profile</button>
         </div>
     {% endif %}
 {% endblock %}
 
-
 {% block content %}
-    <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1050; display: none;" id="toastContainer">
-        <div id="customToast" class="toast align-items-center text-bg-primary border-0 d-flex justify-content-between"
-             role="alert" aria-live="assertive" aria-atomic="true">
-            <div id="toastMessage" class="toast-body">
+    {% csrf_token %}
+    <div class="container mt-5">
+        {% if role == 'recruiter' %}
+            <!-- Job Listing Tile -->
+            <div class="card shadow-sm border rounded mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="mb-0">{{ job.job_title }}</h2>
+                    <h5 class="fw-light">{{ job.company_name }}</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <p class="text-muted mb-2"><strong><i class="bi bi-geo-alt"></i> Location:</strong> {{ job.job_location }}</p>
+                            {% if job.salary_min and job.salary_max %}
+                                <p class="text-muted mb-2"><strong><i class="bi bi-cash"></i> Salary:</strong>
+                                    <span class="fw-bold text-success">{{ job.salary_min }} - {{ job.salary_max }} {{ job.salary_currency }}</span>
+                                </p>
+                            {% endif %}
+                            <div class="mb-3">
+                                {% for skill in skills %}
+                                    {% if skill.level == 3 %}
+                                        <span class="badge bg-danger mb-2">{{ skill.name }}</span>
+                                    {% elif skill.level == 2 %}
+                                        <span class="badge bg-warning mb-2">{{ skill.name }}</span>
+                                    {% elif skill.level == 1 %}
+                                        <span class="badge bg-success mb-2">{{ skill.name }}</span>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+
+                            <div class="mb-3">
+                                <p class="text-muted mb-2">
+                                    <strong><i class="bi bi-building"></i> About Company:</strong>
+                                    <button class="btn btn-link btn-sm p-0 ms-2" type="button" data-bs-toggle="collapse" data-bs-target="#aboutCompany" aria-expanded="false" aria-controls="aboutCompany">
+                                        <i class="bi bi-chevron-down"></i>
+                                    </button>
+                                </p>
+                                <div class="collapse" id="aboutCompany">
+                                    <p class="text-secondary ps-4">{{ job.about_company }}</p>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <p class="text-muted mb-2">
+                                    <strong><i class="bi bi-file-text"></i> Job Description:</strong>
+                                    <button class="btn btn-link btn-sm p-0 ms-2" type="button" data-bs-toggle="collapse" data-bs-target="#jobDescription" aria-expanded="false" aria-controls="jobDescription">
+                                        <i class="bi bi-chevron-down"></i>
+                                    </button>
+                                </p>
+                                <div class="collapse" id="jobDescription">
+                                    <p class="text-secondary ps-4">{{ job.job_description }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="d-flex flex-column align-items-end">
+                                <div class="mb-3">
+                                    <span class="badge {% if job.status == 'ACTIVE' %}bg-success{% elif job.status == 'CLOSED' %}bg-danger{% else %}bg-secondary{% endif %} fs-6">
+                                        {{ job.status }}
+                                    </span>
+                                </div>
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-outline-success" onclick="updateJobStatus('ACTIVE')" {% if job.status == 'ACTIVE' %}disabled{% endif %}>
+                                        <i class="bi bi-check-circle"></i> Activate
+                                    </button>
+                                    <button type="button" class="btn btn-outline-danger" onclick="updateJobStatus('CLOSED')" {% if job.status == 'CLOSED' %}disabled{% endif %}>
+                                        <i class="bi bi-x-circle"></i> Close
+                                    </button>
+                                    <button type="button" class="btn btn-outline-secondary" onclick="updateJobStatus('ARCHIVED')" {% if job.status == 'ARCHIVED' %}disabled{% endif %}>
+                                        <i class="bi bi-archive"></i> Archive
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <button type="button" class="btn-close btn-close-white me-2" data-bs-dismiss="toast"
-                    aria-label="Close"></button>
-        </div>
-    </div>
 
-    {% if is_success == 'True' %}
-        <script>
-            document.addEventListener("DOMContentLoaded", function () {
-                var toastContainer = document.getElementById("toastContainer");
-                var toastElement = document.getElementById("customToast");
-                const toastMessage = document.getElementById("toastMessage");
-                var toast = new bootstrap.Toast(toastElement);
-                toastMessage.innerText = "Successfully applied for the position"
-                toastElement.classList.add("text-bg-success");
-                toastContainer.style.display = "block";
-                toast.show();
-            });
-        </script>
-    {% elif is_success is not None %}
-        <script>
-            document.addEventListener("DOMContentLoaded", function () {
-                var toastContainer = document.getElementById("toastContainer");
-                var toastElement = document.getElementById("customToast");
-                const toastMessage = document.getElementById("toastMessage");
-                var toast = new bootstrap.Toast(toastElement);
-                toastMessage.innerText = "Failed to apply for the position"
-                toastElement.classList.add("text-bg-danger");
-                toastContainer.style.display = "block";
-                toast.show();
-            });
-        </script>
-    {% endif %}
-
-    {% if role == 'recruiter' %}
-        <div class="container mt-5">
+            <!-- Applications List -->
+            <div class="card shadow-sm border rounded">
+                <div class="card-header bg-light">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0">Applications ({{ applications|length }})</h4>
+                        <a href="/listings" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left"></i> Back to Listings
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% if applications %}
+                        <div class="list-group">
+                            {% for application in applications %}
+                                <div class="list-group-item list-group-item-action">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h5 class="mb-1">{{ application.candidate.user.get_full_name }}</h5>
+                                            <p class="text-muted mb-1">{{ application.candidate.user.email }}</p>
+                                            <div class="mb-2">
+                                                {% for skill in application.candidate.skills.all %}
+                                                    <span class="badge bg-primary me-1">{{ skill.name }}</span>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span class="badge {% if application.status == 'PENDING' %}bg-warning{% elif application.status == 'ACCEPTED' %}bg-success{% else %}bg-danger{% endif %} me-2">
+                                                {{ application.status }}
+                                            </span>
+                                            <div class="btn-group">
+                                                <button class="btn btn-outline-primary btn-sm" disabled>
+                                                    <i class="bi bi-person"></i> View Profile
+                                                </button>
+                                                {% if application.status == 'PENDING' %}
+                                                    <button class="btn btn-success btn-sm" onclick="updateStatus('{{ application.id }}', 'ACCEPTED')">
+                                                        <i class="bi bi-check-circle"></i> Accept
+                                                    </button>
+                                                    <button class="btn btn-danger btn-sm" onclick="updateStatus('{{ application.id }}', 'REJECTED')">
+                                                        <i class="bi bi-x-circle"></i> Reject
+                                                    </button>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="bi bi-people display-1 text-muted mb-3"></i>
+                            <h4 class="text-muted mb-3">No Applications Yet</h4>
+                            <p class="text-muted">This job listing hasn't received any applications yet.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        {% elif role == 'worker' %}
             <div class="card shadow-sm border rounded">
                 <div class="card-header bg-primary text-white">
                     <h2 class="mb-0">{{ job.job_title }}</h2>
                     <h5 class="fw-light">{{ job.company_name }}</h5>
                 </div>
                 <div class="card-body">
-                    <p class="text-muted"><strong><i class="bi bi-geo-alt"></i>
-                        Location:</strong> {{ job.job_location }}
-                    </p>
+                    <p class="text-muted"><strong><i class="bi bi-geo-alt"></i> Location:</strong> {{ job.job_location }}</p>
 
                     {% if job.salary_min and job.salary_max %}
                         <p class="text-muted"><strong><i class="bi bi-cash"></i> Salary:</strong>
@@ -93,84 +182,39 @@
                         {% endfor %}
                     </div>
 
-                    <p><strong>About Company:</strong></p>
-                    <p class="text-secondary">{{ job.about_company }}</p>
-
-                    <p><strong>Job Description:</strong></p>
-                    <p class="text-secondary">{{ job.job_description }}</p>
-
-                    <div class="d-flex justify-content-between mt-4">
-                        <a href="/listings" class="btn btn-outline-secondary"><i class="bi bi-arrow-left"></i> Back to
-                            Listings</a>
-                        <div class="d-flex gap-3">
-                            <a href="{% url 'applications:manage_applications' job.id %}" class="btn btn-info">
-                                <i class="bi bi-people"></i> View Applications
-                            </a>
-                            <button type="button" class="btn btn-warning"
-                                    onclick="window.location.href='/close/{{ job.id }}'">
-                                Close Offer <i class="bi bi-x-circle"></i>
+                    <div class="mb-3">
+                        <p class="text-muted mb-2">
+                            <strong><i class="bi bi-building"></i> About Company:</strong>
+                            <button class="btn btn-link btn-sm p-0 ms-2" type="button" data-bs-toggle="collapse" data-bs-target="#aboutCompany" aria-expanded="false" aria-controls="aboutCompany">
+                                <i class="bi bi-chevron-down"></i>
                             </button>
-                            <button type="button" class="btn btn-primary"
-                                    onclick="window.location.href='/edit/{{ job.id }}'">
-                                Edit Offer <i class="bi bi-sliders"></i>
-                            </button>
+                        </p>
+                        <div class="collapse" id="aboutCompany">
+                            <p class="text-secondary ps-4">{{ job.about_company }}</p>
                         </div>
                     </div>
 
-                </div>
-            </div>
-        </div>
-    {% elif role == 'worker' %}
-    <div class="container mt-5">
-            <div class="card shadow-sm border rounded">
-                <div class="card-header bg-primary text-white">
-                    <h2 class="mb-0">{{ job.job_title }}</h2>
-                    <h5 class="fw-light">{{ job.company_name }}</h5>
-                </div>
-                <div class="card-body">
-                    <p class="text-muted"><strong><i class="bi bi-geo-alt"></i>
-                        Location:</strong> {{ job.job_location }}
-                    </p>
-
-                    {% if job.salary_min and job.salary_max %}
-                        <p class="text-muted"><strong><i class="bi bi-cash"></i> Salary:</strong>
-                            <span class="fw-bold text-success">{{ job.salary_min }} - {{ job.salary_max }} {{ job.salary_currency }}</span>
+                    <div class="mb-3">
+                        <p class="text-muted mb-2">
+                            <strong><i class="bi bi-file-text"></i> Job Description:</strong>
+                            <button class="btn btn-link btn-sm p-0 ms-2" type="button" data-bs-toggle="collapse" data-bs-target="#jobDescription" aria-expanded="false" aria-controls="jobDescription">
+                                <i class="bi bi-chevron-down"></i>
+                            </button>
                         </p>
-                    {% else %}
-                        <p class="text-muted"><strong><i class="bi bi-cash"></i> Salary:</strong> Not specified</p>
-                    {% endif %}
-
-                    <hr>
-
-                    <div class="mb-2">
-                        {% for skill in skills %}
-                            {% if skill.level == 3 %}
-                                <span class="badge bg-danger mb-2">{{ skill.name }}</span>
-                            {% elif skill.level == 2 %}
-                                <span class="badge bg-warning mb-2">{{ skill.name }}</span>
-                            {% elif skill.level == 1 %}
-                                <span class="badge bg-success mb-2">{{ skill.name }}</span>
-                            {% endif %}
-                        {% endfor %}
+                        <div class="collapse" id="jobDescription">
+                            <p class="text-secondary ps-4">{{ job.job_description }}</p>
+                        </div>
                     </div>
 
-                    <p><strong>About Company:</strong></p>
-                    <p class="text-secondary">{{ job.about_company }}</p>
-
-                    <p><strong>Job Description:</strong></p>
-                    <p class="text-secondary">{{ job.job_description }}</p>
-
                     <div class="d-flex justify-content-between mt-4">
-                        <a href="/" class="btn btn-outline-secondary"><i class="bi bi-arrow-left"></i> Back to
-                            Listings</a>
+                        <a href="/" class="btn btn-outline-secondary"><i class="bi bi-arrow-left"></i> Back to Listings</a>
                         <div class="d-flex gap-3">
                             {% if has_applied %}
                                 <button type="button" class="btn btn-success" disabled>
                                     Applied <i class="bi bi-check-circle"></i>
                                 </button>
                             {% elif job.status == 'ACTIVE' %}
-                                <button type="button" class="btn btn-primary"
-                                        onclick="window.location.href='/applications/apply/{{ job.id }}/'">
+                                <button type="button" class="btn btn-primary" onclick="window.location.href='/applications/apply/{{ job.id }}/'">
                                     Apply <i class="bi bi-send"></i>
                                 </button>
                             {% else %}
@@ -180,11 +224,10 @@
                             {% endif %}
                         </div>
                     </div>
-
                 </div>
             </div>
-        </div>
-    {% endif %}
+        {% endif %}
+    </div>
 {% endblock %}
 
 {% block extra_js %}
