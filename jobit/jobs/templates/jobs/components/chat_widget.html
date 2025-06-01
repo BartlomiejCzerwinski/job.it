@@ -140,6 +140,58 @@
         max-width: unset;
     }
 }
+.compact-tile {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 0.7em 1em 0.7em 1em;
+    margin-bottom: 0.7em;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+    font-size: 0.97em;
+    min-width: 0;
+    max-width: 100%;
+}
+.tile-header {
+    font-weight: 600;
+    font-size: 1.08em;
+    margin-bottom: 0.2em;
+    color: #222;
+}
+.tile-row {
+    margin-bottom: 0.15em;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4em;
+}
+.job-title {
+    font-size: 1em;
+    color: #1a237e;
+    font-weight: 600;
+}
+.salary {
+    color: #388e3c;
+    font-weight: 500;
+    font-size: 0.98em;
+}
+.location {
+    color: #607d8b;
+    font-size: 0.96em;
+}
+.skills {
+    margin-top: 0.1em;
+    margin-bottom: 0;
+}
+.skill {
+    display: inline-block;
+    background: #e3e7fa;
+    color: #2d3a5a;
+    border-radius: 6px;
+    padding: 0.13em 0.5em;
+    margin-right: 0.2em;
+    font-size: 0.92em;
+    margin-bottom: 0.1em;
+}
 </style>
 <script>
 function toggleChat() {
@@ -168,21 +220,32 @@ function sendMessage() {
         .then(response => response.json())
         .then(data => {
             removeTypingIndicator();
-            addMessage(data.reply, 'ai');
+            if (data.tiles_html !== undefined && data.intro !== undefined) {
+                const html = `<div class="ai-intro">${data.intro}</div>${data.tiles_html}`;
+                addMessage(html, 'ai', true); // everything in one bubble, as HTML
+            } else if (data.reply !== undefined) {
+                addMessage(data.reply, 'ai', true); // fallback, treat as HTML
+            } else {
+                addMessage('[Error] No response from server.', 'ai', false);
+            }
         })
         .catch(() => {
             removeTypingIndicator();
-            addMessage('[Error] Error occurred while sending message. Please, try again later.', 'ai');
+            addMessage('[Error] Error occurred while sending message. Please, try again later.', 'ai', false);
         });
     }
 }
-function addMessage(text, sender) {
+function addMessage(text, sender, isHtml) {
     const chatMessages = document.getElementById('chatMessages');
     const messageDiv = document.createElement('div');
     messageDiv.className = `message ${sender}-message`;
     const contentDiv = document.createElement('div');
     contentDiv.className = 'message-content';
-    contentDiv.textContent = text;
+    if (sender === 'ai' && isHtml) {
+        contentDiv.innerHTML = text;
+    } else {
+        contentDiv.textContent = text;
+    }
     messageDiv.appendChild(contentDiv);
     chatMessages.appendChild(messageDiv);
     chatMessages.scrollTop = chatMessages.scrollHeight;
