@@ -8,6 +8,8 @@ from django.views.decorators.http import require_POST
 from openai import OpenAI
 import json
 import os
+from typing import Dict, Any
+from jobs.tools import search_jobs
 
 def load_api_key():
     try:
@@ -65,3 +67,63 @@ def chat_endpoint(request):
     return JsonResponse({
         'reply': completion.choices[0].message.content
     })
+
+def set_tools() -> Dict[str, Any]:
+    """
+    Returns a dictionary containing the function definitions for OpenAI function calling.
+    """
+    return {
+        "type": "function",
+        "function": {
+            "name": "search_jobs",
+            "description": "Searches for job listings with multiple optional filters.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "search_query": {
+                        "type": "string",
+                        "description": "Search term to match in job title and company name"
+                    },
+                    "job_model": {
+                        "type": "string",
+                        "enum": ["REMOTE", "HYBRID", "ONSITE"],
+                        "description": "Type of work arrangement"
+                    },
+                    "salary_min": {
+                        "type": "number",
+                        "description": "Minimum salary requirement"
+                    },
+                    "salary_max": {
+                        "type": "number",
+                        "description": "Maximum salary requirement"
+                    },
+                    "currency": {
+                        "type": "string",
+                        "description": "Currency for salary (e.g., USD, EUR, PLN)"
+                    },
+                    "skills": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "description": "List of required skills"
+                    },
+                    "location": {
+                        "type": "string",
+                        "description": "Job location or city"
+                    },
+                    "company_name": {
+                        "type": "string",
+                        "description": "Name of the company"
+                    },
+                    "limit": {
+                        "type": "integer",
+                        "description": "Maximum number of results to return"
+                    }
+                },
+                "required": [],
+                "additionalProperties": False
+            },
+            "strict": True
+        }
+    }
