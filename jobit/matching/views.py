@@ -63,13 +63,16 @@ def format_simple_job_tile(job):
         f"<span class='skill'>{skill['name']}</span>"
         for skill in job.get('skills', [])
     )
+    job_id = job.get('id', '')
     return (
+        f"<a href='/listings/{job_id}' class='job-tile-link' target='_blank'>"
         f"<div class='job-tile compact-tile'>"
         f"<div class='tile-header'><span class='job-title'>{job.get('job_title', '')}</span></div>"
         f"<div class='tile-row'><span class='salary'>{job.get('salary_min', '')} - {job.get('salary_max', '')} {job.get('salary_currency', '')}</span></div>"
         f"<div class='tile-row'><span class='location'>{job.get('job_location', '')}</span></div>"
         f"<div class='tile-row skills'>{skills_html}</div>"
         f"</div>"
+        f"</a>"
     )
 
 @csrf_exempt
