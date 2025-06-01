@@ -55,6 +55,23 @@ def knn_match(request):
         'matches': matches
     })
 
+def format_simple_job_tile(job):
+    """
+    Returns a compact HTML tile for a job with only the most important information: title, salary, location, skills.
+    """
+    skills_html = " ".join(
+        f"<span class='skill'>{skill['name']}</span>"
+        for skill in job.get('skills', [])
+    )
+    return (
+        f"<div class='job-tile compact-tile'>"
+        f"<div class='tile-header'><span class='job-title'>{job.get('job_title', '')}</span></div>"
+        f"<div class='tile-row'><span class='salary'>{job.get('salary_min', '')} - {job.get('salary_max', '')} {job.get('salary_currency', '')}</span></div>"
+        f"<div class='tile-row'><span class='location'>{job.get('job_location', '')}</span></div>"
+        f"<div class='tile-row skills'>{skills_html}</div>"
+        f"</div>"
+    )
+
 @csrf_exempt
 @require_POST
 def chat_endpoint(request):
@@ -91,27 +108,11 @@ def chat_endpoint(request):
         # Execute the function
         if function_name == "search_jobs":
             search_results = search_jobs(**function_args)
-            
-            # Second API call to get the model's response with the function results
-            second_completion = client.chat.completions.create(
-                model="gpt-4o-mini",
-                store=True,
-                messages=[
-                    {"role": "system", "content": SYSTEM_PROMPT},
-                    {"role": "user", "content": user_message},
-                    response_message,
-                    {
-                        "role": "tool",
-                        "tool_call_id": tool_call.id,
-                        "name": function_name,
-                        "content": json.dumps(search_results)
-                    }
-                ]
-            )
-            
+            tiles_html = "<div class='ai-tiles'>" + "".join([format_simple_job_tile(job) for job in search_results]) + "</div>"
+            intro = "Here are some jobs you might like:"
             return JsonResponse({
-                'reply': second_completion.choices[0].message.content,
-                'search_results': search_results
+                'intro': intro,
+                'tiles_html': tiles_html
             })
     
     return JsonResponse({
