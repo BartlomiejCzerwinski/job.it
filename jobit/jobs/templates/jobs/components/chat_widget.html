@@ -39,7 +39,7 @@
     bottom: 90px;
     right: 32px;
     width: 350px;
-    height: 500px;
+    height: 70vh;
     background-color: white;
     box-shadow: 0 8px 32px rgba(0,0,0,0.18);
     z-index: 1100;
@@ -191,6 +191,36 @@
     margin-right: 0.2em;
     font-size: 0.92em;
     margin-bottom: 0.1em;
+}
+.job-tile-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    border-radius: 8px;
+    transition: box-shadow 0.18s, background 0.18s, border-color 0.18s, transform 0.18s;
+}
+.job-tile-link:visited,
+.job-tile-link:active {
+    color: inherit;
+}
+.job-tile-link .job-tile {
+    color: inherit;
+}
+.job-tile-link:hover .job-tile,
+.job-tile-link:focus .job-tile {
+    box-shadow: 0 2px 8px rgba(30, 136, 229, 0.10), 0 1.5px 6px rgba(0,0,0,0.04);
+    border-color: #90caf9;
+    background: #f1f8fe;
+    cursor: pointer;
+}
+.job-tile-link:hover,
+.job-tile-link:focus {
+    text-decoration: none;
+    color: inherit;
+}
+.job-title {
+    text-decoration: none !important;
+    color: #1a237e;
 }
 </style>
 <script>
