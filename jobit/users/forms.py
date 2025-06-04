@@ -1,5 +1,6 @@
 from django import forms
 from .models import AppUser
+from .locations import LOCATIONS
 import re
 
 
@@ -77,12 +78,20 @@ class RegisterForm(forms.Form):
             'placeholder': 'Enter your job position (e.g. Full Stack Developer)'
         })
     )
-    location = forms.CharField(
-        label='Location',
-        max_length=255,
-        widget=forms.TextInput(attrs={
-            'class': 'form-control',
-            'placeholder': 'Enter your location (e.g. Warsaw, Poland)'
+    country = forms.ChoiceField(
+        label='Country',
+        choices=[('', '---')] + [(country, country) for country in LOCATIONS.keys()],
+        widget=forms.Select(attrs={
+            'class': 'form-select',
+            'placeholder': 'Select your country'
+        })
+    )
+    city = forms.ChoiceField(
+        label='City',
+        choices=[('', '---')],
+        widget=forms.Select(attrs={
+            'class': 'form-select',
+            'placeholder': 'Select your city'
         })
     )
     mobile = forms.CharField(
@@ -134,6 +143,5 @@ class RegisterForm(forms.Form):
                 self.add_error('position', 'Position is required for workers')
             if not starts_in:
                 self.add_error('starts_in', 'Start date is required for workers')
-            
         
         return cleaned_data

@@ -11,7 +11,8 @@ class AppUser(models.Model):
     full_name = models.CharField(max_length=255, blank=True, null=True)
     mobile = models.CharField(max_length=20, blank=True, null=True)
     position = models.CharField(max_length=255, blank=True, null=True)
-    location = models.CharField(max_length=255, blank=True, null=True)
+    country = models.CharField(max_length=255, blank=True, null=True)
+    city = models.CharField(max_length=255, blank=True, null=True)
     is_remote = models.BooleanField(default=False)
     is_hybrid = models.BooleanField(default=False)
 
