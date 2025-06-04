@@ -71,6 +71,7 @@ class RegisterForm(forms.Form):
     position = forms.CharField(
         label='Position',
         max_length=255,
+        required=False,
         widget=forms.TextInput(attrs={
             'class': 'form-control',
             'placeholder': 'Enter your job position (e.g. Full Stack Developer)'
@@ -98,6 +99,7 @@ class RegisterForm(forms.Form):
     starts_in = forms.ChoiceField(
         choices=AppUser.STARTS_IN_CHOICES,
         label='Starts in',
+        required=False,
         widget=forms.Select(attrs={
             'class': 'form-select',
             'placeholder': 'Select when you can start'
@@ -119,3 +121,19 @@ class RegisterForm(forms.Form):
             'title': 'Check if you are open to hybrid work'
         })
     )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        role = cleaned_data.get('role')
+        
+        if role == 'worker':
+            position = cleaned_data.get('position')
+            starts_in = cleaned_data.get('starts_in')
+            
+            if not position:
+                self.add_error('position', 'Position is required for workers')
+            if not starts_in:
+                self.add_error('starts_in', 'Start date is required for workers')
+            
+        
+        return cleaned_data

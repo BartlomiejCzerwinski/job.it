@@ -83,16 +83,24 @@
             const form = document.getElementById('registerForm');
             const roleSelect = document.querySelector('select[name="role"]');
             const workerFields = document.querySelectorAll('.worker-fields');
+            const positionInput = document.querySelector('input[name="position"]');
+            const startsInSelect = document.querySelector('select[name="starts_in"]');
 
             function toggleWorkerFields() {
                 const isWorker = roleSelect.value === 'worker';
                 workerFields.forEach(field => {
                     field.style.display = isWorker ? 'block' : 'none';
                 });
+                if (isWorker) {
+                    positionInput.setAttribute('required', 'required');
+                    startsInSelect.setAttribute('required', 'required');
+                } else {
+                    positionInput.removeAttribute('required');
+                    startsInSelect.removeAttribute('required');
+                }
             }
 
             toggleWorkerFields();
-
             roleSelect.addEventListener('change', toggleWorkerFields);
 
             function formatPhoneNumber(input) {
