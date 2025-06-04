@@ -43,8 +43,12 @@
                 </div>
             </div>
             <div class="mb-3">
-                <label for="{{ form.location.id_for_label }}" class="form-label">{{ form.location.label }}</label>
-                {{ form.location }}
+                <label for="{{ form.country.id_for_label }}" class="form-label">{{ form.country.label }}</label>
+                {{ form.country }}
+            </div>
+            <div class="mb-3">
+                <label for="{{ form.city.id_for_label }}" class="form-label">{{ form.city.label }}</label>
+                {{ form.city }}
             </div>
             <div class="mb-3">
                 <label for="{{ form.role.id_for_label }}" class="form-label">{{ form.role.label }}</label>
@@ -85,6 +89,32 @@
             const workerFields = document.querySelectorAll('.worker-fields');
             const positionInput = document.querySelector('input[name="position"]');
             const startsInSelect = document.querySelector('select[name="starts_in"]');
+            const countrySelect = document.querySelector('select[name="country"]');
+            const citySelect = document.querySelector('select[name="city"]');
+
+            // Location data
+            const locations = {
+                'Poland': ['Warsaw', 'Krakow', 'Wroclaw', 'Poznan', 'Gdansk', 'Lodz', 'Katowice', 'Lublin', 'Bialystok', 'Szczecin'],
+                'Germany': ['Berlin', 'Munich', 'Hamburg', 'Frankfurt', 'Cologne', 'Stuttgart', 'Dusseldorf', 'Leipzig', 'Dortmund', 'Essen'],
+                'United Kingdom': ['London', 'Manchester', 'Birmingham', 'Leeds', 'Glasgow', 'Liverpool', 'Newcastle', 'Sheffield', 'Bristol', 'Edinburgh']
+            };
+
+            // Update cities based on selected country
+            function updateCities() {
+                const selectedCountry = countrySelect.value;
+                citySelect.innerHTML = '<option value="">---</option>';
+                
+                if (selectedCountry && locations[selectedCountry]) {
+                    locations[selectedCountry].forEach(city => {
+                        const option = document.createElement('option');
+                        option.value = city;
+                        option.textContent = city;
+                        citySelect.appendChild(option);
+                    });
+                }
+            }
+
+            countrySelect.addEventListener('change', updateCities);
 
             function toggleWorkerFields() {
                 const isWorker = roleSelect.value === 'worker';
