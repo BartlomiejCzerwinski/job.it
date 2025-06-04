@@ -50,15 +50,15 @@
                 <label for="{{ form.role.id_for_label }}" class="form-label">{{ form.role.label }}</label>
                 {{ form.role }}
             </div>
-            <div class="mb-3">
+            <div class="mb-3 worker-fields" style="display: none;">
                 <label for="{{ form.position.id_for_label }}" class="form-label">{{ form.position.label }}</label>
                 {{ form.position }}
             </div>
-            <div class="mb-3">
+            <div class="mb-3 worker-fields" style="display: none;">
                 <label for="{{ form.starts_in.id_for_label }}" class="form-label">{{ form.starts_in.label }}</label>
                 {{ form.starts_in }}
             </div>
-            <div class="mb-3">
+            <div class="mb-3 worker-fields" style="display: none;">
                 <label class="form-label">Optional Work Models</label>
                 <div class="form-check">
                     {{ form.is_remote }}
@@ -81,6 +81,19 @@
             const mobileInput = document.querySelector('input[name="mobile"]');
             const mobileError = document.getElementById('mobileError');
             const form = document.getElementById('registerForm');
+            const roleSelect = document.querySelector('select[name="role"]');
+            const workerFields = document.querySelectorAll('.worker-fields');
+
+            function toggleWorkerFields() {
+                const isWorker = roleSelect.value === 'worker';
+                workerFields.forEach(field => {
+                    field.style.display = isWorker ? 'block' : 'none';
+                });
+            }
+
+            toggleWorkerFields();
+
+            roleSelect.addEventListener('change', toggleWorkerFields);
 
             function formatPhoneNumber(input) {
                 let value = input.value.replace(/\D/g, '');
