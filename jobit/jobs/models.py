@@ -1,6 +1,6 @@
 from django.db import models
 
-from users.models import AppUser, Skill
+from users.models import AppUser, Skill, Location
 
 
 class JobListing(models.Model):
@@ -29,7 +29,7 @@ class JobListing(models.Model):
     salary_min = models.PositiveIntegerField(null=True, blank=True)
     salary_max = models.PositiveIntegerField(null=True, blank=True)
     salary_currency = models.CharField(max_length=3, choices=CURRENCY_CHOICES, default="PLN")
-    job_location = models.CharField(max_length=255)
+    location = models.ForeignKey(Location, on_delete=models.SET_NULL, null=True, blank=True)
     job_model = models.CharField(max_length=10, choices=JOB_MODELS, default="STATIONARY")
     owner = models.ForeignKey(AppUser, on_delete=models.CASCADE, null=True, blank=True)
     status = models.CharField(max_length=10, choices=LISTING_STATUSES, default="ACTIVE")
