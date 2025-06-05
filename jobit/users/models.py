@@ -5,14 +5,24 @@ from django.contrib.postgres.fields import ArrayField
 import json
 
 
+class Location(models.Model):
+    country = models.CharField(max_length=255)
+    city = models.CharField(max_length=255)
+
+    class Meta:
+        unique_together = ('country', 'city')
+
+    def __str__(self):
+        return f"{self.city}, {self.country}"
+
+
 class AppUser(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     about_me = models.TextField(blank=True, null=True)
     full_name = models.CharField(max_length=255, blank=True, null=True)
     mobile = models.CharField(max_length=20, blank=True, null=True)
     position = models.CharField(max_length=255, blank=True, null=True)
-    country = models.CharField(max_length=255, blank=True, null=True)
-    city = models.CharField(max_length=255, blank=True, null=True)
+    location = models.ForeignKey(Location, on_delete=models.SET_NULL, null=True, blank=True)
     is_remote = models.BooleanField(default=False)
     is_hybrid = models.BooleanField(default=False)
 
