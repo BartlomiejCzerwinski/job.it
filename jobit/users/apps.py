@@ -9,24 +9,24 @@ from .locations import LOCATIONS
 def update_locations(sender, **kwargs):
     from .models import Location
     
-    print("Starting location update process...")
-    print(f"Number of locations in LOCATIONS dictionary: {sum(len(cities) for cities in LOCATIONS.values())}")
+    print("Checking for new locations...")
     
+    # Get all existing locations from database
     existing_locations = set(
         (loc.country, loc.city) 
         for loc in Location.objects.all()
     )
-    print(f"Number of existing locations in database: {len(existing_locations)}")
     
+    # Check all locations from LOCATIONS dictionary
     new_locations_count = 0
     for country, cities in LOCATIONS.items():
         for city in cities:
             if (country, city) not in existing_locations:
-                print(f"Creating new location: {country}, {city}")
                 Location.objects.create(country=country, city=city)
                 new_locations_count += 1
     
-    print(f"Location update complete. Added {new_locations_count} new locations.")
+    if new_locations_count > 0:
+        print(f"Added {new_locations_count} new locations to database")
 
 
 class UsersConfig(AppConfig):
@@ -34,11 +34,10 @@ class UsersConfig(AppConfig):
     name = 'users'
 
     def ready(self):
-        print("UsersConfig ready method called")
-        init_skills_table()
+        # Run location update
+        update_locations(self)
         # Connect the signal to update locations after migrations
         post_migrate.connect(update_locations, sender=self)
-        print("post_migrate signal connected")
 
 
 def init_skills_table():
