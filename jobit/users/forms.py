@@ -131,9 +131,23 @@ class RegisterForm(forms.Form):
         })
     )
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if 'country' in self.data:
+            try:
+                country = self.data.get('country')
+                self.fields['city'].choices = [('', '---')] + [(city, city) for city in LOCATIONS.get(country, [])]
+            except (ValueError, TypeError):
+                pass
+        elif 'initial' in kwargs and 'country' in kwargs['initial']:
+            country = kwargs['initial']['country']
+            self.fields['city'].choices = [('', '---')] + [(city, city) for city in LOCATIONS.get(country, [])]
+
     def clean(self):
         cleaned_data = super().clean()
         role = cleaned_data.get('role')
+        country = cleaned_data.get('country')
+        city = cleaned_data.get('city')
         
         if role == 'worker':
             position = cleaned_data.get('position')
@@ -143,5 +157,9 @@ class RegisterForm(forms.Form):
                 self.add_error('position', 'Position is required for workers')
             if not starts_in:
                 self.add_error('starts_in', 'Start date is required for workers')
+        
+        if country and city:
+            if city not in LOCATIONS.get(country, []):
+                self.add_error('city', 'Please select a valid city for the chosen country')
         
         return cleaned_data
