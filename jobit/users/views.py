@@ -2,7 +2,7 @@ import json
 
 from django.shortcuts import render, get_object_or_404
 from django.views.decorators.http import require_http_methods
-from users.models import AppUser, UserSkill, Skill, SocialLink, Project
+from users.models import AppUser, UserSkill, Skill, SocialLink, Project, Location
 from .forms import LoginForm, RegisterForm
 from django.contrib.auth.hashers import make_password
 from django.contrib import messages
@@ -42,21 +42,38 @@ def register(request):
     if request.method == 'POST':
         form = RegisterForm(request.POST)
         if form.is_valid():
-            first_name, last_name, email, password, repeated_password, role, position, location, mobile, starts_in, is_remote, is_hybrid = extract_registration_form_data(form)
+            first_name = form.cleaned_data.get('first_name')
+            last_name = form.cleaned_data.get('last_name')
+            email = form.cleaned_data.get('email')
+            password = form.cleaned_data.get('password')
+            repeated_password = form.cleaned_data.get('repeated_password')
+            role = form.cleaned_data.get('role')
+            position = form.cleaned_data.get('position')
+            country = form.cleaned_data.get('country')
+            city = form.cleaned_data.get('city')
+            mobile = form.cleaned_data.get('mobile')
+            starts_in = form.cleaned_data.get('starts_in')
+            is_remote = form.cleaned_data.get('is_remote')
+            is_hybrid = form.cleaned_data.get('is_hybrid')
+
             if not is_password_valid(password, repeated_password):
-                messages.error(request, "Wrong repeated password")
-                form = RegisterForm()
+                form.add_error('repeated_password', 'Passwords do not match')
                 return render(request, 'users/register.html', {'form': form})
 
             if User.objects.filter(email=email).exists():
-                messages.error(request, "Email already taken!")
-                form = RegisterForm()
+                form.add_error('email', 'Email already taken')
                 return render(request, 'users/register.html', {'form': form})
 
-            create_user(first_name, last_name, email, password, role, position, location, mobile, starts_in, is_remote, is_hybrid)
-            query_string = '?registration=ture'
-            return HttpResponseRedirect('login' + query_string)
+            # Create Location object
+            location = None
+            if country and city:
+                location, _ = Location.objects.get_or_create(country=country, city=city)
 
+            create_user(first_name, last_name, email, password, role, position, location, mobile, starts_in, is_remote, is_hybrid)
+            return HttpResponseRedirect('login?registration=true')
+        else:
+            messages.error(request, "Please correct the errors below.")
+            return render(request, 'users/register.html', {'form': form})
     else:
         form = RegisterForm()
     return render(request, 'users/register.html', {'form': form})
@@ -77,21 +94,6 @@ def create_user(first_name, last_name, email, password, role, position=None, loc
         is_hybrid=is_hybrid
     )
     app_user.save()
-
-
-def extract_registration_form_data(form):
-    return form.cleaned_data.get('first_name'), \
-        form.cleaned_data.get('last_name'), \
-        form.cleaned_data.get('email'), \
-        form.cleaned_data.get('password'), \
-        form.cleaned_data.get('repeated_password'), \
-        form.cleaned_data.get('role'), \
-        form.cleaned_data.get('position'), \
-        form.cleaned_data.get('location'), \
-        form.cleaned_data.get('mobile'), \
-        form.cleaned_data.get('starts_in'), \
-        form.cleaned_data.get('is_remote'), \
-        form.cleaned_data.get('is_hybrid')
 
 
 def is_password_valid(password, repeated_password):
