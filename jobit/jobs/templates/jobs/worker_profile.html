@@ -663,23 +663,10 @@
     <script src="{% static 'js/worker-profile-edit-about-me.js' %}"></script>
     <script src="{% static 'js/worker-profile-social-links.js' %}"></script>
     <script>
+        const locations = {{ locations_json|safe }};
         const initialCountry = "{{ user_data.country|escapejs }}";
         const initialCity = "{{ user_data.city|escapejs }}";
         console.log(initialCountry, initialCity);
-
-        // Define locations object
-        const locations = {
-            "Poland": ["Warsaw", "Krakow", "Wroclaw", "Poznan", "Gdansk", "Lodz", "Katowice", "Lublin", "Bialystok", "Szczecin"],
-            "United Kingdom": ["London", "Manchester", "Birmingham", "Edinburgh", "Glasgow", "Liverpool", "Bristol", "Cardiff", "Belfast", "Leeds"],
-            "Germany": ["Berlin", "Munich", "Hamburg", "Frankfurt", "Cologne", "Stuttgart", "Dusseldorf", "Leipzig", "Dortmund", "Essen"],
-            "France": ["Paris", "Marseille", "Lyon", "Toulouse", "Nice", "Nantes", "Strasbourg", "Montpellier", "Bordeaux", "Lille"],
-            "Spain": ["Madrid", "Barcelona", "Valencia", "Seville", "Zaragoza", "Malaga", "Murcia", "Palma", "Bilbao", "Alicante"],
-            "Italy": ["Rome", "Milan", "Naples", "Turin", "Palermo", "Genoa", "Bologna", "Florence", "Bari", "Catania"],
-            "Netherlands": ["Amsterdam", "Rotterdam", "The Hague", "Utrecht", "Eindhoven", "Groningen", "Tilburg", "Almere", "Breda", "Nijmegen"],
-            "Belgium": ["Brussels", "Antwerp", "Ghent", "Charleroi", "Liege", "Bruges", "Namur", "Leuven", "Mons", "Aalst"],
-            "Sweden": ["Stockholm", "Gothenburg", "Malmo", "Uppsala", "Vasteras", "Orebro", "Linkoping", "Helsingborg", "Jonkoping", "Norrkoping"],
-            "Denmark": ["Copenhagen", "Aarhus", "Odense", "Aalborg", "Frederiksberg", "Esbjerg", "Gentofte", "Gladsaxe", "Randers", "Kolding"]
-        };
 
         // Initialize country select
         function initializeCountrySelect() {

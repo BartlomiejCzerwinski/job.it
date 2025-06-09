@@ -14,6 +14,7 @@ from users.views import get_user
 from .models import JobListing, JobListingSkill
 from applications.models import Application
 from django.db.utils import IntegrityError
+from users.locations import LOCATIONS
 ROLE_WORKER = "worker"
 ROLE_RECRUITER = "recruiter"
 
@@ -141,12 +142,14 @@ def worker_profile(request):
     }
     skills = get_user_skills(user)
     projects = profile.projects.all()  
-    return render(request, 'jobs/worker_profile.html', {
-        'skills': skills,
-        'user_data': user_data,
-        'about_me': getattr(profile, "about_me", ""),
-        'projects': projects
-    })
+    context = {
+        "user_data": user_data,
+        "locations_json": json.dumps(LOCATIONS),
+        "skills": skills,
+        "about_me": getattr(profile, "about_me", ""),
+        "projects": projects
+    }
+    return render(request, 'jobs/worker_profile.html', context)
 
 
 @login_required
