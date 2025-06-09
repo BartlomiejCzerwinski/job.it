@@ -14,6 +14,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 from django.contrib.auth.decorators import login_required
+from .locations import LOCATIONS
 
 
 def login_view(request):
@@ -58,11 +59,11 @@ def register(request):
 
             if not is_password_valid(password, repeated_password):
                 form.add_error('repeated_password', 'Passwords do not match')
-                return render(request, 'users/register.html', {'form': form})
+                return render(request, 'users/register.html', {'form': form, 'locations_json': json.dumps(LOCATIONS)})
 
             if User.objects.filter(email=email).exists():
                 form.add_error('email', 'Email already taken')
-                return render(request, 'users/register.html', {'form': form})
+                return render(request, 'users/register.html', {'form': form, 'locations_json': json.dumps(LOCATIONS)})
 
             # Create Location object
             location = None
@@ -73,10 +74,10 @@ def register(request):
             return HttpResponseRedirect('login?registration=true')
         else:
             messages.error(request, "Please correct the errors below.")
-            return render(request, 'users/register.html', {'form': form})
+            return render(request, 'users/register.html', {'form': form, 'locations_json': json.dumps(LOCATIONS)})
     else:
         form = RegisterForm()
-    return render(request, 'users/register.html', {'form': form})
+    return render(request, 'users/register.html', {'form': form, 'locations_json': json.dumps(LOCATIONS)})
 
 
 def create_user(first_name, last_name, email, password, role, position=None, location=None, mobile=None, starts_in=None, is_remote=False, is_hybrid=False):
