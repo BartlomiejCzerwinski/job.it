@@ -2,7 +2,6 @@ let SKILLS_URL = "http://127.0.0.1:8000/get_skills";
 let SKILLS_IN_LISTING = [];
 
 document.addEventListener("DOMContentLoaded", function () {
-    jobLocationSearchLogic();
     addSkillModalLogic();
     modalVisibilityLogic();
     addSkillFromModalToJobListingLogic();
@@ -192,39 +191,6 @@ function addSkillModalLogic() {
     });
 }
 
-function jobLocationSearchLogic() {
-    const locationInput = document.getElementById("id_job_location");
-    const suggestionsDiv = document.getElementById("locationSuggestions");
-    locationInput.addEventListener("input", function () {
-        const query = locationInput.value;
-        if (query.length < 3) {
-            suggestionsDiv.innerHTML = "";
-            return;
-        }
-
-        fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${query}`)
-            .then(response => response.json())
-            .then(data => {
-                suggestionsDiv.innerHTML = "";
-                data.forEach(location => {
-                    const item = document.createElement("div");
-                    item.classList.add("list-group-item", "list-group-item-action");
-                    item.textContent = location.display_name;
-                    item.addEventListener("click", function () {
-                        locationInput.value = location.display_name;
-                        suggestionsDiv.innerHTML = "";
-                    });
-                    suggestionsDiv.appendChild(item);
-                });
-            });
-    });
-
-    document.addEventListener("click", function (event) {
-        if (!suggestionsDiv.contains(event.target)) {
-            suggestionsDiv.innerHTML = "";
-        }
-    });
-}
 
 function modalVisibilityLogic() {
     let skillModal = document.getElementById("addSkillModal");
