@@ -91,7 +91,7 @@ def search_results_view(request):
             job_list.append({
                 'id': job.id,
                 'job_title': job.job_title,
-                'job_location': job.job_location,
+                'job_location': str(job.location) if job.location else "",
                 'company_name': job.company_name,
                 'salary_min': job.salary_min,
                 'salary_max': job.salary_max,
@@ -238,7 +238,7 @@ def get_listings_tiles(job_listings, number_of_skills_per_tile):
         result.append({
             "id": job_listing.id,
             "job_title": job_listing.job_title,
-            "job_location": job_listing.job_location,
+            "job_location": str(job_listing.location) if job_listing.location else "",
             "company_name": job_listing.company_name,
             "salary_min": job_listing.salary_min,
             "salary_max": job_listing.salary_max,

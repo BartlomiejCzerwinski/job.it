@@ -1,7 +1,7 @@
 from typing import List, Optional, Dict, Any
 from django.db.models import Q
 from .models import JobListing, JobListingSkill
-from users.models import Skill
+from users.models import Skill, Location
 
 def search_jobs(
     search_query: Optional[str] = None,
@@ -57,7 +57,19 @@ def search_jobs(
 
     # Apply location filter
     if location:
-        job_listings = job_listings.filter(job_location__icontains=location)
+        # Split location into country and city if possible
+        location_parts = location.split(', ', 1)
+        if len(location_parts) == 2:
+            country, city = location_parts
+            job_listings = job_listings.filter(
+                Q(location__country__icontains=country) |
+                Q(location__city__icontains=city)
+            )
+        else:
+            job_listings = job_listings.filter(
+                Q(location__country__icontains=location) |
+                Q(location__city__icontains=location)
+            )
 
     # Apply company name filter
     if company_name:
@@ -82,7 +94,7 @@ def search_jobs(
         job_dict = {
             'id': job.id,
             'job_title': job.job_title,
-            'job_location': job.job_location,
+            'job_location': str(job.location) if job.location else "",
             'company_name': job.company_name,
             'salary_min': job.salary_min,
             'salary_max': job.salary_max,
