@@ -215,7 +215,11 @@ def add_listing_view(request):
     else:
         form = JobListingForm()
 
-    return render(request, "jobs/add_listing.html", {"form": form})
+    context = {
+        "form": form,
+        "locations_json": json.dumps(LOCATIONS),
+    }
+    return render(request, "jobs/add_listing.html", context)
 
 
 def parse_skills_from_form(skills_string):

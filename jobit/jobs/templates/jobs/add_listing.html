@@ -58,9 +58,13 @@
                     </div>
                 </div>
                 <div class="mb-3">
-                    {{ form.job_location.label_tag }}
-                    {{ form.job_location }}
-                    <div id="locationSuggestions" class="list-group"></div>
+                    <label class="form-label">Location</label>
+                    <select class="form-select mb-2" id="countrySelect" name="country" required>
+                        <option value="">Select Country</option>
+                    </select>
+                    <select class="form-select mb-2" id="citySelect" name="city" required>
+                        <option value="">Select City</option>
+                    </select>
                 </div>
                 <div class="mb-3">
                     <p>{{ form.job_model.label_tag }}</p>
@@ -131,4 +135,41 @@
         </div>
     </div>
     <script src="{% static 'js/recruiter.js' %}"></script>
+    <script>
+        const locations = {{ locations_json|safe }};
+        // Populate country select
+        function initializeCountrySelect() {
+            const countrySelect = document.getElementById('countrySelect');
+            if (!countrySelect) return;
+            Object.keys(locations).forEach(country => {
+                const option = document.createElement('option');
+                option.value = country;
+                option.textContent = country;
+                countrySelect.appendChild(option);
+            });
+        }
+        // Populate city select based on selected country
+        function updateCitySelect(country) {
+            const citySelect = document.getElementById('citySelect');
+            if (!citySelect) return;
+            citySelect.innerHTML = '<option value="">Select City</option>';
+            if (country && locations[country]) {
+                locations[country].forEach(city => {
+                    const option = document.createElement('option');
+                    option.value = city;
+                    option.textContent = city;
+                    citySelect.appendChild(option);
+                });
+            }
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCountrySelect();
+            const countrySelect = document.getElementById('countrySelect');
+            if (countrySelect) {
+                countrySelect.addEventListener('change', function() {
+                    updateCitySelect(this.value);
+                });
+            }
+        });
+    </script>
 {% endblock %}
