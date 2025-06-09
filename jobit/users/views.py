@@ -258,17 +258,21 @@ def update_position(request):
 def update_location(request):
     try:
         data = json.loads(request.body)
-        location = data.get('location')
+        country = data.get('country')
+        city = data.get('city')
         is_remote = data.get('is_remote', False)
         is_hybrid = data.get('is_hybrid', False)
         
-        if not location:
-            return JsonResponse({'error': 'Location is required'}, status=400)
+        if not country or not city:
+            return JsonResponse({'error': 'Country and city are required'}, status=400)
             
         user = get_user(request.user)
         if not user:
             return JsonResponse({'error': 'User not found'}, status=404)
             
+        # Get or create Location object
+        location, _ = Location.objects.get_or_create(country=country, city=city)
+        
         user.location = location
         user.is_remote = is_remote
         user.is_hybrid = is_hybrid

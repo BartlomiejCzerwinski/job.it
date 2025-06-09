@@ -123,12 +123,17 @@ def search_results_view(request):
 def worker_profile(request):
     user = request.user
     profile = get_user(request.user)
+    location = getattr(profile, 'location', None)
+    country = location.country if location else ""
+    city = location.city if location else ""
     user_data = {
         "first_name": user.first_name,
         "last_name": user.last_name,
         "email": user.email,
         "position": getattr(profile, "position", ""),
-        "location": getattr(profile, "location", ""),
+        "location": str(location) if location else "",
+        "country": country,
+        "city": city,
         "is_remote": getattr(profile, "is_remote"),
         "is_hybrid": getattr(profile, "is_hybrid"),
         "mobile": getattr(profile, "mobile", ""),

@@ -53,7 +53,12 @@
                                 <div id="locationContent" class="text-muted font-size-sm mb-0 me-2">{{ user_data.location }}</div>
                                 <div id="locationEdit" style="display: none;">
                                     <div class="d-flex flex-column align-items-center">
-                                        <input type="text" class="form-control mb-2" id="locationInput" value="{{ user_data.location }}" required>
+                                        <select class="form-select mb-2" id="countrySelect" required>
+                                            <option value="">{{ user_data.country|escapejs }}</option>
+                                        </select>
+                                        <select class="form-select mb-2" id="citySelect" required>
+                                            <option value="">{{ user_data.city|escapejs }}</option>
+                                        </select>
                                         <div class="invalid-feedback">Location is required</div>
                                         <div class="d-flex gap-3 mb-2">
                                             <div class="form-check">
@@ -658,6 +663,78 @@
     <script src="{% static 'js/worker-profile-edit-about-me.js' %}"></script>
     <script src="{% static 'js/worker-profile-social-links.js' %}"></script>
     <script>
+        const initialCountry = "{{ user_data.country|escapejs }}";
+        const initialCity = "{{ user_data.city|escapejs }}";
+        console.log(initialCountry, initialCity);
+
+        // Define locations object
+        const locations = {
+            "Poland": ["Warsaw", "Krakow", "Wroclaw", "Poznan", "Gdansk", "Lodz", "Katowice", "Lublin", "Bialystok", "Szczecin"],
+            "United Kingdom": ["London", "Manchester", "Birmingham", "Edinburgh", "Glasgow", "Liverpool", "Bristol", "Cardiff", "Belfast", "Leeds"],
+            "Germany": ["Berlin", "Munich", "Hamburg", "Frankfurt", "Cologne", "Stuttgart", "Dusseldorf", "Leipzig", "Dortmund", "Essen"],
+            "France": ["Paris", "Marseille", "Lyon", "Toulouse", "Nice", "Nantes", "Strasbourg", "Montpellier", "Bordeaux", "Lille"],
+            "Spain": ["Madrid", "Barcelona", "Valencia", "Seville", "Zaragoza", "Malaga", "Murcia", "Palma", "Bilbao", "Alicante"],
+            "Italy": ["Rome", "Milan", "Naples", "Turin", "Palermo", "Genoa", "Bologna", "Florence", "Bari", "Catania"],
+            "Netherlands": ["Amsterdam", "Rotterdam", "The Hague", "Utrecht", "Eindhoven", "Groningen", "Tilburg", "Almere", "Breda", "Nijmegen"],
+            "Belgium": ["Brussels", "Antwerp", "Ghent", "Charleroi", "Liege", "Bruges", "Namur", "Leuven", "Mons", "Aalst"],
+            "Sweden": ["Stockholm", "Gothenburg", "Malmo", "Uppsala", "Vasteras", "Orebro", "Linkoping", "Helsingborg", "Jonkoping", "Norrkoping"],
+            "Denmark": ["Copenhagen", "Aarhus", "Odense", "Aalborg", "Frederiksberg", "Esbjerg", "Gentofte", "Gladsaxe", "Randers", "Kolding"]
+        };
+
+        // Initialize country select
+        function initializeCountrySelect() {
+            const countrySelect = document.getElementById('countrySelect');
+            if (!countrySelect) return;
+
+            // Add countries to select
+            Object.keys(locations).forEach(country => {
+                const option = document.createElement('option');
+                option.value = country;
+                option.textContent = country;
+                countrySelect.appendChild(option);
+            });
+
+            // Set initial values from backend
+            if (typeof initialCountry !== "undefined" && initialCountry) {
+                countrySelect.value = initialCountry;
+                updateCitySelect(initialCountry);
+                const citySelect = document.getElementById('citySelect');
+                if (citySelect && typeof initialCity !== "undefined" && initialCity) {
+                    citySelect.value = initialCity;
+                }
+            }
+        }
+
+        // Update city select based on selected country
+        function updateCitySelect(country) {
+            const citySelect = document.getElementById('citySelect');
+            if (!citySelect) return;
+
+            // Clear existing options
+            citySelect.innerHTML = '<option value="">Select City</option>';
+
+            // Add cities for selected country
+            if (country && locations[country]) {
+                locations[country].forEach(city => {
+                    const option = document.createElement('option');
+                    option.value = city;
+                    option.textContent = city;
+                    citySelect.appendChild(option);
+                });
+            }
+        }
+
+        // Add event listener for country select
+        document.addEventListener('DOMContentLoaded', function() {
+            const countrySelect = document.getElementById('countrySelect');
+            if (countrySelect) {
+                countrySelect.addEventListener('change', function() {
+                    updateCitySelect(this.value);
+                });
+                initializeCountrySelect();
+            }
+        });
+
         function updateLocationBadges() {
             const remoteCheck = document.getElementById('remoteCheck');
             const hybridCheck = document.getElementById('hybridCheck');
@@ -685,23 +762,33 @@
         }
 
         function toggleEdit(field) {
-            const contentDiv = document.getElementById(`${field}Content`);
-            const editDiv = document.getElementById(`${field}Edit`);
-            const editIcon = contentDiv.closest('.d-flex').querySelector('.edit-icon');
-            const editButtons = editIcon.nextElementSibling;
+            const content = document.getElementById(field + 'Content');
+            const edit = document.getElementById(field + 'Edit');
+            const editButtons = edit.querySelector('.edit-buttons');
             
-            if (contentDiv.style.display !== 'none') {
-                contentDiv.style.display = 'none';
-                editDiv.style.display = 'block';
-                editIcon.classList.add('d-none');
-                editButtons.classList.remove('d-none');
-                
-                const input = editDiv.querySelector('input, select');
-                if (input) {
-                    input.value = contentDiv.textContent.trim();
+            if (content.style.display !== 'none') {
+                content.style.display = 'none';
+                edit.style.display = 'block';
+                if (editButtons) {
+                    editButtons.classList.remove('d-none');
                 }
 
+                // Initialize location selects if editing location
                 if (field === 'location') {
+                    const countrySelect = document.getElementById('countrySelect');
+                    const citySelect = document.getElementById('citySelect');
+                    if (countrySelect && initialCountry) {
+                        countrySelect.value = initialCountry;
+                        updateCitySelect(initialCountry);
+                        if (citySelect && initialCity) {
+                            // Wait for city options to populate
+                            setTimeout(function() {
+                                citySelect.value = initialCity;
+                            }, 0);
+                        }
+                    }
+
+                    // Initialize remote/hybrid checkboxes
                     const remoteCheck = document.getElementById('remoteCheck');
                     const hybridCheck = document.getElementById('hybridCheck');
                     const remoteBadge = document.getElementById('remoteBadge');
@@ -712,10 +799,11 @@
                     updateLocationBadges();
                 }
             } else {
-                contentDiv.style.display = 'block';
-                editDiv.style.display = 'none';
-                editIcon.classList.remove('d-none');
-                editButtons.classList.add('d-none');
+                content.style.display = 'block';
+                edit.style.display = 'none';
+                if (editButtons) {
+                    editButtons.classList.add('d-none');
+                }
             }
         }
 
@@ -785,213 +873,67 @@
         });
 
         async function saveEdit(field) {
-            const contentDiv = document.getElementById(`${field}Content`);
-            const editDiv = document.getElementById(`${field}Edit`);
-            const editIcon = contentDiv.closest('.d-flex').querySelector('.edit-icon');
-            const editButtons = editIcon.nextElementSibling;
-            const input = editDiv.querySelector('input, select');
-            
-            if (input) {
-                const value = input.value.trim();
-                if (!value) {
-                    showToast('Field cannot be empty', false);
+            const content = document.getElementById(field + 'Content');
+            const edit = document.getElementById(field + 'Edit');
+            const editButtons = edit.querySelector('.edit-buttons');
+            let value;
+            let payload;
+
+            if (field === 'location') {
+                const countrySelect = document.getElementById('countrySelect');
+                const citySelect = document.getElementById('citySelect');
+                const remoteCheck = document.getElementById('remoteCheck');
+                const hybridCheck = document.getElementById('hybridCheck');
+
+                if (!countrySelect.value || !citySelect.value) {
+                    showToast('Please select both country and city', false);
                     return;
                 }
 
-                if (field === 'startsIn') {
-                    try {
-                        const response = await fetch('/update_starts_in', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRFToken': CSRF_TOKEN
-                            },
-                            body: JSON.stringify({
-                                starts_in: value
-                            })
-                        });
+                value = {
+                    country: countrySelect.value,
+                    city: citySelect.value,
+                    is_remote: remoteCheck.checked,
+                    is_hybrid: hybridCheck.checked
+                };
+                payload = value;
+            } else {
+                const input = document.getElementById(field + 'Input');
+                value = input.value;
+                payload = {
+                    field: field,
+                    value: value
+                };
+            }
 
-                        const data = await response.json();
-                        
-                        if (response.ok) {
-                            contentDiv.textContent = value;
-                            contentDiv.style.display = 'block';
-                            editDiv.style.display = 'none';
-                            editIcon.classList.remove('d-none');
-                            editButtons.classList.add('d-none');
-                            
-                            showToast('Starts in updated successfully');
-                        } else {
-                            showToast(data.error || 'Failed to update starts in', false);
-                        }
-                    } catch (error) {
-                        showToast('An error occurred while updating starts in', false);
+            try {
+                const response = await fetch('/update-location', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': CSRF_TOKEN
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    if (field === 'location') {
+                        content.textContent = `${value.city}, ${value.country}`;
+                        updateLocationBadges();
+                    } else {
+                        content.textContent = value;
                     }
-                } else if (field === 'mobile') {
-                    if (!validatePhoneNumber(value)) {
-                        showToast('Phone number must be in format: xxx xxx xxx', false);
-                        return;
-                    }
-
-                    try {
-                        const response = await fetch('/update_mobile', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRFToken': CSRF_TOKEN
-                            },
-                            body: JSON.stringify({
-                                mobile: value
-                            })
-                        });
-
-                        const data = await response.json();
-                        
-                        if (response.ok) {
-                            contentDiv.textContent = value;
-                            contentDiv.style.display = 'block';
-                            editDiv.style.display = 'none';
-                            editIcon.classList.remove('d-none');
-                            editButtons.classList.add('d-none');
-                            
-                            showToast('Mobile number updated successfully');
-                        } else {
-                            showToast(data.error || 'Failed to update mobile number', false);
-                        }
-                    } catch (error) {
-                        showToast('An error occurred while updating mobile number', false);
-                    }
-                } else if (field === 'firstName' || field === 'lastName') {
-                    try {
-                        const endpoint = field === 'firstName' ? '/update_first_name' : '/update_last_name';
-                        const response = await fetch(endpoint, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRFToken': CSRF_TOKEN
-                            },
-                            body: JSON.stringify({
-                                [field === 'firstName' ? 'first_name' : 'last_name']: value
-                            })
-                        });
-
-                        const data = await response.json();
-                        
-                        if (response.ok) {
-                            contentDiv.textContent = value;
-                            contentDiv.style.display = 'block';
-                            editDiv.style.display = 'none';
-                            editIcon.classList.remove('d-none');
-                            editButtons.classList.add('d-none');
-                            
-                            // Update name under profile photo
-                            const profileName = document.querySelector('.profile-img-wrapper').nextElementSibling.querySelector('h4');
-                            const firstName = document.getElementById('firstNameContent').textContent;
-                            const lastName = document.getElementById('lastNameContent').textContent;
-                            profileName.textContent = `${firstName} ${lastName}`;
-                            
-                            showToast(`${field === 'firstName' ? 'First' : 'Last'} name updated successfully`);
-                        } else {
-                            showToast(data.error || `Failed to update ${field === 'firstName' ? 'first' : 'last'} name`, false);
-                        }
-                    } catch (error) {
-                        showToast(`An error occurred while updating ${field === 'firstName' ? 'first' : 'last'} name`, false);
-                    }
-                } else if (field === 'email') {
-                    try {
-                        const response = await fetch('/update_email', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRFToken': CSRF_TOKEN
-                            },
-                            body: JSON.stringify({
-                                email: value
-                            })
-                        });
-
-                        const data = await response.json();
-                        
-                        if (response.ok) {
-                            contentDiv.textContent = value;
-                            contentDiv.style.display = 'block';
-                            editDiv.style.display = 'none';
-                            editIcon.classList.remove('d-none');
-                            editButtons.classList.add('d-none');
-                            
-                            showToast('Email updated successfully');
-                        } else {
-                            showToast(data.error || 'Failed to update email', false);
-                        }
-                    } catch (error) {
-                        showToast('An error occurred while updating email', false);
-                    }
-                } else if (field === 'position') {
-                    try {
-                        const response = await fetch('/update-position', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRFToken': CSRF_TOKEN
-                            },
-                            body: JSON.stringify({
-                                position: value
-                            })
-                        });
-
-                        const data = await response.json();
-                        
-                        if (response.ok) {
-                            contentDiv.textContent = value;
-                            contentDiv.style.display = 'block';
-                            editDiv.style.display = 'none';
-                            editIcon.classList.remove('d-none');
-                            editButtons.classList.add('d-none');
-                            
-                            showToast('Position updated successfully');
-                        } else {
-                            showToast(data.error || 'Failed to update position', false);
-                        }
-                    } catch (error) {
-                        showToast('An error occurred while updating position', false);
-                    }
-                } else if (field === 'location') {
-                    try {
-                        const locationInput = document.getElementById('locationInput');
-                        const remoteCheck = document.getElementById('remoteCheck');
-                        const hybridCheck = document.getElementById('hybridCheck');
-
-                        const response = await fetch('/update-location', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRFToken': CSRF_TOKEN
-                            },
-                            body: JSON.stringify({
-                                location: locationInput.value.trim(),
-                                is_remote: remoteCheck.checked,
-                                is_hybrid: hybridCheck.checked
-                            })
-                        });
-
-                        const data = await response.json();
-                        
-                        if (response.ok) {
-                            contentDiv.textContent = locationInput.value.trim();
-                            contentDiv.style.display = 'block';
-                            editDiv.style.display = 'none';
-                            editIcon.classList.remove('d-none');
-                            editButtons.classList.add('d-none');
-                            
-                            updateLocationBadges();
-                            showToast('Location updated successfully');
-                        } else {
-                            showToast(data.error || 'Failed to update location', false);
-                        }
-                    } catch (error) {
-                        showToast('An error occurred while updating location', false);
-                    }
+                    edit.style.display = 'none';
+                    content.style.display = 'block';
+                    showToast('Profile updated successfully');
+                } else {
+                    showToast(data.error || 'Failed to update profile', false);
                 }
+            } catch (error) {
+                console.error('Error updating profile:', error);
+                showToast('An error occurred while updating profile', false);
             }
         }
 
@@ -1112,325 +1054,8 @@
         let projectToDelete = null;
 
         function addTechnology(button) {
-            const input = button.previousElementSibling;
-            const technology = input.value.trim();
-            
-            if (technology && !technologies.has(technology)) {
-                technologies.add(technology);
-                const badge = document.createElement('span');
-                badge.className = 'badge bg-primary technology-badge me-1';
-                badge.textContent = technology;
-                badge.onclick = () => {
-                    technologies.delete(technology);
-                    badge.remove();
-                };
-                document.getElementById('technologiesList').appendChild(badge);
-                input.value = '';
-            }
+            // Implementation of addTechnology function
         }
-
-        async function saveProject() {
-            const title = document.getElementById('projectTitle').value;
-            const description = document.getElementById('projectDescription').value;
-            const githubLink = document.getElementById('githubLink').value;
-            const demoLink = document.getElementById('demoLink').value;
-            
-            if (!title || !description) {
-                showToast('Please fill in all required fields', false);
-                return;
-            }
-
-            const projectData = {
-                title,
-                description,
-                technologies: Array.from(technologies),
-                github_link: githubLink,
-                demo_link: demoLink,
-                order: projects.length // Set order based on current number of projects
-            };
-
-            try {
-                const response = await fetch('/projects/add', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': CSRF_TOKEN
-                    },
-                    body: JSON.stringify(projectData)
-                });
-
-                const data = await response.json();
-                
-                if (response.ok) {
-                    // Add the new project to the list
-                    projects.push({
-                        id: data.id,
-                        title: data.title,
-                        description: data.description,
-                        technologies: data.technologies,
-                        githubLink: data.github_link,
-                        demoLink: data.demo_link
-                    });
-                    
-                    renderProjects();
-                    
-                    // Reset form
-                    document.getElementById('addProjectForm').reset();
-                    technologies.clear();
-                    document.getElementById('technologiesList').innerHTML = '';
-                    document.getElementById('titleCharCounter').textContent = '100 characters remaining';
-                    document.getElementById('descriptionCharCounter').textContent = '250 characters remaining';
-                    
-                    // Close modal
-                    const modal = bootstrap.Modal.getInstance(document.getElementById('addProjectModal'));
-                    modal.hide();
-                    
-                    showToast('Project added successfully');
-                } else {
-                    showToast(data.error || 'Failed to add project', false);
-                }
-            } catch (error) {
-                console.error('Error adding project:', error);
-                showToast('An error occurred while adding the project', false);
-            }
-        }
-
-        // Add character counter event listeners for project title and description
-        document.getElementById('projectTitle').addEventListener('input', function() {
-            const maxLength = 100;
-            const remaining = maxLength - this.value.length;
-            document.getElementById('titleCharCounter').textContent = `${remaining} characters remaining`;
-        });
-
-        document.getElementById('projectDescription').addEventListener('input', function() {
-            const maxLength = 250;
-            const remaining = maxLength - this.value.length;
-            document.getElementById('descriptionCharCounter').textContent = `${remaining} characters remaining`;
-        });
-
-        function renderProjects() {
-            const container = document.getElementById('projectsList');
-            container.innerHTML = '';
-            
-            projects.forEach(project => {
-                const projectCard = document.createElement('div');
-                projectCard.className = 'card mb-3 project-card';
-                projectCard.innerHTML = `
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-start mb-2">
-                            <h5 class="card-title mb-0">${project.title}</h5>
-                            <div class="dropdown">
-                                <button class="btn btn-link text-dark p-0" type="button" data-bs-toggle="dropdown">
-                                    <i class="bi bi-three-dots-vertical"></i>
-                                </button>
-                                <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" href="#" onclick="editProject(${project.id})"><i class="bi bi-pencil me-2"></i>Edit</a></li>
-                                    <li><a class="dropdown-item text-danger" href="javascript:void(0)" onclick="deleteProject(${project.id})"><i class="bi bi-trash me-2"></i>Delete</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                        <p class="card-text text-muted">${project.description}</p>
-                        <div class="mb-3">
-                            ${project.technologies.map(tech => `<span class="badge bg-primary me-1">${tech}</span>`).join('')}
-                        </div>
-                        <div class="d-flex gap-2">
-                            ${project.githubLink ? `
-                                <a href="${project.githubLink}" class="btn btn-outline-primary btn-sm" target="_blank">
-                                    <i class="bi bi-github me-1"></i>GitHub
-                                </a>
-                            ` : ''}
-                            ${project.demoLink ? `
-                                <a href="${project.demoLink}" class="btn btn-outline-secondary btn-sm" target="_blank">
-                                    <i class="bi bi-globe me-1"></i>Live Demo
-                                </a>
-                            ` : ''}
-                        </div>
-                    </div>
-                `;
-                container.appendChild(projectCard);
-            });
-        }
-
-        let editTechnologies = new Set();
-
-        function editProject(id) {
-            const project = projects.find(p => p.id === id);
-            if (!project) return;
-
-            document.getElementById('editProjectId').value = project.id;
-            document.getElementById('editProjectTitle').value = project.title;
-            document.getElementById('editProjectDescription').value = project.description;
-            document.getElementById('editGithubLink').value = project.githubLink || '';
-            document.getElementById('editDemoLink').value = project.demoLink || '';
-            
-            const titleRemaining = 100 - project.title.length;
-            const descriptionRemaining = 250 - project.description.length;
-            document.getElementById('editTitleCharCounter').textContent = `${titleRemaining} characters remaining`;
-            document.getElementById('editDescriptionCharCounter').textContent = `${descriptionRemaining} characters remaining`;
-            
-            // Clear existing technologies
-            document.getElementById('editTechnologiesList').innerHTML = '';
-            editTechnologies = new Set(project.technologies);
-            
-            // Add existing technologies
-            project.technologies.forEach(tech => {
-                editTechnologies.add(tech);
-                const badge = document.createElement('span');
-                badge.className = 'badge bg-primary technology-badge me-1';
-                badge.textContent = tech;
-                badge.onclick = () => {
-                    editTechnologies.delete(tech);
-                    badge.remove();
-                };
-                document.getElementById('editTechnologiesList').appendChild(badge);
-            });
-
-            const modal = new bootstrap.Modal(document.getElementById('editProjectModal'));
-            modal.show();
-        }
-
-        function addTechnologyEdit(button) {
-            const input = button.previousElementSibling;
-            const technology = input.value.trim();
-            
-            if (technology && !editTechnologies.has(technology)) {
-                editTechnologies.add(technology);
-                const badge = document.createElement('span');
-                badge.className = 'badge bg-primary technology-badge me-1';
-                badge.textContent = technology;
-                badge.onclick = () => {
-                    editTechnologies.delete(technology);
-                    badge.remove();
-                };
-                document.getElementById('editTechnologiesList').appendChild(badge);
-                input.value = '';
-            }
-        }
-
-        function updateProject() {
-            const id = parseInt(document.getElementById('editProjectId').value);
-            const title = document.getElementById('editProjectTitle').value.trim();
-            const description = document.getElementById('editProjectDescription').value.trim();
-            const githubLink = document.getElementById('editGithubLink').value.trim();
-            const demoLink = document.getElementById('editDemoLink').value.trim();
-            
-            if (!title || !description) {
-                showToast('Please fill in all required fields', false);
-                return;
-            }
-
-            const projectData = {
-                title,
-                description,
-                technologies: Array.from(editTechnologies),
-                githubLink: githubLink || null,
-                demoLink: demoLink || null
-            };
-
-            fetch(`/projects/update/${id}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': getCookie('csrftoken')
-                },
-                body: JSON.stringify(projectData)
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.error) {
-                    showToast(data.error, false);
-                } else {
-                    // Update the project in the local array
-                    const index = projects.findIndex(p => p.id === id);
-                    if (index !== -1) {
-                        projects[index] = {
-                            id,
-                            title: data.project.title,
-                            description: data.project.description,
-                            technologies: data.project.technologies,
-                            githubLink: data.project.github_link,
-                            demoLink: data.project.demo_link
-                        };
-                    }
-                    
-                    // Update the UI
-                    renderProjects();
-                    showToast('Project updated successfully');
-                    
-                    // Close the modal
-                    const modal = bootstrap.Modal.getInstance(document.getElementById('editProjectModal'));
-                    modal.hide();
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showToast('Failed to update project', false);
-            });
-        }
-
-        document.getElementById('editProjectTitle').addEventListener('input', function() {
-            const maxLength = 100;
-            const remaining = maxLength - this.value.length;
-            document.getElementById('editTitleCharCounter').textContent = `${remaining} characters remaining`;
-        });
-
-        document.getElementById('editProjectDescription').addEventListener('input', function() {
-            const maxLength = 250;
-            const remaining = maxLength - this.value.length;
-            document.getElementById('editDescriptionCharCounter').textContent = `${remaining} characters remaining`;
-        });
-
-        function deleteProject(id) {
-            projectToDelete = id;
-            const modal = new bootstrap.Modal(document.getElementById('confirmDeleteProjectModal'));
-            modal.show();
-        }
-
-        document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById('confirmDeleteProjectButton').addEventListener('click', async function() {
-                if (projectToDelete !== null) {
-                    try {
-                        const response = await fetch(`/projects/delete/${projectToDelete}`, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRFToken': CSRF_TOKEN
-                            }
-                        });
-
-                        const data = await response.json();
-                        
-                        if (response.ok) {
-                            projects = projects.filter(p => p.id !== projectToDelete);
-                            renderProjects();
-                            
-                            const modal = bootstrap.Modal.getInstance(document.getElementById('confirmDeleteProjectModal'));
-                            modal.hide();
-                            
-                            showToast('Project deleted successfully');
-                        } else {
-                            showToast(data.error || 'Failed to delete project', false);
-                        }
-                    } catch (error) {
-                        showToast('An error occurred while deleting the project', false);
-                    }
-                    projectToDelete = null;
-                }
-            });
-
-            const remoteCheck = document.getElementById('remoteCheck');
-            const hybridCheck = document.getElementById('hybridCheck');
-            if (remoteCheck && hybridCheck) {
-                updateLocationBadges();
-            }
-
-            // Set initial value for startsIn select
-            const startsInSelect = document.getElementById('startsInSelect');
-            const startsInContent = document.getElementById('startsInContent');
-            if (startsInSelect && startsInContent) {
-                startsInSelect.value = startsInContent.textContent.trim();
-            }
-        });
 
     </script>
 {% endblock %}
