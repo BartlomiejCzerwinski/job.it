@@ -29,6 +29,9 @@ Responsible for creating, listing, and managing job offers posted by employers.
 ### Matching
 Implements job recommendation and prediction models to match users with relevant job offers based on their profiles and activity.
 
+![Components-Diagram](https://github.com/user-attachments/assets/33bf8c30-0c24-40b9-bd8f-1bea2f745baf)
+
+
 ---
 
 ## 🚀 Getting Started
