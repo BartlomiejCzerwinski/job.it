@@ -1,50 +1,54 @@
-# job.it
+# 💼 job.it – Intelligent Recruitment Platform for IT
 
-**job.it** is a modular web application designed to support and streamline the recruitment process in the IT industry. The platform brings together job seekers and employers, providing tools for job searching, applications, communication, and intelligent job matching.
+**job.it** is a modular web application designed to support and streamline the recruitment process in the IT industry. The platform connects job seekers and employers, offering tools for job searching, applications, communication, and intelligent job matching based on user profiles.
 
 ---
 
 ## 🗺️ System Architecture
 
+The application follows a modular, scalable architecture built with Django. Each core functionality is implemented as a separate Django app to ensure maintainability and clarity.
+
 ![Applications-Diagram](https://github.com/user-attachments/assets/6fba49a9-da47-4db6-9fb0-f52ea53d2b30)
 
-*Note: The diagram above presents a high-level overview of the system's architecture.*
+*The above diagram shows a high-level system architecture with separate modules for users, job offers, matching engine, and messaging.*
 
 ---
 
-## 🧩 Main Modules
+## 🧩 Component Diagram
 
-### Users
-Handles user registration, authentication, session management, and user profile operations.
-
-### Messaging (Chat)
-Enables direct communication between users, including messaging and contact management.
-
-### Applications
-Manages the process of submitting, tracking, and managing job applications.
-
-### Jobs
-Responsible for creating, listing, and managing job offers posted by employers.
-
-### Matching
-Implements job recommendation and prediction models to match users with relevant job offers based on their profiles and activity.
+The following diagram illustrates how the internal components of the system interact:
 
 ![Components-Diagram](https://github.com/user-attachments/assets/33bf8c30-0c24-40b9-bd8f-1bea2f745baf)
 
+*Each component is responsible for a distinct area of functionality, such as user management, job posting, or chat messaging.*
+
+---
+
+## 🗃️ Database Schema
+
+This relational model outlines how the core entities relate to one another:
+
+![database](https://github.com/user-attachments/assets/d172af03-ad89-434a-9807-473caad89b6f)
+
+*The database schema supports users, job applications, communication logs, job offers, and matching metadata.*
+
+---
+
+## 🧠 Main Modules
+
+- **Users** – Registration, authentication, session management, profile handling
+- **Jobs** – Creating, editing, browsing, and managing job offers
+- **Applications** – Job application submission, status tracking, and feedback
+- **Messaging (Chat)** – Real-time communication between users
+- **Matching** – AI-driven recommendation engine using user profiles and job data
 
 ---
 
 ## 🚀 Getting Started
 
+To run the application locally:
+
 1. **Clone the repository**
-2. **Install dependencies** for each module (see individual module folders for requirements)
-3. **Run the Django server** using `python manage.py runserver`
-4. Access the application via your browser at `http://localhost:8000/`
-
----
-
-## 🛠️ Technologies Used
-
-- Python & Django (backend)
-- SQLite (default database, can be replaced)
-- HTML/CSS (frontend templates)
+   ```bash
+   git clone https://github.com/your-username/job.it.git
+   cd job.it
