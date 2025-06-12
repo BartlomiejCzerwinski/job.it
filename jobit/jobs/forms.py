@@ -13,7 +13,6 @@ class JobListingForm(forms.ModelForm):
             "salary_min",
             "salary_max",
             "salary_currency",
-            "job_location",
             "job_model"
         ]
 
@@ -41,9 +40,6 @@ class JobListingForm(forms.ModelForm):
     salary_currency = forms.ChoiceField(
         choices=JobListing.CURRENCY_CHOICES,
         widget=forms.Select(attrs={"class": "form-control"})
-    )
-    job_location = forms.CharField(
-        widget=forms.TextInput(attrs={"class": "form-control", "autocomplete": "off", "placeholder": "Type to search"})
     )
     job_model = forms.ChoiceField(
         choices=JobListing.JOB_MODELS,
