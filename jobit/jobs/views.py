@@ -7,7 +7,7 @@ from django.http import HttpResponseRedirect, JsonResponse
 from django.views.decorators.http import require_http_methods
 
 from jobs.forms import JobListingForm
-from users.models import Skill, UserSkill, AppUser, User
+from users.models import Skill, UserSkill, AppUser, User, Location
 from users.views import get_user_role, get_user, get_user_skills
 from django.contrib.auth import logout
 from users.views import get_user
@@ -190,28 +190,48 @@ def listing_details_view(request, id):
 def add_listing_view(request):
     if request.method == "POST":
         form = JobListingForm(request.POST)
-        skills_data = parse_skills_from_form(request.POST.get("skills_data"))
-        print("Skills for job listing: ", skills_data)
-        if form.is_valid():
-            job_listing = form.save()
-            job_listing.owner = get_user(request.user)
-            job_listing.save()
-            is_success = True
-            if job_listing.owner is None:
-                job_listing.delete()
-                is_success = False
+        if not form.is_valid():
+            context = {
+                "form": form,
+                "locations_json": json.dumps(LOCATIONS),
+            }
+            return render(request, "jobs/add_listing.html", context)
 
-            query_string = '?success='
-            if is_success:
-                try:
-                    add_skills_to_job_listing(job_listing, skills_data)
-                    query_string += "True"
-                except IntegrityError:
-                    query_string += "False"
-            else:
+        country = request.POST.get("country")
+        city = request.POST.get("city")
+        skills_string = request.POST.get("skillsListForListing")
+
+        if not country or not city:
+            form.add_error(None, "Please select both country and city")
+            context = {
+                "form": form,
+                "locations_json": json.dumps(LOCATIONS),
+            }
+            return render(request, "jobs/add_listing.html", context)
+
+        skills_data = parse_skills_from_form(skills_string)
+        job_listing = form.save(commit=False)
+        location, _ = Location.objects.get_or_create(country=country, city=city)
+        job_listing.location = location
+        job_listing.owner = get_user(request.user)
+        job_listing.save()
+        is_success = True
+        if job_listing.owner is None:
+            job_listing.delete()
+            is_success = False
+
+        query_string = '?success='
+        print("is_success", is_success)
+        if is_success:
+            try:
+                add_skills_to_job_listing(job_listing, skills_data)
+                query_string += "True"
+            except IntegrityError:
                 query_string += "False"
+        else:
+            query_string += "False"
 
-            return HttpResponseRedirect("/listings" + query_string)
+        return HttpResponseRedirect("/listings" + query_string)
     else:
         form = JobListingForm()
 
@@ -228,6 +248,8 @@ def parse_skills_from_form(skills_string):
             skills_data = json.loads(skills_string)
         except json.JSONDecodeError:
             skills_data = []
+    else:
+        skills_data = []
     return skills_data
 
 
