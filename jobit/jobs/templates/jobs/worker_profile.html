@@ -479,6 +479,10 @@
                         </div>
                     </div>
                 </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger me-auto" onclick="removeProfilePhoto()">Remove Photo</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
             </div>
         </div>
     </div>
@@ -628,6 +632,25 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                     <button type="button" class="btn btn-primary" onclick="updateProject()">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Photo removal confirmation modal -->
+    <div class="modal fade" id="confirmRemovePhotoModal" tabindex="-1" aria-labelledby="confirmRemovePhotoModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmRemovePhotoModalLabel">Remove Profile Photo</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to remove your profile photo? This action cannot be undone.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" onclick="confirmRemovePhoto()">Remove Photo</button>
                 </div>
             </div>
         </div>
@@ -1023,6 +1046,44 @@
             modal.hide();
             
             resetUpload();
+        }
+
+        function removeProfilePhoto() {
+            // Show confirmation modal instead of removing directly
+            const confirmModal = new bootstrap.Modal(document.getElementById('confirmRemovePhotoModal'));
+            confirmModal.show();
+        }
+
+        function confirmRemovePhoto() {
+            const profileImg = document.querySelector('.profile-img');
+            profileImg.src = "{% static 'images/avatar.png' %}";
+            
+            //  PLACEHOLDER: Send request to remove photo
+            fetch('/remove-profile-photo', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': CSRF_TOKEN
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showToast('Profile photo removed successfully');
+                } else {
+                    showToast('Failed to remove profile photo', false);
+                }
+            })
+            .catch(error => {
+                console.error('Error removing profile photo:', error);
+                showToast('An error occurred while removing profile photo', false);
+            });
+
+            // Close both modals
+            const confirmModal = bootstrap.Modal.getInstance(document.getElementById('confirmRemovePhotoModal'));
+            confirmModal.hide();
+            const photoModal = bootstrap.Modal.getInstance(document.getElementById('profilePhotoModal'));
+            photoModal.hide();
         }
 
         let projects = [
