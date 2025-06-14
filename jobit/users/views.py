@@ -1,7 +1,7 @@
 import json
 
 from django.shortcuts import render, get_object_or_404
-from django.views.decorators.http import require_http_methods
+from django.views.decorators.http import require_http_methods, require_GET
 from users.models import AppUser, UserSkill, Skill, SocialLink, Project, Location
 from .forms import LoginForm, RegisterForm
 from django.contrib.auth.hashers import make_password
@@ -417,3 +417,21 @@ def add_profile_photo(request):
         except Exception as e:
             return JsonResponse({"success": False, "error": str(e)})
     return JsonResponse({"success": False, "error": "Invalid request method"})
+
+
+def get_profile_photo(user_id):
+    """
+    Tries to retrieve the profile photo for the given user ID from Azure Blob Storage.
+    Returns the image bytes if found, otherwise returns False.
+    """
+    try:
+        filename = f"{user_id}.jpg"
+        connection_string = load_azure_storage_connection_string()
+        blob_service_client = BlobServiceClient.from_connection_string(connection_string)
+        container_client = blob_service_client.get_container_client(PROFILE_PHOTOS_CONTAINER)
+        blob_client = container_client.get_blob_client(filename)
+        stream = blob_client.download_blob()
+        image_bytes = stream.readall()
+        return image_bytes
+    except Exception:
+        return False
