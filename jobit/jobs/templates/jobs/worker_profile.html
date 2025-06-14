@@ -1098,10 +1098,6 @@
         }
 
         function confirmRemovePhoto() {
-            const profileImg = document.querySelector('.profile-img');
-            profileImg.src = "{% static 'images/avatar.png' %}";
-            
-            //  PLACEHOLDER: Send request to remove photo
             fetch('/profile-photo/remove/', {
                 method: 'POST',
                 headers: {
@@ -1112,6 +1108,11 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
+                    // Set all profile images to the default avatar
+                    const allProfileImages = document.querySelectorAll('.profile-img');
+                    allProfileImages.forEach(img => {
+                        img.src = "{% static 'images/avatar.png' %}";
+                    });
                     showToast('Profile photo removed successfully');
                 } else {
                     showToast('Failed to remove profile photo', false);
