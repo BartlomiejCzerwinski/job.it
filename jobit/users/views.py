@@ -15,7 +15,16 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.contrib.auth.decorators import login_required
 from .locations import LOCATIONS
+from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
+from azure.storage.blob import BlobServiceClient
+import base64
+import os
+from datetime import datetime
+from .azure_storage import load_azure_storage_connection_string
 
+# Azure Storage configuration
+PROFILE_PHOTOS_CONTAINER = 'profile-photos'
 
 def login_view(request):
     if request.method == 'POST':
@@ -368,5 +377,43 @@ def remove_profile_photo(request):
 
 @login_required
 def add_profile_photo(request):
-    # TODO: Implement photo upload
-    return JsonResponse({"success": True, "photo_url": "/static/images/avatar.png"})
+    if request.method == "POST":
+        try:
+            # Get the base64 image data from the request
+            image_data = request.POST.get('image')
+            if not image_data:
+                return JsonResponse({"success": False, "error": "No image data provided"})
+
+            # Remove the data URL prefix if present
+            if ',' in image_data:
+                image_data = image_data.split(',')[1]
+
+            # Decode the base64 data
+            image_bytes = base64.b64decode(image_data)
+
+            # Generate a unique filename
+            filename = f"{request.user.id}.jpg"
+
+            # Get connection string and initialize the BlobServiceClient
+            connection_string = load_azure_storage_connection_string()
+            blob_service_client = BlobServiceClient.from_connection_string(connection_string)
+            container_client = blob_service_client.get_container_client(PROFILE_PHOTOS_CONTAINER)
+
+            # Upload the blob
+            blob_client = container_client.get_blob_client(filename)
+            blob_client.upload_blob(image_bytes, overwrite=True)
+
+            # Get the blob URL
+            blob_url = blob_client.url
+
+            # Update user's profile photo URL in the database
+            request.user.profile_photo = blob_url
+            request.user.save()
+
+            return JsonResponse({
+                "success": True,
+                "photo_url": blob_url
+            })
+        except Exception as e:
+            return JsonResponse({"success": False, "error": str(e)})
+    return JsonResponse({"success": False, "error": "Invalid request method"})
