@@ -369,8 +369,18 @@ def update_project(request, project_id):
 
 @login_required
 def remove_profile_photo(request):
-    # TODO: Implement photo removal
-    return JsonResponse({"success": True})
+    if request.method == "POST":
+        try:
+            filename = f"{request.user.id}.jpg"
+            connection_string = load_azure_storage_connection_string()
+            blob_service_client = BlobServiceClient.from_connection_string(connection_string)
+            container_client = blob_service_client.get_container_client(PROFILE_PHOTOS_CONTAINER)
+            blob_client = container_client.get_blob_client(filename)
+            blob_client.delete_blob()
+            return JsonResponse({"success": True})
+        except Exception as e:
+            return JsonResponse({"success": False, "error": f"Failed to delete profile photo: {str(e)}"})
+    return JsonResponse({"success": False, "error": "Invalid request method"})
 
 
 @login_required
