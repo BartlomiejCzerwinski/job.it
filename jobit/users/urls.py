@@ -16,7 +16,7 @@ urlpatterns = [
     path("projects/add", views.add_project, name="add-project"),
     path('projects/delete/<int:project_id>', views.delete_project, name='delete_project'),
     path('projects/update/<int:project_id>', views.update_project, name='update_project'),
-    path('logout/', views.logout_view, name='logout'),
+    path('logout/', views.logout_user, name='logout'),
     path('profile-photo/remove/', views.remove_profile_photo, name='remove_profile_photo'),
     path('profile-photo/add/', views.add_profile_photo, name='add_profile_photo'),
 ]
