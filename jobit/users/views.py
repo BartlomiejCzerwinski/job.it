@@ -358,3 +358,15 @@ def update_project(request, project_id):
         return JsonResponse({'error': 'Invalid JSON data'}, status=400)
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
+
+
+@login_required
+def remove_profile_photo(request):
+    # TODO: Implement photo removal
+    return JsonResponse({"success": True})
+
+
+@login_required
+def add_profile_photo(request):
+    # TODO: Implement photo upload
+    return JsonResponse({"success": True, "photo_url": "/static/images/avatar.png"})
