@@ -5,6 +5,7 @@ __pycache__/
 
 # API Keys
 **/api_key.txt
+**/azure_storage_connection.txt 
 
 # C extensions
 *.so
