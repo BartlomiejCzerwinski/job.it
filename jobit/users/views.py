@@ -19,8 +19,6 @@ from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 from azure.storage.blob import BlobServiceClient
 import base64
-import os
-from datetime import datetime
 from .azure_storage import load_azure_storage_connection_string
 
 # Azure Storage configuration
@@ -422,7 +420,7 @@ def add_profile_photo(request):
 def get_profile_photo(user_id):
     """
     Tries to retrieve the profile photo for the given user ID from Azure Blob Storage.
-    Returns the image bytes if found, otherwise returns False.
+    Returns the image as a base64-encoded string if found, otherwise returns None.
     """
     try:
         filename = f"{user_id}.jpg"
@@ -432,6 +430,6 @@ def get_profile_photo(user_id):
         blob_client = container_client.get_blob_client(filename)
         stream = blob_client.download_blob()
         image_bytes = stream.readall()
-        return image_bytes
+        return base64.b64encode(image_bytes).decode('utf-8')
     except Exception:
-        return False
+        return None
