@@ -1037,15 +1037,55 @@
         }
 
         function uploadPhoto() {
-            // TODO: Upload photo to server
             const preview = document.getElementById('imagePreview');
             const profileImg = document.querySelector('.profile-img');
-            profileImg.src = preview.src;
             
-            const modal = bootstrap.Modal.getInstance(document.getElementById('profilePhotoModal'));
-            modal.hide();
-            
-            resetUpload();
+            // Convert the image to base64
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = preview.naturalWidth;
+            canvas.height = preview.naturalHeight;
+            ctx.drawImage(preview, 0, 0);
+            const base64Image = canvas.toDataURL('image/jpeg');
+
+            // Create form data
+            const formData = new FormData();
+            formData.append('image', base64Image);
+
+
+            fetch('/profile-photo/add/', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': CSRF_TOKEN
+                },
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Set the uploaded base64 image as the current profile photo
+                    const allProfileImages = document.querySelectorAll('.profile-img');
+                    allProfileImages.forEach(img => {
+                        img.src = base64Image;
+                    });
+                    showToast('Profile photo updated successfully');
+                    // Close modal and reset
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('profilePhotoModal'));
+                    modal.hide();
+                    resetUpload();
+                } else {
+                    showToast(data.error || 'Failed to update profile photo', false);
+                }
+            })
+            .catch(error => {
+                console.error('Error uploading photo:', error);
+                showToast('An error occurred while uploading photo', false);
+            })
+            .finally(() => {
+                // Reset button state
+                uploadButton.disabled = false;
+                uploadButton.innerHTML = originalText;
+            });
         }
 
         function removeProfilePhoto() {
@@ -1059,7 +1099,7 @@
             profileImg.src = "{% static 'images/avatar.png' %}";
             
             //  PLACEHOLDER: Send request to remove photo
-            fetch('/remove-profile-photo', {
+            fetch('/profile-photo/remove/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
