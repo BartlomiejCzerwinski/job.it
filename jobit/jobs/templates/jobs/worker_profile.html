@@ -20,8 +20,11 @@
                     <div class="d-flex flex-column align-items-center text-center">
 
                         <div class="profile-img-wrapper position-relative">
-                            <img src="{% static 'images/avatar.png' %}" alt="Admin" class="rounded-circle profile-img"
-                                 width="150"/>
+                            {% if profile_photo_b64 %}
+                                <img class="profile-img" alt="Profile Photo" src="data:image/jpeg;base64,{{ profile_photo_b64 }}">
+                            {% else %}
+                                <img class="profile-img" alt="Profile Photo" src="{% static 'images/avatar.png' %}">
+                            {% endif %}
                             <div class="overlay">
                                 <i class="bi bi-camera-fill"></i>
                                 <span>Change photo</span>

@@ -8,7 +8,7 @@ from django.views.decorators.http import require_http_methods
 
 from jobs.forms import JobListingForm
 from users.models import Skill, UserSkill, AppUser, User, Location
-from users.views import get_user_role, get_user, get_user_skills
+from users.views import get_user_role, get_user, get_user_skills, get_profile_photo
 from django.contrib.auth import logout
 from users.views import get_user
 from .models import JobListing, JobListingSkill
@@ -142,12 +142,14 @@ def worker_profile(request):
     }
     skills = get_user_skills(user)
     projects = profile.projects.all()  
+    profile_photo_b64 = get_profile_photo(user.id)
     context = {
         "user_data": user_data,
         "locations_json": json.dumps(LOCATIONS),
         "skills": skills,
         "about_me": getattr(profile, "about_me", ""),
-        "projects": projects
+        "projects": projects,
+        "profile_photo_b64": profile_photo_b64
     }
     return render(request, 'jobs/worker_profile.html', context)
 
