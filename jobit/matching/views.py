@@ -5,6 +5,7 @@ from users.views import get_user_skills
 from .vectorizer import JobMatchingVectorizer
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
+from jobs.views import get_all_listings
 from openai import OpenAI
 import json
 import os
