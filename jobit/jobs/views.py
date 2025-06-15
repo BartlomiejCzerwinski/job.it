@@ -15,6 +15,7 @@ from .models import JobListing, JobListingSkill
 from applications.models import Application
 from django.db.utils import IntegrityError
 from users.locations import LOCATIONS
+from applications.utils import get_job_listing_applications
 ROLE_WORKER = "worker"
 ROLE_RECRUITER = "recruiter"
 
@@ -182,82 +183,7 @@ def listing_details_view(request, id):
     # Add placeholder applications data for recruiters
     applications = []
     if user_role == ROLE_RECRUITER:
-        # If no real applications, add placeholder data
-        if not applications:
-            placeholder_applications = [
-                {
-                    'candidate': {
-                        'user': {
-                            'get_full_name': 'John Doe',
-                            'email': 'john.doe@example.com'
-                        },
-                        'position': 'Senior Developer',
-                        'skills': [
-                            {'name': 'Python', 'level': 3},
-                            {'name': 'Django', 'level': 3},
-                            {'name': 'React', 'level': 2},
-                            {'name': 'PostgreSQL', 'level': 3},
-                            {'name': 'Docker', 'level': 2},
-                            {'name': 'AWS', 'level': 2},
-                            {'name': 'PostgreSQL', 'level': 3},
-                            {'name': 'Docker', 'level': 2},
-                            {'name': 'AWS', 'level': 2},
-                            {'name': 'PostgreSQL', 'level': 3},
-                            {'name': 'Docker', 'level': 2},
-                            {'name': 'AWS', 'level': 2}
-                        ],
-                        'profile_photo': None
-                    },
-                    'match_percentage': 92  # High match - has all required skills at high levels
-                },
-                {
-                    'candidate': {
-                        'user': {
-                            'get_full_name': 'Jane Smith',
-                            'email': 'jane.smith@example.com'
-                        },
-                        'position': 'Full Stack Developer',
-                        'skills': [
-                            {'name': 'JavaScript', 'level': 3},
-                            {'name': 'Node.js', 'level': 2},
-                            {'name': 'MongoDB', 'level': 2},
-                            {'name': 'React', 'level': 3},
-                            {'name': 'TypeScript', 'level': 2},
-                            {'name': 'Express.js', 'level': 2}
-                        ],
-                        'profile_photo': None
-                    },
-                    'match_percentage': 75  # Medium match - has some required skills but missing others
-                },
-                {
-                    'candidate': {
-                        'user': {
-                            'get_full_name': 'Mike Johnson',
-                            'email': 'mike.johnson@example.com'
-                        },
-                        'position': 'Backend Developer',
-                        'skills': [
-                            {'name': 'Java', 'level': 2},
-                            {'name': 'Spring', 'level': 2},
-                            {'name': 'PostgreSQL', 'level': 1},
-                            {'name': 'Maven', 'level': 1},
-                            {'name': 'JUnit', 'level': 1},
-                            {'name': 'Git', 'level': 2}
-                        ],
-                        'profile_photo': None
-                    },
-                    'match_percentage': 45  # Low match - has some skills but at lower levels
-                }
-            ]
-            
-            # Convert placeholder data to Application-like objects
-            class PlaceholderApplication:
-                def __init__(self, data):
-                    self.candidate = type('Candidate', (), data['candidate'])
-                    self.match_percentage = data['match_percentage']
-                    self.id = f"placeholder_{len(applications)}"
-            
-            applications = [PlaceholderApplication(app) for app in placeholder_applications]
+        applications = get_job_listing_applications(job_listing)
     
     return render(request, 'jobs/listing_details.html', {
         'job': job_listing, 
