@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.http import JsonResponse
-from jobs.views import get_all_listings, get_listing_skills
+from jobs.utils import get_listing_skills
 from users.views import get_user_skills
 from .vectorizer import JobMatchingVectorizer
 from django.views.decorators.csrf import csrf_exempt

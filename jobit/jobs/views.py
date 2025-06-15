@@ -5,7 +5,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect, JsonResponse
 from django.views.decorators.http import require_http_methods
-
+from jobs.utils import get_listing_skills
 from jobs.forms import JobListingForm
 from users.models import Skill, UserSkill, AppUser, User, Location
 from users.views import get_user_role, get_user, get_user_skills, get_profile_photo
@@ -370,19 +370,6 @@ def update_user_skill(email, skill_id, new_level):
     user_skill.save()
 
     return JsonResponse({'message': 'Skill updated successfully'}, status=201)
-
-
-def get_listing_skills(job_listing):
-    job_listing_skills = JobListingSkill.objects.filter(job_listing=job_listing)
-    skills = []
-    for job_listing_skill in job_listing_skills:
-        skills.append({"name": job_listing_skill.skill.name, "level": job_listing_skill.level, "id": job_listing_skill.skill.id})
-
-    def level(e):
-        return e['level']
-    skills.sort(key=level, reverse=True)
-
-    return skills
 
 
 @require_http_methods(["POST"])
