@@ -166,17 +166,17 @@
                                     {% for application in applications %}
                                         <tr class="applicant-row" style="cursor: pointer;" onclick="window.location.href='/worker_profile/{{ application.candidate.id }}'">
                                             <td>
-                                                {% if application.candidate.profile_photo %}
-                                                    <img src="data:image/jpeg;base64,{{ application.candidate.profile_photo }}" class="rounded-circle" style="width: 40px; height: 40px;" alt="Profile Photo">
+                                                {% if application.profile_photo %}
+                                                    <img src="data:image/jpeg;base64,{{ application.profile_photo }}" class="rounded-circle" style="width: 40px; height: 40px;" alt="Profile Photo">
                                                 {% else %}
                                                     <img src="{% static 'images/avatar.png' %}" class="rounded-circle" style="width: 40px; height: 40px;" alt="Profile Photo">
                                                 {% endif %}
                                             </td>
-                                            <td>{{ application.candidate.user.get_full_name }}</td>
-                                            <td>{{ application.candidate.position }}</td>
+                                            <td>{{ application.name }}</td>
+                                            <td>{{ application.position }}</td>
                                             <td>
                                                 <div class="d-flex gap-1 flex-wrap w-100">
-                                                    {% for skill in application.candidate.skills %}
+                                                    {% for skill in application.skills %}
                                                         <span class="badge {% if skill.level == 1 %}bg-success{% elif skill.level == 2 %}bg-warning{% else %}bg-danger{% endif %}">
                                                             {{ skill.name }}
                                                         </span>
