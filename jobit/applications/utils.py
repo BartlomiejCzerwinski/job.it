@@ -1,5 +1,6 @@
 from .models import Application
 from jobs.views import get_profile_photo
+from matching.utils import calculate_match_percentage
 
 def get_job_listing_applications(job_listing):
     applications = Application.objects.filter(job_listing=job_listing).select_related('candidate__user')
@@ -16,6 +17,7 @@ def get_job_listing_applications(job_listing):
             'position': candidate.position,
             'skills': skills_data,
             'status': app.status,
-            'profile_photo': get_profile_photo(candidate.id)
+            'profile_photo': get_profile_photo(candidate.id),
+            'match_percentage': calculate_match_percentage(job_listing, candidate)
         })
     return data 
