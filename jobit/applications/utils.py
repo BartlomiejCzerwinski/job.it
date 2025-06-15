@@ -9,7 +9,10 @@ def get_job_listing_applications(job_listing):
         candidate = app.candidate
         user = candidate.user
         skills = candidate.userskill_set.select_related('skill').all()
-        skills_data = [{'name': s.skill.name, 'level': s.level} for s in skills]
+        skills_data = sorted(
+            [{'name': s.skill.name, 'level': s.level} for s in skills],
+            key=lambda x: x['level'], reverse=True
+        )
         data.append({
             'id': app.id,
             'candidate_id': candidate.id,
@@ -20,4 +23,5 @@ def get_job_listing_applications(job_listing):
             'profile_photo': get_profile_photo(candidate.id),
             'match_percentage': calculate_match_percentage(job_listing, candidate)
         })
+    data.sort(key=lambda x: x['match_percentage'], reverse=True)
     return data 
