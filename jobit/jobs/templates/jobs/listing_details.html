@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}Index - Job.it{% endblock %}
 
@@ -43,6 +44,20 @@
         .btn-status-archived:hover {
             background-color: #1a1e21 !important;
             border-color: #1a1e21 !important;
+        }
+        .applicant-row:hover:not(.no-row-hover) {
+            background-color: #f5f5f5 !important;
+        }
+        .applicant-row.no-row-hover,
+        .applicant-row.no-row-hover:hover {
+            background-color: transparent !important;
+        }
+        .action-btn:hover,
+        .message-btn:hover {
+            color: #fff !important;
+            box-shadow: 0 2px 8px rgba(13,110,253,0.15);
+            transform: scale(1.08);
+            transition: all 0.15s;
         }
     </style>
 
@@ -134,40 +149,119 @@
                 </div>
                 <div class="card-body">
                     {% if applications %}
-                        <div class="list-group">
-                            {% for application in applications %}
-                                <div class="list-group-item list-group-item-action">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div>
-                                            <h5 class="mb-1">{{ application.candidate.user.get_full_name }}</h5>
-                                            <p class="text-muted mb-1">{{ application.candidate.user.email }}</p>
-                                            <div class="mb-2">
-                                                {% for skill in application.candidate.skills.all %}
-                                                    <span class="badge bg-primary me-1">{{ skill.name }}</span>
-                                                {% endfor %}
-                                            </div>
-                                        </div>
-                                        <div class="d-flex align-items-center gap-2">
-                                            <span class="badge {% if application.status == 'PENDING' %}bg-warning{% elif application.status == 'ACCEPTED' %}bg-success{% else %}bg-danger{% endif %} me-2">
-                                                {{ application.status }}
-                                            </span>
-                                            <div class="btn-group">
-                                                <button class="btn btn-outline-primary btn-sm" disabled>
-                                                    <i class="bi bi-person"></i> View Profile
-                                                </button>
-                                                {% if application.status == 'PENDING' %}
-                                                    <button class="btn btn-success btn-sm" onclick="updateStatus('{{ application.id }}', 'ACCEPTED')">
-                                                        <i class="bi bi-check-circle"></i> Accept
-                                                    </button>
-                                                    <button class="btn btn-danger btn-sm" onclick="updateStatus('{{ application.id }}', 'REJECTED')">
-                                                        <i class="bi bi-x-circle"></i> Reject
-                                                    </button>
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 50px;"></th>
+                                        <th>Name</th>
+                                        <th>Position</th>
+                                        <th style="width: 40%;">Skills</th>
+                                        <th class="text-center">Match</th>
+                                        <th class="text-center">Action</th>
+                                        <th style="width: 50px;"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for application in applications %}
+                                        <tr class="applicant-row" style="cursor: pointer;" onclick="window.location.href='/worker_profile/{{ application.candidate.id }}'">
+                                            <td>
+                                                {% if application.candidate.profile_photo %}
+                                                    <img src="data:image/jpeg;base64,{{ application.candidate.profile_photo }}" class="rounded-circle" style="width: 40px; height: 40px;" alt="Profile Photo">
+                                                {% else %}
+                                                    <img src="{% static 'images/avatar.png' %}" class="rounded-circle" style="width: 40px; height: 40px;" alt="Profile Photo">
                                                 {% endif %}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            {% endfor %}
+                                            </td>
+                                            <td>{{ application.candidate.user.get_full_name }}</td>
+                                            <td>{{ application.candidate.position }}</td>
+                                            <td>
+                                                <div class="d-flex gap-1 flex-wrap w-100">
+                                                    {% for skill in application.candidate.skills %}
+                                                        <span class="badge {% if skill.level == 1 %}bg-success{% elif skill.level == 2 %}bg-warning{% else %}bg-danger{% endif %}">
+                                                            {{ skill.name }}
+                                                        </span>
+                                                    {% endfor %}
+                                                </div>
+                                            </td>
+                                            <td class="text-center align-middle">
+                                                <div class="progress position-relative" style="height: 20px;">
+                                                    <div class="progress-bar" 
+                                                         role="progressbar" 
+                                                         style="width: {{ application.match_percentage }}%; background-color: hsl(120, {{ application.match_percentage }}%, 40%);" 
+                                                         aria-valuenow="{{ application.match_percentage }}" 
+                                                         aria-valuemin="0" 
+                                                         aria-valuemax="100">
+                                                    </div>
+                                                    <span class="position-absolute top-50 start-50 translate-middle fw-bold" style="color: #1a1a1a; text-shadow: 0 0 3px rgba(255,255,255,0.8), 0 0 5px rgba(255,255,255,0.5);">
+                                                        {{ application.match_percentage }}%
+                                                    </span>
+                                                </div>
+                                            </td>
+                                            <td class="text-center align-middle">
+                                                <div class="w-100 d-flex justify-content-center align-items-center" style="height: 100%;">
+                                                    <div class="dropdown" onclick="event.stopPropagation();">
+                                                        <button class="btn btn-sm py-0 px-2 dropdown-toggle d-flex align-items-center justify-content-center action-btn"
+                                                                type="button"
+                                                                data-bs-toggle="dropdown"
+                                                                aria-expanded="false"
+                                                                style="
+                                                                    min-width: 90px;
+                                                                    font-weight: bold;
+                                                                    border: none;
+                                                                    border-radius: 0.5rem;
+                                                                    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+                                                                    {% if application.status == 'ACCEPTED' %}
+                                                                        background-color: #198754;
+                                                                        color: #fff;
+                                                                    {% elif application.status == 'REJECTED' %}
+                                                                        background-color: #dc3545;
+                                                                        color: #fff;
+                                                                    {% else %}
+                                                                        background-color: #ffc107;
+                                                                        color: #212529;
+                                                                    {% endif %}
+                                                                ">
+                                                            {% if application.status == 'ACCEPTED' %}
+                                                                <i class="bi bi-check-circle me-1"></i>
+                                                            {% elif application.status == 'REJECTED' %}
+                                                                <i class="bi bi-x-circle me-1"></i>
+                                                            {% else %}
+                                                                <i class="bi bi-hourglass-split me-1"></i>
+                                                            {% endif %}
+                                                            {{ application.status|default:"PENDING" }}
+                                                        </button>
+                                                        <ul class="dropdown-menu">
+                                                            <li>
+                                                                <a class="dropdown-item" href="#" onclick="updateStatus('{{ application.id }}', 'PENDING')">
+                                                                    <span class="badge bg-warning text-dark"><i class="bi bi-hourglass-split me-1"></i>PENDING</span>
+                                                                </a>
+                                                            </li>
+                                                            <li>
+                                                                <a class="dropdown-item" href="#" onclick="updateStatus('{{ application.id }}', 'ACCEPTED')">
+                                                                    <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>ACCEPTED</span>
+                                                                </a>
+                                                            </li>
+                                                            <li>
+                                                                <a class="dropdown-item" href="#" onclick="updateStatus('{{ application.id }}', 'REJECTED')">
+                                                                    <span class="badge bg-danger"><i class="bi bi-x-circle me-1"></i>REJECTED</span>
+                                                                </a>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="text-center align-middle">
+                                                <button class="btn btn-primary rounded-circle d-flex align-items-center justify-content-center message-btn"
+                                                        style="width: 38px; height: 38px; padding: 0;"
+                                                        title="Message"
+                                                        onclick="event.stopPropagation(); /* Add your message logic here */">
+                                                    <i class="bi bi-chat-dots" style="font-size: 1.3rem; color: #fff;"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
                         </div>
                     {% else %}
                         <div class="text-center py-5">
@@ -255,4 +349,19 @@
             </div>
         {% endif %}
     </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.action-btn, .message-btn').forEach(function(btn) {
+            btn.addEventListener('mouseenter', function() {
+                var row = btn.closest('.applicant-row');
+                if (row) row.classList.add('no-row-hover');
+            });
+            btn.addEventListener('mouseleave', function() {
+                var row = btn.closest('.applicant-row');
+                if (row) row.classList.remove('no-row-hover');
+            });
+        });
+    });
+    </script>
 {% endblock %}
