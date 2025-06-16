@@ -46,3 +46,60 @@ def my_applications(request):
         'applications': applications
     })
 
+@login_required
+@require_http_methods(["POST"])
+def accept_application(request, application_id):
+    application = get_object_or_404(Application, id=application_id)
+    user_role = get_user_role(request.user)
+    
+    if user_role != ROLE_RECRUITER or application.job_listing.recruiter != get_user(request.user):
+        return JsonResponse({'error': 'Unauthorized'}, status=403)
+    
+    if application.job_listing.status != 'ACTIVE':
+        return JsonResponse({'error': 'Job listing is not active'}, status=400)
+    
+    try:
+        application.status = 'ACCEPTED'
+        application.save()
+        return JsonResponse({'status': 'success'})
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+@login_required
+@require_http_methods(["POST"])
+def reject_application(request, application_id):
+    application = get_object_or_404(Application, id=application_id)
+    user_role = get_user_role(request.user)
+    
+    if user_role != ROLE_RECRUITER or application.job_listing.recruiter != get_user(request.user):
+        return JsonResponse({'error': 'Unauthorized'}, status=403)
+    
+    if application.job_listing.status != 'ACTIVE':
+        return JsonResponse({'error': 'Job listing is not active'}, status=400)
+    
+    try:
+        application.status = 'REJECTED'
+        application.save()
+        return JsonResponse({'status': 'success'})
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+@login_required
+@require_http_methods(["POST"])
+def set_pending_application(request, application_id):
+    application = get_object_or_404(Application, id=application_id)
+    user_role = get_user_role(request.user)
+    
+    if user_role != ROLE_RECRUITER or application.job_listing.recruiter != get_user(request.user):
+        return JsonResponse({'error': 'Unauthorized'}, status=403)
+    
+    if application.job_listing.status != 'ACTIVE':
+        return JsonResponse({'error': 'Job listing is not active'}, status=400)
+    
+    try:
+        application.status = 'PENDING'
+        application.save()
+        return JsonResponse({'status': 'success'})
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
