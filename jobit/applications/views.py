@@ -52,7 +52,7 @@ def accept_application(request, application_id):
     application = get_object_or_404(Application, id=application_id)
     user_role = get_user_role(request.user)
     
-    if user_role != ROLE_RECRUITER or application.job_listing.recruiter != get_user(request.user):
+    if user_role != ROLE_RECRUITER:
         return JsonResponse({'error': 'Unauthorized'}, status=403)
     
     if application.job_listing.status != 'ACTIVE':
@@ -71,7 +71,7 @@ def reject_application(request, application_id):
     application = get_object_or_404(Application, id=application_id)
     user_role = get_user_role(request.user)
     
-    if user_role != ROLE_RECRUITER or application.job_listing.recruiter != get_user(request.user):
+    if user_role != ROLE_RECRUITER:
         return JsonResponse({'error': 'Unauthorized'}, status=403)
     
     if application.job_listing.status != 'ACTIVE':
@@ -90,7 +90,7 @@ def set_pending_application(request, application_id):
     application = get_object_or_404(Application, id=application_id)
     user_role = get_user_role(request.user)
     
-    if user_role != ROLE_RECRUITER or application.job_listing.recruiter != get_user(request.user):
+    if user_role != ROLE_RECRUITER:
         return JsonResponse({'error': 'Unauthorized'}, status=403)
     
     if application.job_listing.status != 'ACTIVE':
