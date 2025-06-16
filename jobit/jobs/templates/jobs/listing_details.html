@@ -18,6 +18,13 @@
 {% endblock %}
 
 {% block content %}
+    <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1050; display: none;" id="toastContainer">
+        <div id="customToast" class="toast align-items-center text-bg-primary border-0 d-flex justify-content-between" role="alert" aria-live="assertive" aria-atomic="true">
+            <div id="toastMessage" class="toast-body"></div>
+            <button type="button" class="btn-close btn-close-white me-2" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+
     <style>
         .btn-status-active {
             background-color: #198754 !important;
@@ -203,6 +210,7 @@
                                                         <button class="btn btn-sm py-0 px-2 dropdown-toggle d-flex align-items-center justify-content-center action-btn"
                                                                 type="button"
                                                                 data-bs-toggle="dropdown"
+                                                                data-application-id="{{ application.id }}"
                                                                 aria-expanded="false"
                                                                 style="
                                                                     min-width: 90px;
@@ -232,17 +240,17 @@
                                                         </button>
                                                         <ul class="dropdown-menu">
                                                             <li>
-                                                                <a class="dropdown-item" href="#" onclick="updateStatus('{{ application.id }}', 'PENDING')">
+                                                                <a class="dropdown-item" href="#" onclick="updateStatus('{{ application.id }}', 'pending')">
                                                                     <span class="badge bg-warning text-dark"><i class="bi bi-hourglass-split me-1"></i>PENDING</span>
                                                                 </a>
                                                             </li>
                                                             <li>
-                                                                <a class="dropdown-item" href="#" onclick="updateStatus('{{ application.id }}', 'ACCEPTED')">
+                                                                <a class="dropdown-item" href="#" onclick="updateStatus('{{ application.id }}', 'accept')">
                                                                     <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>ACCEPTED</span>
                                                                 </a>
                                                             </li>
                                                             <li>
-                                                                <a class="dropdown-item" href="#" onclick="updateStatus('{{ application.id }}', 'REJECTED')">
+                                                                <a class="dropdown-item" href="#" onclick="updateStatus('{{ application.id }}', 'reject')">
                                                                     <span class="badge bg-danger"><i class="bi bi-x-circle me-1"></i>REJECTED</span>
                                                                 </a>
                                                             </li>
@@ -363,5 +371,77 @@
             });
         });
     });
+
+    function showToast(message, isSuccess = true) {
+        const toastContainer = document.getElementById('toastContainer');
+        const toast = document.getElementById('customToast');
+        const toastMessage = document.getElementById('toastMessage');
+        
+        toastContainer.style.display = 'block';
+        toast.className = `toast align-items-center text-bg-${isSuccess ? 'success' : 'danger'} border-0 d-flex justify-content-between`;
+        toastMessage.textContent = message;
+        
+        const bsToast = new bootstrap.Toast(toast);
+        bsToast.show();
+        
+        toast.addEventListener('hidden.bs.toast', function () {
+            toastContainer.style.display = 'none';
+        });
+    }
+
+    function updateStatus(applicationId, status) {
+        const endpoint = `/applications/${status}/${applicationId}/`;
+        
+        fetch(endpoint, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': CSRF_TOKEN,
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                // Update the button appearance
+                const button = document.querySelector(`[data-application-id="${applicationId}"]`);
+                if (button) {
+                    // Close the dropdown menu
+                    const dropdownMenu = button.nextElementSibling;
+                    if (dropdownMenu) {
+                        const bsDropdown = bootstrap.Dropdown.getInstance(button);
+                        if (bsDropdown) {
+                            bsDropdown.hide();
+                        }
+                    }
+
+                    button.className = 'btn btn-sm py-0 px-2 dropdown-toggle d-flex align-items-center justify-content-center action-btn';
+                    
+                    // Update button style based on status
+                    if (status === 'accept') {
+                        button.style.backgroundColor = '#198754';
+                        button.style.color = '#fff';
+                        button.innerHTML = '<i class="bi bi-check-circle me-1"></i>ACCEPTED';
+                        showToast('Application accepted successfully');
+                    } else if (status === 'reject') {
+                        button.style.backgroundColor = '#dc3545';
+                        button.style.color = '#fff';
+                        button.innerHTML = '<i class="bi bi-x-circle me-1"></i>REJECTED';
+                        showToast('Application rejected successfully');
+                    } else {
+                        button.style.backgroundColor = '#ffc107';
+                        button.style.color = '#212529';
+                        button.innerHTML = '<i class="bi bi-hourglass-split me-1"></i>PENDING';
+                        showToast('Application status set to pending');
+                    }
+                }
+            } else {
+                showToast(data.error || 'Failed to update application status', false);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showToast('An error occurred while updating status', false);
+        });
+    }
     </script>
 {% endblock %}
