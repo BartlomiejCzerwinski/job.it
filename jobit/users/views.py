@@ -471,10 +471,12 @@ def get_user_profile_context(app_user, read_only=False):
     }
     # Import here to avoid circular import
     from users.views import get_user_skills, get_profile_photo
+    from users.models import SocialLink
     skills = get_user_skills(user)
     projects = app_user.projects.all() if hasattr(app_user, 'projects') else []
     profile_photo_b64 = get_profile_photo(user.id)
     from users.locations import LOCATIONS
+    social_links = list(SocialLink.objects.filter(user=app_user).values('platform', 'url', 'display_name'))
     context = {
         "user_data": user_data,
         "locations_json": json.dumps(LOCATIONS),
@@ -482,6 +484,7 @@ def get_user_profile_context(app_user, read_only=False):
         "about_me": getattr(app_user, "about_me", ""),
         "projects": projects,
         "profile_photo_b64": profile_photo_b64,
-        "read_only": read_only
+        "read_only": read_only,
+        "social_links": social_links
     }
     return context

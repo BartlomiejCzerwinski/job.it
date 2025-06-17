@@ -49,21 +49,61 @@
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h6 class="mb-0">Social Links</h6>
                     </div>
-                    <ul class="list-group list-group-flush" id="socialLinksList">
-                        {% for link in user_data.social_links %}
-                            <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap social-link-item">
-                                <h6 class="mb-0">
-                                    <i class="bi bi-{{ link.platform }} me-2"></i>
-                                    {{ link.display_name|default:link.url }}
-                                </h6>
-                                <span class="text-secondary social-link-name">
-                                    <a href="{{ link.url }}" target="_blank">{{ link.url }}</a>
-                                </span>
-                            </li>
-                        {% empty %}
+                    <ul class="list-group list-group-flush">
+                        {% if social_links %}
+                            {% for link in social_links %}
+                                <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap social-link-item" style="cursor: pointer; padding-top: 0.5rem; padding-bottom: 0.5rem; border: 0; border-bottom: 1px solid #e9ecef; font-size: 1rem; font-weight: 400;" onclick="window.open('{{ link.url }}', '_blank')">
+                                    <h6 class="mb-0 d-flex align-items-center" style="font-size: 1rem; font-weight: 500;">
+                                        {% if link.platform == 'github' %}
+                                            <i class="bi bi-github text-dark me-2" style="font-size: 1.1em;"></i>GitHub
+                                        {% elif link.platform == 'linkedin' %}
+                                            <i class="bi bi-linkedin text-primary me-2" style="font-size: 1.1em;"></i>LinkedIn
+                                        {% elif link.platform == 'website' %}
+                                            <i class="bi bi-globe text-secondary me-2" style="font-size: 1.1em;"></i>Personal Website
+                                        {% elif link.platform == 'portfolio' %}
+                                            <i class="bi bi-briefcase text-info me-2" style="font-size: 1.1em;"></i>Portfolio
+                                        {% elif link.platform == 'gitlab' %}
+                                            <i class="bi bi-gitlab text-danger me-2" style="font-size: 1.1em;"></i>GitLab
+                                        {% elif link.platform == 'stackoverflow' %}
+                                            <i class="bi bi-stack-overflow text-warning me-2" style="font-size: 1.1em;"></i>Stack Overflow
+                                        {% elif link.platform == 'medium' %}
+                                            <i class="bi bi-medium text-dark me-2" style="font-size: 1.1em;"></i>Medium
+                                        {% elif link.platform == 'devto' %}
+                                            <i class="bi bi-dev text-dark me-2" style="font-size: 1.1em;"></i>Dev.to
+                                        {% else %}
+                                            <i class="bi bi-link-45deg text-secondary me-2" style="font-size: 1.1em;"></i>Other
+                                        {% endif %}
+                                    </h6>
+                                    <span class="text-secondary social-link-name" style="font-size: 1rem;">{{ link.display_name|default:link.url }}</span>
+                                </li>
+                            {% endfor %}
+                        {% else %}
                             <li class="list-group-item text-muted">No social links provided.</li>
-                        {% endfor %}
+                        {% endif %}
                     </ul>
+                    <style>
+                        .social-link-item:last-child {
+                            border-bottom: 0 !important;
+                        }
+                        .social-link-item:hover, .social-link-item:focus {
+                            background: #f8f9fa !important;
+                            transform: scale(1.03);
+                        }
+                        .social-link-item {
+                            transition: all 0.2s ease-in-out;
+                        }
+                        .social-link-item h6, .social-link-item span {
+                            font-size: 1rem !important;
+                            font-weight: 400 !important;
+                        }
+                        .social-link-item h6 {
+                            font-weight: 500 !important;
+                        }
+                        .social-link-item i {
+                            font-size: 1.1em !important;
+                            vertical-align: middle;
+                        }
+                    </style>
                 </div>
             </div>
             <div class="col-md-8">
