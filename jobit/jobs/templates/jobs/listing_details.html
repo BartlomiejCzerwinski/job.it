@@ -178,13 +178,15 @@
                                 </thead>
                                 <tbody>
                                     {% for application in applications %}
-                                        <tr class="applicant-row" style="cursor: pointer;" onclick="window.location.href='/worker_profile/{{ application.candidate.id }}'">
+                                        <tr class="applicant-row" style="cursor: pointer;" onclick="window.location.href='/profiles/{{ application.candidate_id }}'">
                                             <td>
-                                                {% if application.profile_photo %}
-                                                    <img src="data:image/jpeg;base64,{{ application.profile_photo }}" class="rounded-circle" style="width: 40px; height: 40px;" alt="Profile Photo">
-                                                {% else %}
-                                                    <img src="{% static 'images/avatar.png' %}" class="rounded-circle" style="width: 40px; height: 40px;" alt="Profile Photo">
-                                                {% endif %}
+                                                <a href="/profiles/{{ application.candidate_id }}/" onclick="event.stopPropagation();">
+                                                    {% if application.profile_photo %}
+                                                        <img src="data:image/jpeg;base64,{{ application.profile_photo }}" class="rounded-circle" style="width: 40px; height: 40px;" alt="Profile Photo">
+                                                    {% else %}
+                                                        <img src="{% static 'images/avatar.png' %}" class="rounded-circle" style="width: 40px; height: 40px;" alt="Profile Photo">
+                                                    {% endif %}
+                                                </a>
                                             </td>
                                             <td>{{ application.name }}</td>
                                             <td>{{ application.position }}</td>
@@ -201,41 +203,25 @@
                                                 <div class="progress position-relative" style="height: 20px;">
                                                     <div class="progress-bar" 
                                                          role="progressbar" 
-                                                         style="width: {{ application.match_percentage }}%; background-color: hsl(120, {{ application.match_percentage }}%, 40%);" 
+                                                         style="width: {{ application.match_percentage }}%; background-color: hsl(120, {{ application.match_percentage }}%, 40%)" 
                                                          aria-valuenow="{{ application.match_percentage }}" 
                                                          aria-valuemin="0" 
                                                          aria-valuemax="100">
                                                     </div>
-                                                    <span class="position-absolute top-50 start-50 translate-middle fw-bold" style="color: #1a1a1a; text-shadow: 0 0 3px rgba(255,255,255,0.8), 0 0 5px rgba(255,255,255,0.5);">
+                                                    <span class="position-absolute top-50 start-50 translate-middle fw-bold" style="color: #1a1a1a; text-shadow: 0 0 3px rgba(255,255,255,0.8), 0 0 5px rgba(255,255,255,0.5)">
                                                         {{ application.match_percentage }}%
                                                     </span>
                                                 </div>
                                             </td>
                                             <td class="text-center align-middle">
-                                                <div class="w-100 d-flex justify-content-center align-items-center" style="height: 100%;">
+                                                <div class="w-100 d-flex justify-content-center align-items-center" style="height: 100%">
                                                     <div class="dropdown" onclick="event.stopPropagation();">
                                                         <button class="btn btn-sm py-0 px-2 dropdown-toggle d-flex align-items-center justify-content-center action-btn"
                                                                 type="button"
                                                                 data-bs-toggle="dropdown"
                                                                 data-application-id="{{ application.id }}"
                                                                 aria-expanded="false"
-                                                                style="
-                                                                    min-width: 90px;
-                                                                    font-weight: bold;
-                                                                    border: none;
-                                                                    border-radius: 0.5rem;
-                                                                    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-                                                                    {% if application.status == 'ACCEPTED' %}
-                                                                        background-color: #198754;
-                                                                        color: #fff;
-                                                                    {% elif application.status == 'REJECTED' %}
-                                                                        background-color: #dc3545;
-                                                                        color: #fff;
-                                                                    {% else %}
-                                                                        background-color: #ffc107;
-                                                                        color: #212529;
-                                                                    {% endif %}
-                                                                ">
+                                                                style="min-width: 90px; font-weight: bold; border: none; border-radius: 0.5rem; box-shadow: 0 1px 2px rgba(0,0,0,0.05); {% if application.status == 'ACCEPTED' %}background-color: #198754; color: #fff;{% elif application.status == 'REJECTED' %}background-color: #dc3545; color: #fff;{% else %}background-color: #ffc107; color: #212529;{% endif %}">
                                                             {% if application.status == 'ACCEPTED' %}
                                                                 <i class="bi bi-check-circle me-1"></i>
                                                             {% elif application.status == 'REJECTED' %}
