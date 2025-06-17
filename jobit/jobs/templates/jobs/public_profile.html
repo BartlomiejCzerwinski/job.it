@@ -1,0 +1,193 @@
+{% extends "base.html" %} {% load static %}
+<link rel="stylesheet" href="{% static '/css/styles.css' %}"/>
+{% block title %}Profile - Job.it{% endblock %}
+{% block navbar_extra %}
+    <div class="position-absolute top-50 start-50 translate-middle">
+        <button type="button" class="btn btn-secondary me-2" onclick="window.location.href='/'">Search Jobs</button>
+    </div>
+{% endblock %}
+{% block content %}
+    <div class="container mt-5">
+        <div class="row gutters-sm">
+            <div class="col-md-4 mb-3">
+                <div class="card shadow p-2">
+                    <div class="card-body">
+                        <div class="d-flex flex-column align-items-center text-center">
+                            <div class="profile-img-wrapper position-relative">
+                                {% if profile_photo_b64 %}
+                                    <img class="profile-img" alt="Profile Photo" src="data:image/jpeg;base64,{{ profile_photo_b64 }}">
+                                {% else %}
+                                    <img class="profile-img" alt="Profile Photo" src="{% static 'images/avatar.png' %}">
+                                {% endif %}
+                            </div>
+                            <div class="mt-3">
+                                <div class="d-flex align-items-center justify-content-center mb-1">
+                                    <h4 class="mb-0 me-2">{{ user_data.first_name }} {{ user_data.last_name }}</h4>
+                                </div>
+                                <div class="d-flex align-items-center justify-content-center mb-1">
+                                    <div class="text-secondary mb-0 me-2">{{ user_data.position }}</div>
+                                </div>
+                                <div class="d-flex align-items-center justify-content-center mb-2">
+                                    <div class="text-muted font-size-sm mb-0 me-2">{{ user_data.location }}</div>
+                                </div>
+                                <div class="d-flex justify-content-center">
+                                    <div class="d-flex gap-2 mt-1">
+                                        {% if user_data.is_remote %}
+                                            <span class="badge bg-success">Remote</span>
+                                        {% endif %}
+                                        {% if user_data.is_hybrid %}
+                                            <span class="badge bg-warning">Hybrid</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card shadow mt-3">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0">Social Links</h6>
+                    </div>
+                    <ul class="list-group list-group-flush" id="socialLinksList">
+                        {% for link in user_data.social_links %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap social-link-item">
+                                <h6 class="mb-0">
+                                    <i class="bi bi-{{ link.platform }} me-2"></i>
+                                    {{ link.display_name|default:link.url }}
+                                </h6>
+                                <span class="text-secondary social-link-name">
+                                    <a href="{{ link.url }}" target="_blank">{{ link.url }}</a>
+                                </span>
+                            </li>
+                        {% empty %}
+                            <li class="list-group-item text-muted">No social links provided.</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <div class="card shadow mb-3">
+                    <div class="card-body">
+                        <div class="row align-items-center mb-2">
+                            <div class="col-sm-3">
+                                <h6 class="mb-0">First Name</h6>
+                            </div>
+                            <div class="col-sm-9 text-secondary">{{ user_data.first_name }}</div>
+                        </div>
+                        <hr/>
+                        <div class="row align-items-center mb-2">
+                            <div class="col-sm-3">
+                                <h6 class="mb-0">Last Name</h6>
+                            </div>
+                            <div class="col-sm-9 text-secondary">{{ user_data.last_name }}</div>
+                        </div>
+                        <hr/>
+                        <div class="row align-items-center mb-2">
+                            <div class="col-sm-3">
+                                <h6 class="mb-0">Email</h6>
+                            </div>
+                            <div class="col-sm-9 text-secondary">{{ user_data.email }}</div>
+                        </div>
+                        <hr/>
+                        <div class="row align-items-center mb-2">
+                            <div class="col-sm-3">
+                                <h6 class="mb-0">Mobile</h6>
+                            </div>
+                            <div class="col-sm-9 text-secondary">{{ user_data.mobile }}</div>
+                        </div>
+                        <hr/>
+                        <div class="row align-items-center mb-2">
+                            <div class="col-sm-3">
+                                <h6 class="mb-0">Starts in</h6>
+                            </div>
+                            <div class="col-sm-9 text-secondary">{{ user_data.starts_in }}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row gutters-sm">
+                    <div class="col-sm-6 mb-3">
+                        <div class="card shadow h-100">
+                            <div class="card-body">
+                                <h6 class="d-flex align-items-center mb-3">
+                                    <i class="material-icons text-info mr-2">About me</i>
+                                </h6>
+                                <div class="about-me-content">
+                                    {% if about_me %}
+                                        {{ about_me|linebreaks }}
+                                    {% else %}
+                                        <span class="text-muted">No description provided.</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 mb-3">
+                        <div class="card shadow h-100">
+                            <div class="card-body">
+                                <h6 class="d-flex align-items-center mb-3"><i class="material-icons text-info mr-2">Skills</i></h6>
+                                <div id="skillsList">
+                                    {% for skill in skills %}
+                                        <div>
+                                            <div class="d-flex align-items-center">
+                                                <small class="w-100 text-truncate">{{ skill.name }}</small>
+                                            </div>
+                                            <div class="progress mb-3" style="height: 5px;">
+                                                {% if skill.level == 1 %}
+                                                    <div class="progress-bar bg-success" role="progressbar" style="width: 33%;" aria-valuenow="33" aria-valuemin="0" aria-valuemax="100"></div>
+                                                {% elif skill.level == 2 %}
+                                                    <div class="progress-bar bg-warning" role="progressbar" style="width: 66%;" aria-valuenow="66" aria-valuemin="0" aria-valuemax="100"></div>
+                                                {% else %}
+                                                    <div class="progress-bar bg-danger" role="progressbar" style="width: 100%;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-12 mb-3">
+                        <div class="card shadow h-100">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h6 class="d-flex align-items-center mb-0">
+                                        <i class="material-icons text-info mr-2">Projects</i>
+                                    </h6>
+                                </div>
+                                <div id="projectsList">
+                                    {% for project in projects %}
+                                        <div class="card mb-3 project-card">
+                                            <div class="card-body">
+                                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                                    <h5 class="card-title mb-0">{{ project.title }}</h5>
+                                                </div>
+                                                <p class="card-text text-muted">{{ project.description }}</p>
+                                                <div class="mb-3">
+                                                    {% for tech in project.get_technologies %}
+                                                        <span class="badge bg-primary me-1">{{ tech }}</span>
+                                                    {% endfor %}
+                                                </div>
+                                                <div class="d-flex gap-2">
+                                                    {% if project.github_link %}
+                                                        <a href="{{ project.github_link }}" class="btn btn-outline-primary btn-sm" target="_blank">
+                                                            <i class="bi bi-github me-1"></i>GitHub
+                                                        </a>
+                                                    {% endif %}
+                                                    {% if project.demo_link %}
+                                                        <a href="{{ project.demo_link }}" class="btn btn-outline-secondary btn-sm" target="_blank">
+                                                            <i class="bi bi-globe me-1"></i>Live Demo
+                                                        </a>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %} 

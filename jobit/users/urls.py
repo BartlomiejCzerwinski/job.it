@@ -20,4 +20,5 @@ urlpatterns = [
     path('profile-photo/remove/', views.remove_profile_photo, name='remove_profile_photo'),
     path('profile-photo/add/', views.add_profile_photo, name='add_profile_photo'),
     path('profile-photo/<int:user_id>/', views.get_profile_photo, name='get_profile_photo'),
+    path('profiles/<int:user_id>/', views.public_profile, name='public_profile'),
 ]

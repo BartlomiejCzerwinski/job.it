@@ -443,3 +443,45 @@ def get_profile_photo(user_id):
         return base64.b64encode(image_bytes).decode('utf-8')
     except Exception:
         return None
+
+
+def public_profile(request, user_id):
+    user_data = get_object_or_404(AppUser, id=user_id)
+    context = get_user_profile_context(user_data, read_only=True)
+    return render(request, 'jobs/public_profile.html', context)
+
+
+def get_user_profile_context(app_user, read_only=False):
+    user = app_user.user
+    location = getattr(app_user, 'location', None)
+    country = location.country if location else ""
+    city = location.city if location else ""
+    user_data = {
+        "first_name": user.first_name,
+        "last_name": user.last_name,
+        "email": user.email,
+        "position": getattr(app_user, "position", ""),
+        "location": str(location) if location else "",
+        "country": country,
+        "city": city,
+        "is_remote": getattr(app_user, "is_remote"),
+        "is_hybrid": getattr(app_user, "is_hybrid"),
+        "mobile": getattr(app_user, "mobile", ""),
+        "starts_in": getattr(app_user, "starts_in")
+    }
+    # Import here to avoid circular import
+    from users.views import get_user_skills, get_profile_photo
+    skills = get_user_skills(user)
+    projects = app_user.projects.all() if hasattr(app_user, 'projects') else []
+    profile_photo_b64 = get_profile_photo(user.id)
+    from users.locations import LOCATIONS
+    context = {
+        "user_data": user_data,
+        "locations_json": json.dumps(LOCATIONS),
+        "skills": skills,
+        "about_me": getattr(app_user, "about_me", ""),
+        "projects": projects,
+        "profile_photo_b64": profile_photo_b64,
+        "read_only": read_only
+    }
+    return context
