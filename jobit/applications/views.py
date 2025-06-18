@@ -6,6 +6,7 @@ from django.views.decorators.http import require_http_methods
 from jobs.models import JobListing
 from users.views import get_user_role, get_user
 from .models import Application
+from django.db.models import Case, When, Value, IntegerField
 
 ROLE_WORKER = "worker"
 ROLE_RECRUITER = "recruiter"
@@ -41,7 +42,15 @@ def apply(request, job_id):
 @login_required
 def my_applications(request):
     user = get_user(request.user)
-    applications = Application.objects.filter(candidate=user).select_related('job_listing')
+    applications = Application.objects.filter(candidate=user).select_related('job_listing').annotate(
+        status_order=Case(
+            When(status='ACCEPTED', then=Value(0)),
+            When(status='PENDING', then=Value(1)),
+            When(status='REJECTED', then=Value(2)),
+            default=Value(3),
+            output_field=IntegerField(),
+        )
+    ).order_by('status_order')
     return render(request, 'applications/my_applications.html', {
         'applications': applications
     })
