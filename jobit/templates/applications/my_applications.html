@@ -22,6 +22,52 @@
         transform: translateY(-5px);
         box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
     }
+    
+    .sort-controls {
+        margin-bottom: 20px;
+        padding: 10px 0;
+        border-bottom: 1px solid #e9ecef;
+    }
+    
+    .sort-btn {
+        font-size: 0.875rem;
+        padding: 0.375rem 0.75rem;
+        border: 1px solid #dee2e6;
+        background: white;
+        color: #6c757d;
+        transition: all 0.2s ease;
+    }
+    
+    .sort-btn:hover {
+        background: #f8f9fa;
+        border-color: #adb5bd;
+    }
+    
+    .sort-btn.active {
+        background: #0d6efd;
+        color: white;
+        border-color: #0d6efd;
+    }
+    
+    .order-btn {
+        font-size: 0.875rem;
+        padding: 0.375rem 0.75rem;
+        border: 1px solid #dee2e6;
+        background: white;
+        color: #6c757d;
+        transition: all 0.2s ease;
+    }
+    
+    .order-btn:hover {
+        background: #f8f9fa;
+        border-color: #adb5bd;
+    }
+    
+    .order-btn.active {
+        background: #6c757d;
+        color: white;
+        border-color: #6c757d;
+    }
 </style>
 
     <div class="position-relative my-5">
@@ -33,9 +79,36 @@
             <h2 class="mb-4">My Applications</h2>
             
             {% if applications %}
-                <div class="row g-4">
+                <!-- Simple Sorting Controls -->
+                <div class="sort-controls">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="text-muted small">Sort:</span>
+                            <button type="button" class="btn sort-btn active" data-sort="status" data-order="asc">
+                                Status
+                            </button>
+                            <button type="button" class="btn sort-btn" data-sort="applied" data-order="asc">
+                                Date
+                            </button>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="text-muted small">Order:</span>
+                            <button type="button" class="btn order-btn active" data-order="asc" data-sort="status">
+                                ↑
+                            </button>
+                            <button type="button" class="btn order-btn" data-order="desc" data-sort="status">
+                                ↓
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row g-4" id="applications-container">
                     {% for application in applications %}
-                        <div class="col-12">
+                        <div class="col-12 application-item" 
+                             data-status="{{ application.status }}" 
+                             data-applied="{{ application.applied_at|date:'Y-m-d' }}"
+                             data-status-order="{% if application.status == 'ACCEPTED' %}0{% elif application.status == 'PENDING' %}1{% elif application.status == 'REJECTED' %}2{% else %}3{% endif %}">
                             <div class="card h-100 border-0 shadow-sm application-card">
                                 <div class="card-body">
                                     <div class="d-flex justify-content-between align-items-start mb-3">
@@ -79,4 +152,70 @@
             {% endif %}
         </div>
     </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    let currentSort = 'status';
+    let currentOrder = 'asc';
+    
+    // Sort button event listeners
+    document.querySelectorAll('.sort-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            // Remove active class from all sort buttons
+            document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+            // Add active class to clicked button
+            this.classList.add('active');
+            
+            currentSort = this.dataset.sort;
+            
+            // Update order buttons to reflect current sort type
+            document.querySelectorAll('.order-btn').forEach(orderBtn => {
+                orderBtn.dataset.sort = currentSort;
+            });
+            
+            sortApplications();
+        });
+    });
+    
+    // Order button event listeners
+    document.querySelectorAll('.order-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            // Remove active class from all order buttons
+            document.querySelectorAll('.order-btn').forEach(b => b.classList.remove('active'));
+            // Add active class to clicked button
+            this.classList.add('active');
+            
+            currentOrder = this.dataset.order;
+            sortApplications();
+        });
+    });
+    
+    function sortApplications() {
+        const container = document.getElementById('applications-container');
+        const items = Array.from(container.querySelectorAll('.application-item'));
+        
+        items.sort((a, b) => {
+            let aValue, bValue;
+            
+            if (currentSort === 'status') {
+                aValue = parseInt(a.dataset.statusOrder);
+                bValue = parseInt(b.dataset.statusOrder);
+            } else if (currentSort === 'applied') {
+                aValue = new Date(a.dataset.applied);
+                bValue = new Date(b.dataset.applied);
+            }
+            
+            if (currentOrder === 'asc') {
+                return aValue > bValue ? 1 : -1;
+            } else {
+                return aValue < bValue ? 1 : -1;
+            }
+        });
+        
+        // Clear container and re-append sorted items
+        container.innerHTML = '';
+        items.forEach(item => container.appendChild(item));
+    }
+});
+</script>
 {% endblock %} 
