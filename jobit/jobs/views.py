@@ -288,7 +288,8 @@ def get_listings_tiles(job_listings, number_of_skills_per_tile):
             "salary_currency": job_listing.salary_currency,
             "skills": skills,
             "is_remote": job_listing.job_model == 'REMOTE',
-            "is_hybrid": job_listing.job_model == 'HYBRID'
+            "is_hybrid": job_listing.job_model == 'HYBRID',
+            "status": job_listing.status
         })
     return result
 
@@ -575,3 +576,87 @@ def get_knn_matches(request):
         matched_jobs.append(job)
     print(matched_jobs)
     return matched_jobs
+
+
+@login_required
+@require_http_methods(["POST"])
+def close_listing(request, listing_id):
+    job_listing = get_object_or_404(JobListing, id=listing_id)
+    user_role = get_user_role(request.user)
+    
+    if user_role != ROLE_RECRUITER:
+        return JsonResponse({'error': 'Only recruiters can close job listings'}, status=403)
+    
+    if job_listing.owner != get_user(request.user):
+        return JsonResponse({'error': 'You can only close your own job listings'}, status=403)
+    
+    if job_listing.status in ['CLOSED', 'ARCHIVED']:
+        return JsonResponse({'error': f'Listing is already {job_listing.status.lower()}'}, status=400)
+    
+    try:
+        job_listing.status = 'CLOSED'
+        job_listing.save()
+        return JsonResponse({
+            'status': 'success',
+            'message': 'Job listing closed successfully',
+            'listing_status': job_listing.status
+        })
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+
+@login_required
+@require_http_methods(["POST"])
+def archive_listing(request, listing_id):
+    job_listing = get_object_or_404(JobListing, id=listing_id)
+    user_role = get_user_role(request.user)
+    
+    if user_role != ROLE_RECRUITER:
+        return JsonResponse({'error': 'Only recruiters can archive job listings'}, status=403)
+    
+    if job_listing.owner != get_user(request.user):
+        return JsonResponse({'error': 'You can only archive your own job listings'}, status=403)
+    
+    if job_listing.status == 'ARCHIVED':
+        return JsonResponse({'error': 'Listing is already archived'}, status=400)
+    
+    try:
+        job_listing.status = 'ARCHIVED'
+        job_listing.save()
+        return JsonResponse({
+            'status': 'success',
+            'message': 'Job listing archived successfully',
+            'listing_status': job_listing.status
+        })
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+
+@login_required
+@require_http_methods(["POST"])
+def reactivate_listing(request, listing_id):
+    job_listing = get_object_or_404(JobListing, id=listing_id)
+    user_role = get_user_role(request.user)
+    
+    if user_role != ROLE_RECRUITER:
+        return JsonResponse({'error': 'Only recruiters can reactivate job listings'}, status=403)
+    
+    if job_listing.owner != get_user(request.user):
+        return JsonResponse({'error': 'You can only reactivate your own job listings'}, status=403)
+    
+    if job_listing.status == 'ACTIVE':
+        return JsonResponse({'error': 'Listing is already active'}, status=400)
+    
+    if job_listing.status == 'ARCHIVED':
+        return JsonResponse({'error': 'Archived listings cannot be reactivated'}, status=400)
+    
+    try:
+        job_listing.status = 'ACTIVE'
+        job_listing.save()
+        return JsonResponse({
+            'status': 'success',
+            'message': 'Job listing reactivated successfully',
+            'listing_status': job_listing.status
+        })
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
