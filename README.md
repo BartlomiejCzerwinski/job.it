@@ -27,6 +27,7 @@ The following diagram illustrates how the internal components of the system inte
 ## 🗃️ Database Schema
 
 This relational model outlines how the core entities relate to one another:
+*TODO: Add application for job listing*
 
 ![database](https://github.com/user-attachments/assets/d172af03-ad89-434a-9807-473caad89b6f)
 
