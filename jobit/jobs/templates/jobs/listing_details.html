@@ -164,7 +164,7 @@
                         <div class="col-md-4">
                             <div class="d-flex flex-column align-items-end">
                                 <div class="btn-group mb-3">
-                                    <button type="button" class="btn {% if job.status == 'ACTIVE' %}btn-status-active{% else %}btn-outline-success{% endif %} d-flex align-items-center gap-2 status-btn" data-status="ACTIVE" data-listing-id="{{ job.id }}" {% if job.status == 'ACTIVE' %}disabled{% endif %}>
+                                    <button type="button" class="btn {% if job.status == 'ACTIVE' %}btn-status-active{% else %}btn-outline-success{% endif %} d-flex align-items-center gap-2 status-btn" data-status="ACTIVE" data-listing-id="{{ job.id }}" {% if job.status == 'ACTIVE' or job.status == 'ARCHIVED' %}disabled{% endif %}>
                                         <i class="bi bi-check-circle"></i>
                                         <span>Active</span>
                                     </button>
