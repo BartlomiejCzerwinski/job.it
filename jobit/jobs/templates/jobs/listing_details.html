@@ -45,32 +45,26 @@
     </div>
 
     <style>
-        .btn-status-active {
+        .btn-group .btn.btn-success {
             background-color: #198754 !important;
             border-color: #198754 !important;
             color: white !important;
+            font-weight: 600 !important;
+            box-shadow: 0 2px 4px rgba(25, 135, 84, 0.3) !important;
         }
-        .btn-status-active:hover {
-            background-color: #157347 !important;
-            border-color: #157347 !important;
-        }
-        .btn-status-closed {
+        .btn-group .btn.btn-danger {
             background-color: #dc3545 !important;
             border-color: #dc3545 !important;
             color: white !important;
+            font-weight: 600 !important;
+            box-shadow: 0 2px 4px rgba(220, 53, 69, 0.3) !important;
         }
-        .btn-status-closed:hover {
-            background-color: #bb2d3b !important;
-            border-color: #bb2d3b !important;
-        }
-        .btn-status-archived {
+        .btn-group .btn.btn-secondary {
             background-color: #6c757d !important;
             border-color: #6c757d !important;
             color: white !important;
-        }
-        .btn-status-archived:hover {
-            background-color: #5a6268 !important;
-            border-color: #5a6268 !important;
+            font-weight: 600 !important;
+            box-shadow: 0 2px 4px rgba(108, 117, 125, 0.3) !important;
         }
         .applicant-row:hover:not(.no-row-hover) {
             background-color: #f5f5f5 !important;
@@ -164,15 +158,15 @@
                         <div class="col-md-4">
                             <div class="d-flex flex-column align-items-end">
                                 <div class="btn-group mb-3">
-                                    <button type="button" class="btn {% if job.status == 'ACTIVE' %}btn-status-active{% else %}btn-outline-success{% endif %} d-flex align-items-center gap-2 status-btn" data-status="ACTIVE" data-listing-id="{{ job.id }}" {% if job.status == 'ACTIVE' or job.status == 'ARCHIVED' %}disabled{% endif %}>
+                                    <button type="button" class="btn {% if job.status == 'ACTIVE' %}btn-success{% else %}btn-outline-success{% endif %} d-flex align-items-center gap-2 status-btn" data-status="ACTIVE" data-listing-id="{{ job.id }}" {% if job.status == 'ACTIVE' or job.status == 'ARCHIVED' %}disabled{% endif %}>
                                         <i class="bi bi-check-circle"></i>
                                         <span>Active</span>
                                     </button>
-                                    <button type="button" class="btn {% if job.status == 'CLOSED' %}btn-status-closed{% else %}btn-outline-danger{% endif %} d-flex align-items-center gap-2 status-btn" data-status="CLOSED" data-listing-id="{{ job.id }}" {% if job.status == 'CLOSED' or job.status == 'ARCHIVED' %}disabled{% endif %}>
+                                    <button type="button" class="btn {% if job.status == 'CLOSED' %}btn-danger{% else %}btn-outline-danger{% endif %} d-flex align-items-center gap-2 status-btn" data-status="CLOSED" data-listing-id="{{ job.id }}" {% if job.status == 'CLOSED' or job.status == 'ARCHIVED' %}disabled{% endif %}>
                                         <i class="bi bi-x-circle"></i>
                                         <span>Closed</span>
                                     </button>
-                                    <button type="button" class="btn {% if job.status == 'ARCHIVED' %}btn-status-archived{% else %}btn-outline-dark{% endif %} d-flex align-items-center gap-2 status-btn" data-status="ARCHIVED" data-listing-id="{{ job.id }}" {% if job.status != 'CLOSED' %}disabled{% endif %}>
+                                    <button type="button" class="btn {% if job.status == 'ARCHIVED' %}btn-secondary{% else %}btn-outline-secondary{% endif %} d-flex align-items-center gap-2 status-btn" data-status="ARCHIVED" data-listing-id="{{ job.id }}" {% if job.status != 'CLOSED' %}disabled{% endif %}>
                                         <i class="bi bi-archive"></i>
                                         <span>Archived</span>
                                     </button>
