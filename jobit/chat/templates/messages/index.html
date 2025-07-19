@@ -3,6 +3,26 @@
 {% block title %}Messages - Job.it{% endblock %}
 
 {% block content %}
+<style>
+    /* Light hover effects for chat message bubbles */
+    .message-bubble {
+        transition: all 0.15s ease;
+        cursor: pointer;
+    }
+    
+    .message-bubble:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    }
+    
+    .message-bubble.sent:hover {
+        box-shadow: 0 2px 6px rgba(13, 110, 253, 0.15);
+    }
+    
+    .message-bubble.received:hover {
+        box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    }
+</style>
 <div class="container-fluid">
     <div class="row" style="height: calc(100vh - 156px);">
         <!-- Contacts List -->
@@ -85,19 +105,19 @@
                 <div class="flex-grow-1 overflow-auto p-3">
                     <!-- Placeholder for chat messages -->
                     <div class="d-flex justify-content-start mb-3">
-                        <div class="bg-light rounded p-3" style="max-width: 75%;">
+                        <div class="bg-light rounded p-3 message-bubble received" style="max-width: 75%;">
                             <p class="mb-0">Hello! I'm interested in the Senior Developer position at TechCorp Inc.</p>
                             <small class="text-muted">10:30 AM</small>
                         </div>
                     </div>
                     <div class="d-flex justify-content-end mb-3">
-                        <div class="bg-primary text-white rounded p-3" style="max-width: 75%;">
+                        <div class="bg-primary text-white rounded p-3 message-bubble sent" style="max-width: 75%;">
                             <p class="mb-0">Hi John! Thanks for your interest. I'd love to discuss your experience with our tech stack.</p>
                             <small class="text-white-50">10:31 AM</small>
                         </div>
                     </div>
                     <div class="d-flex justify-content-start mb-3">
-                        <div class="bg-light rounded p-3" style="max-width: 75%;">
+                        <div class="bg-light rounded p-3 message-bubble received" style="max-width: 75%;">
                             <p class="mb-0">Great! I have 5+ years of experience with React, Node.js, and Python. Would you like to schedule an interview?</p>
                             <small class="text-muted">10:32 AM</small>
                         </div>
