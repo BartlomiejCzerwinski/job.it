@@ -44,6 +44,56 @@
         </div>
     </div>
 
+    <!-- Send Message Modal -->
+    <div class="modal fade" id="sendMessageModal" tabindex="-1" aria-labelledby="sendMessageModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="sendMessageModalLabel">Send Message to Candidate</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <h6 class="text-muted mb-2">Candidate Information</h6>
+                            <div class="d-flex align-items-center mb-2">
+                                <div class="rounded-circle me-3" style="width: 40px; height: 40px; overflow: hidden;">
+                                    <img id="candidatePhoto" src="{% static 'images/avatar.png' %}" alt="Candidate Photo" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                                <div>
+                                    <strong id="candidateName">John Doe</strong>
+                                    <div class="text-muted small" id="candidatePosition">Senior Developer</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted mb-2">Job Information</h6>
+                            <div>
+                                <strong>{{ job.job_title }}</strong>
+                                <div class="text-muted small">{{ job.company_name }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="mb-3">
+                        <label for="messageContent" class="form-label">Message</label>
+                        <textarea class="form-control" id="messageContent" rows="6" placeholder="Write your message to the candidate..."></textarea>
+                    </div>
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle me-2"></i>
+                        <strong>Tip:</strong> This will initiate a conversation with the candidate about this job position.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="sendMessageBtn">
+                        <i class="bi bi-send me-1"></i>Send Message
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <style>
         .btn-group .btn.btn-success {
             background-color: #198754 !important;
@@ -307,7 +357,7 @@
                                                 <button class="btn btn-primary rounded-circle d-flex align-items-center justify-content-center message-btn"
                                                         style="width: 38px; height: 38px; padding: 0;"
                                                         title="Message"
-                                                        onclick="event.stopPropagation(); /* Add your message logic here */">
+                                                        onclick="event.stopPropagation(); openMessageModal('{{ application.name }}', '{{ application.position }}', '{{ application.candidate_id }}', '{{ application.profile_photo }}')">
                                                     <i class="bi bi-chat-dots" style="font-size: 1.3rem; color: #fff;"></i>
                                                 </button>
                                             </td>
@@ -573,6 +623,61 @@
         document.getElementById('confirmStatusChange').dataset.listingId = '';
     }
 
+    function openMessageModal(candidateName, candidatePosition, candidateId, candidatePhoto) {
+        // Set candidate information in the modal
+        document.getElementById('candidateName').textContent = candidateName;
+        document.getElementById('candidatePosition').textContent = candidatePosition;
+        
+        // Set candidate photo
+        const photoElement = document.getElementById('candidatePhoto');
+        if (candidatePhoto) {
+            photoElement.src = `data:image/jpeg;base64,${candidatePhoto}`;
+        } else {
+            photoElement.src = "{% static 'images/avatar.png' %}";
+        }
+        
+        // Store candidate ID for sending message
+        document.getElementById('sendMessageBtn').dataset.candidateId = candidateId;
+        
+        // Clear previous message content
+        document.getElementById('messageContent').value = '';
+        
+        // Show the modal
+        const modal = new bootstrap.Modal(document.getElementById('sendMessageModal'));
+        modal.show();
+    }
+
+    function sendMessage() {
+        const candidateId = document.getElementById('sendMessageBtn').dataset.candidateId;
+        const content = document.getElementById('messageContent').value.trim();
+        
+        if (!content) {
+            showToast('Please enter a message content', false);
+            return;
+        }
+        
+        // Show loading state
+        const sendBtn = document.getElementById('sendMessageBtn');
+        const originalText = sendBtn.innerHTML;
+        sendBtn.innerHTML = '<i class="bi bi-hourglass-split me-1"></i>Sending...';
+        sendBtn.disabled = true;
+        
+        // Send the message (placeholder for now)
+        // TODO: Implement actual message sending endpoint
+        setTimeout(() => {
+            // Simulate API call
+            showToast('Message sent successfully!');
+            
+            // Reset button
+            sendBtn.innerHTML = originalText;
+            sendBtn.disabled = false;
+            
+            // Close modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('sendMessageModal'));
+            modal.hide();
+        }, 1000);
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
         document.querySelectorAll('.action-btn, .message-btn').forEach(function(btn) {
             btn.addEventListener('mouseenter', function() {
@@ -633,6 +738,16 @@
 
             // Perform the status change
             performStatusChange(listingId, action);
+        });
+
+        // Add event listener for send message button
+        document.getElementById('sendMessageBtn').addEventListener('click', function() {
+            sendMessage();
+        });
+
+        // Handle message modal cleanup
+        document.getElementById('sendMessageModal').addEventListener('hidden.bs.modal', function() {
+            cleanupModal();
         });
     });
     </script>
