@@ -181,6 +181,21 @@
                 sendMessage();
             }
         });
+        
+        // Auto-refresh conversations every 10 seconds
+        setInterval(() => {
+            if (!currentConversationId) {
+                // Only refresh conversations if no conversation is selected
+                loadConversations();
+            }
+        }, 10000);
+        
+        // Auto-refresh messages every 5 seconds if conversation is selected
+        setInterval(() => {
+            if (currentConversationId) {
+                loadMessages(currentConversationId, true);
+            }
+        }, 5000);
     });
     
     // Load conversations from API
@@ -325,7 +340,7 @@
     }
     
     // Load messages for a conversation
-    function loadMessages(conversationId) {
+    function loadMessages(conversationId, isAutoRefresh = false) {
         fetch(`/messages/conversations/${conversationId}/messages/`, {
             method: 'GET',
             headers: {
@@ -337,7 +352,6 @@
         .then(data => {
             if (data.status === 'success') {
                 const messagesContainer = document.getElementById('messagesContainer');
-                messagesContainer.innerHTML = '';
                 
                 if (data.data.messages.length === 0) {
                     // Show placeholder for empty conversation
@@ -350,32 +364,59 @@
                         </div>
                     `;
                 } else {
-                    // Display all messages
-                    data.data.messages.forEach(message => {
-                        const messageTime = new Date(message.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-                        addMessageToUI(message.content, message.is_sent_by_me, messageTime);
-                    });
+                    if (!isAutoRefresh) {
+                        // Initial load - clear and show all messages
+                        messagesContainer.innerHTML = '';
+                        data.data.messages.forEach(message => {
+                            const messageTime = new Date(message.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                            addMessageToUI(message.content, message.is_sent_by_me, messageTime, message.id);
+                        });
+                    } else {
+                        // Auto-refresh - only add new messages
+                        const existingMessageIds = new Set(
+                            Array.from(messagesContainer.querySelectorAll('[data-message-id]'))
+                                .map(el => el.dataset.messageId)
+                        );
+                        
+                        const newMessages = data.data.messages.filter(message => 
+                            !existingMessageIds.has(message.id.toString())
+                        );
+                        
+                        newMessages.forEach(message => {
+                            const messageTime = new Date(message.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                            addMessageToUI(message.content, message.is_sent_by_me, messageTime, message.id);
+                        });
+                        
+                        // Log for debugging (remove in production)
+                        if (newMessages.length > 0) {
+                            console.log(`Added ${newMessages.length} new messages via auto-refresh`);
+                        }
+                    }
                 }
                 
-                // Scroll to bottom
+                // Scroll to bottom only if user is near bottom or it's initial load
                 const messagesArea = document.getElementById('messagesArea');
-                messagesArea.scrollTop = messagesArea.scrollHeight;
+                if (!isAutoRefresh || messagesArea.scrollTop + messagesArea.clientHeight >= messagesArea.scrollHeight - 100) {
+                    messagesArea.scrollTop = messagesArea.scrollHeight;
+                }
             } else {
                 console.error('Failed to load messages:', data.message);
             }
         })
         .catch(error => {
             console.error('Error loading messages:', error);
-            // Show error message
-            const messagesContainer = document.getElementById('messagesContainer');
-            messagesContainer.innerHTML = `
-                <div class="d-flex justify-content-center mb-3">
-                    <div class="bg-light rounded p-3 message-bubble received" style="max-width: 75%;">
-                        <p class="mb-0">Error loading messages. Please try again.</p>
-                        <small class="text-muted">${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</small>
+            if (!isAutoRefresh) {
+                // Show error message only on initial load
+                const messagesContainer = document.getElementById('messagesContainer');
+                messagesContainer.innerHTML = `
+                    <div class="d-flex justify-content-center mb-3">
+                        <div class="bg-light rounded p-3 message-bubble received" style="max-width: 75%;">
+                            <p class="mb-0">Error loading messages. Please try again.</p>
+                            <small class="text-muted">${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</small>
+                        </div>
                     </div>
-                </div>
-            `;
+                `;
+            }
         });
     }
     
@@ -409,14 +450,21 @@
         .then(response => response.json())
         .then(data => {
             if (data.status === 'success') {
-                // Add message to UI
-                addMessageToUI(content, true);
+                // Add message to UI with the new message ID
+                addMessageToUI(content, true, null, data.data.message_id);
                 
                 // Clear input
                 messageText.value = '';
                 
                 // Refresh conversations to update last message
                 loadConversations();
+                
+                // Pause auto-refresh briefly to prevent immediate duplication
+                setTimeout(() => {
+                    if (currentConversationId) {
+                        loadMessages(currentConversationId, true);
+                    }
+                }, 2000);
             } else {
                 console.error('Failed to send message:', data.message);
                 alert('Failed to send message. Please try again.');
@@ -434,7 +482,7 @@
     }
     
     // Add message to UI
-    function addMessageToUI(content, isSent, customTime = null) {
+    function addMessageToUI(content, isSent, customTime = null, messageId = null) {
         const messagesContainer = document.getElementById('messagesContainer');
         const messageDiv = document.createElement('div');
         messageDiv.className = `d-flex justify-content-${isSent ? 'end' : 'start'} mb-3`;
@@ -444,7 +492,7 @@
         const messageTime = customTime || new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
         
         messageDiv.innerHTML = `
-            <div class="${bubbleClass} rounded p-3 message-bubble ${isSent ? 'sent' : 'received'}" style="max-width: 75%;">
+            <div class="${bubbleClass} rounded p-3 message-bubble ${isSent ? 'sent' : 'received'}" style="max-width: 75%;" ${messageId ? `data-message-id="${messageId}"` : ''}>
                 <p class="mb-0">${content}</p>
                 <small class="${timeClass}">${messageTime}</small>
             </div>
@@ -452,9 +500,11 @@
         
         messagesContainer.appendChild(messageDiv);
         
-        // Scroll to bottom
-        const messagesArea = document.getElementById('messagesArea');
-        messagesArea.scrollTop = messagesArea.scrollHeight;
+        // Scroll to bottom only if not auto-refresh
+        if (!messageId) {
+            const messagesArea = document.getElementById('messagesArea');
+            messagesArea.scrollTop = messagesArea.scrollHeight;
+        }
     }
     
     // Refresh conversations
