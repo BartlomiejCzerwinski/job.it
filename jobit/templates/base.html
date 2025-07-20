@@ -21,14 +21,24 @@
         </a>
         {% if user.is_authenticated %}
             <div class="dropdown">
-                <button class="btn btn-light p-2" type="button" id="dropdownArrow" data-bs-toggle="dropdown"
+                <button class="btn btn-light p-2 position-relative" type="button" id="dropdownArrow" data-bs-toggle="dropdown"
                         aria-expanded="false">
                     <span class="navbar-toggler-icon"></span>
+                    <!-- Notification badge for new messages -->
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" 
+                          style="font-size: 0.6rem; transform: translate(-50%, -50%);" id="messageNotificationBadge">
+                        !
+                    </span>
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownArrow">
                     <li>
-                        <a class="dropdown-item" href="{% url 'chat:index' %}">
+                        <a class="dropdown-item position-relative" href="{% url 'chat:index' %}">
                             <i class="bi bi-chat-dots me-1"></i> Messages
+                            <!-- Notification badge for Messages menu item -->
+                            <span class="position-absolute top-50 end-0 translate-middle-y badge rounded-pill bg-danger me-2" 
+                                  style="font-size: 0.7rem;" id="messagesMenuBadge">
+                                3
+                            </span>
                         </a>
                     </li>
                     {% if user.appuser.role == 'worker' %}
