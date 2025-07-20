@@ -25,20 +25,24 @@
                         aria-expanded="false">
                     <span class="navbar-toggler-icon"></span>
                     <!-- Notification badge for new messages -->
+                    {% if has_unread_messages %}
                     <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" 
                           style="font-size: 0.6rem; transform: translate(-50%, -50%);" id="messageNotificationBadge">
                         !
                     </span>
+                    {% endif %}
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownArrow">
                     <li>
                         <a class="dropdown-item position-relative" href="{% url 'chat:index' %}">
                             <i class="bi bi-chat-dots me-1"></i> Messages
                             <!-- Notification badge for Messages menu item -->
+                            {% if has_unread_messages %}
                             <span class="position-absolute top-50 end-0 translate-middle-y badge rounded-pill bg-danger me-2" 
                                   style="font-size: 0.7rem;" id="messagesMenuBadge">
-                                3
+                                {{ unread_messages_count }}
                             </span>
+                            {% endif %}
                         </a>
                     </li>
                     {% if user.appuser.role == 'worker' %}
@@ -98,6 +102,58 @@
 
 <script>
     var CSRF_TOKEN = '{{ csrf_token }}';
+    
+    // Function to update notification badges
+    function updateNotificationBadges() {
+        fetch('/messages/notifications/', {
+            method: 'GET',
+            headers: {
+                'X-CSRFToken': CSRF_TOKEN,
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                const unreadCount = data.data.unread_messages_count;
+                const hasUnread = data.data.has_unread_messages;
+                
+                // Update menu burger badge
+                const menuBadge = document.getElementById('messageNotificationBadge');
+                if (menuBadge) {
+                    if (hasUnread) {
+                        menuBadge.textContent = '!';
+                        menuBadge.style.display = 'block';
+                    } else {
+                        menuBadge.style.display = 'none';
+                    }
+                }
+                
+                // Update messages menu badge
+                const messagesMenuBadge = document.getElementById('messagesMenuBadge');
+                if (messagesMenuBadge) {
+                    if (hasUnread) {
+                        messagesMenuBadge.textContent = unreadCount;
+                        messagesMenuBadge.style.display = 'block';
+                    } else {
+                        messagesMenuBadge.style.display = 'none';
+                    }
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Error updating notifications:', error);
+        });
+    }
+    
+    // Update notifications every 30 seconds
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() {
+            setInterval(updateNotificationBadges, 30000);
+        });
+    } else {
+        setInterval(updateNotificationBadges, 30000);
+    }
 </script>
 
 </body>
