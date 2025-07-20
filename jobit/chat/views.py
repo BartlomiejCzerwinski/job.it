@@ -197,7 +197,9 @@ def get_conversations(request):
                 'job_listing': {
                     'id': conversation.job_listing.id,
                     'title': conversation.job_listing.job_title,
-                    'company': conversation.job_listing.company_name
+                    'company': conversation.job_listing.company_name,
+                    'location': str(conversation.job_listing.location) if conversation.job_listing.location else None,
+                    'job_model': conversation.job_listing.job_model
                 },
                 'other_user': {
                     'id': conversation.candidate.id,
@@ -221,7 +223,9 @@ def get_conversations(request):
                 'job_listing': {
                     'id': conversation.job_listing.id,
                     'title': conversation.job_listing.job_title,
-                    'company': conversation.job_listing.company_name
+                    'company': conversation.job_listing.company_name,
+                    'location': str(conversation.job_listing.location) if conversation.job_listing.location else None,
+                    'job_model': conversation.job_listing.job_model
                 },
                 'other_user': {
                     'id': conversation.recruiter.id,
@@ -282,6 +286,59 @@ def get_notifications(request):
                 'has_unread_messages': total_unread > 0
             }
         }, status=200)
+        
+    except Exception as e:
+        return JsonResponse({
+            'status': 'error',
+            'message': f'An error occurred: {str(e)}'
+        }, status=500)
+
+@login_required
+@require_http_methods(["GET"])
+def get_messages(request, conversation_id):
+    """
+    Get all messages for a specific conversation.
+    """
+    try:
+        # Get the conversation
+        conversation = get_object_or_404(Conversation, id=conversation_id)
+        
+        # Verify user is part of this conversation
+        current_user = request.user
+        if current_user not in [conversation.recruiter, conversation.candidate]:
+            return JsonResponse({
+                'status': 'error',
+                'message': 'You are not authorized to view messages in this conversation'
+            }, status=403)
+        
+        # Get all messages for this conversation
+        messages = conversation.messages.all()
+        
+        # Serialize messages
+        messages_data = []
+        for message in messages:
+            messages_data.append({
+                'id': message.id,
+                'content': message.content,
+                'sender_id': message.sender.id,
+                'is_sent_by_me': message.sender == current_user,
+                'created_at': message.created_at.isoformat(),
+                'read_at': message.read_at.isoformat() if message.read_at else None
+            })
+        
+        return JsonResponse({
+            'status': 'success',
+            'data': {
+                'conversation_id': conversation.id,
+                'messages': messages_data
+            }
+        }, status=200)
+        
+    except Conversation.DoesNotExist:
+        return JsonResponse({
+            'status': 'error',
+            'message': 'Conversation not found'
+        }, status=404)
         
     except Exception as e:
         return JsonResponse({
