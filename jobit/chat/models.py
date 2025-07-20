@@ -33,8 +33,10 @@ class Conversation(models.Model):
         return self.messages.order_by('-created_at').first()
 
     def get_unread_count(self, user):
+        # Count messages sent by the other person that haven't been read
+        other_user = self.candidate if user == self.recruiter else self.recruiter
         return self.messages.filter(
-            recipient=user,
+            sender=other_user,
             read_at__isnull=True
         ).count()
 

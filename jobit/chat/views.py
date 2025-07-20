@@ -45,7 +45,7 @@ def init_conversation(request):
         current_user = request.user
         
         # Determine if current user is recruiter or candidate for this job listing
-        is_recruiter = job_listing.recruiter == current_user
+        is_recruiter = job_listing.owner.user == current_user
         
         if is_recruiter:
             # Current user is recruiter, recipient is candidate
