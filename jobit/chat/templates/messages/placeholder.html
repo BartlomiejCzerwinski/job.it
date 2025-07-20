@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+
+{% block title %}Messages - Job.it{% endblock %}
+
+{% block content %}
+<style>
+    /* Light hover effects for chat message bubbles */
+    .message-bubble {
+        transition: all 0.15s ease;
+        cursor: pointer;
+    }
+    
+    .message-bubble:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    }
+    
+    .message-bubble.sent:hover {
+        box-shadow: 0 2px 6px rgba(13, 110, 253, 0.15);
+    }
+    
+    .message-bubble.received:hover {
+        box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    }
+    
+    .conversation-item {
+        transition: background-color 0.2s ease;
+        cursor: pointer;
+    }
+    
+    .conversation-item:hover {
+        background-color: #f8f9fa !important;
+    }
+</style>
+<div class="container-fluid">
+    <div class="row" style="height: calc(100vh - 156px);">
+        <!-- Contacts List -->
+        <div class="col-md-4 col-lg-3 border-end p-0" style="height: 100%;">
+            <div class="d-flex flex-column h-100">
+                <div class="p-3 border-bottom">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Messages</h5>
+                    </div>
+                </div>
+                <div class="overflow-auto flex-grow-1">
+                    <div class="list-group list-group-flush">
+                        <!-- Placeholder for conversations -->
+                        <div class="list-group-item list-group-item-action p-3 conversation-item">
+                            <div class="d-flex w-100 justify-content-between align-items-center">
+                                <div class="d-flex align-items-center">
+                                    <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px;">
+                                        <i class="bi bi-person-fill fs-4"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="mb-1">John Doe</h6>
+                                        <p class="mb-1 text-muted small">Senior Developer</p>
+
+                                    </div>
+                                </div>
+                                <div class="text-end">
+                                    <span class="badge bg-primary rounded-pill ms-2">2</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="list-group-item list-group-item-action p-3 conversation-item">
+                            <div class="d-flex w-100 justify-content-between align-items-center">
+                                <div class="d-flex align-items-center">
+                                    <div class="rounded-circle bg-success text-white d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px;">
+                                        <i class="bi bi-person-fill fs-4"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="mb-1">Jane Smith</h6>
+                                        <p class="mb-1 text-muted small">Product Manager</p>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chat Area -->
+        <div class="col-md-8 col-lg-9 p-0" style="height: 100%;">
+            <div class="d-flex flex-column h-100">
+                <!-- Chat Header with Context -->
+                <div class="p-3 border-bottom bg-light">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center">
+                            <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px;">
+                                <i class="bi bi-person-fill fs-4"></i>
+                            </div>
+                            <div>
+                                <h5 class="mb-0">John Doe</h5>
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="badge bg-info text-dark">Senior Software Engineer</span>
+                                    <span class="text-muted">•</span>
+                                    <span class="text-muted">Lodz, Poland</span>
+                                    <span class="badge bg-success" style="font-size: 0.7rem;">Remote</span>
+                                    <span class="badge bg-warning" style="font-size: 0.7rem;">Hybrid</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-end">
+                            <small class="text-muted d-block">Position: Senior Developer</small>
+                            <small class="text-muted d-block">Company: TechCorp Inc.</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Messages Area -->
+                <div class="flex-grow-1 overflow-auto p-3">
+                    <!-- Placeholder for chat messages -->
+                    <div class="d-flex justify-content-start mb-3">
+                        <div class="bg-light rounded p-3 message-bubble received" style="max-width: 75%;">
+                            <p class="mb-0">Hello! I'm interested in the Senior Developer position at TechCorp Inc.</p>
+                            <small class="text-muted">10:30 AM</small>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-end mb-3">
+                        <div class="bg-primary text-white rounded p-3 message-bubble sent" style="max-width: 75%;">
+                            <p class="mb-0">Hi John! Thanks for your interest. I'd love to discuss your experience with our tech stack.</p>
+                            <small class="text-white-50">10:31 AM</small>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-start mb-3">
+                        <div class="bg-light rounded p-3 message-bubble received" style="max-width: 75%;">
+                            <p class="mb-0">Great! I have 5+ years of experience with React, Node.js, and Python. Would you like to schedule an interview?</p>
+                            <small class="text-muted">10:32 AM</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Message Input -->
+                <div class="p-3 border-top">
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Type a message...">
+                        <button class="btn btn-primary">
+                            <i class="bi bi-send"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
