@@ -17,48 +17,126 @@ def index(request):
 
 @login_required
 @require_http_methods(["POST"])
-def send_message(request):
+def init_conversation(request):
     """
-    Send a message to a candidate for a specific job listing.
-    Creates a new conversation if one doesn't exist, or adds to existing conversation.
+    Initialize a conversation between two users for a specific job listing.
+    Creates a new conversation if one doesn't exist, or returns existing conversation.
+    Works for both recruiters and candidates.
     """
     try:
         data = json.loads(request.body)
         job_listing_id = data.get('job_listing_id')
-        candidate_id = data.get('candidate_id')
-        content = data.get('content')
+        recipient_id = data.get('recipient_id')
         
         # Validate required fields
-        if not all([job_listing_id, candidate_id, content]):
+        if not all([job_listing_id, recipient_id]):
             return JsonResponse({
                 'status': 'error',
-                'message': 'Missing required fields: job_listing_id, candidate_id, content'
+                'message': 'Missing required fields: job_listing_id, recipient_id'
             }, status=400)
         
         # Get the job listing
         job_listing = get_object_or_404(JobListing, id=job_listing_id)
         
-        # Get the candidate user
-        candidate_user = get_object_or_404(AppUser, id=candidate_id)
+        # Get the recipient user
+        recipient_user = get_object_or_404(AppUser, id=recipient_id)
         
-        # Get the current user (recruiter)
-        recruiter_user = get_object_or_404(AppUser, user=request.user)
+        # Get the current user
+        current_user = request.user
+        
+        # Determine if current user is recruiter or candidate for this job listing
+        is_recruiter = job_listing.recruiter == current_user
+        
+        if is_recruiter:
+            # Current user is recruiter, recipient is candidate
+            recruiter = current_user
+            candidate = recipient_user.user
+        else:
+            # Current user is candidate, recipient is recruiter
+            recruiter = recipient_user.user
+            candidate = current_user
         
         # Check if conversation already exists
         conversation, created = Conversation.objects.get_or_create(
             job_listing=job_listing,
-            recruiter=recruiter_user.user,
-            candidate=candidate_user.user,
+            recruiter=recruiter,
+            candidate=candidate,
             defaults={
                 'created_at': timezone.now(),
                 'updated_at': timezone.now()
             }
         )
         
+        return JsonResponse({
+            'status': 'success',
+            'message': 'Conversation initialized successfully',
+            'data': {
+                'conversation_id': conversation.id,
+                'conversation_created': created,
+                'sender_role': 'recruiter' if is_recruiter else 'candidate',
+                'recipient_id': recipient_id,
+                'job_listing_id': job_listing_id
+            }
+        }, status=201 if created else 200)
+        
+    except JobListing.DoesNotExist:
+        return JsonResponse({
+            'status': 'error',
+            'message': 'Job listing not found'
+        }, status=404)
+        
+    except AppUser.DoesNotExist:
+        return JsonResponse({
+            'status': 'error',
+            'message': 'Recipient not found'
+        }, status=404)
+        
+    except json.JSONDecodeError:
+        return JsonResponse({
+            'status': 'error',
+            'message': 'Invalid JSON data'
+        }, status=400)
+        
+    except Exception as e:
+        return JsonResponse({
+            'status': 'error',
+            'message': f'An error occurred: {str(e)}'
+        }, status=500)
+
+@login_required
+@require_http_methods(["POST"])
+def send_message(request):
+    """
+    Send a message in an existing conversation.
+    Requires conversation_id and content.
+    """
+    try:
+        data = json.loads(request.body)
+        conversation_id = data.get('conversation_id')
+        content = data.get('content')
+        
+        # Validate required fields
+        if not all([conversation_id, content]):
+            return JsonResponse({
+                'status': 'error',
+                'message': 'Missing required fields: conversation_id, content'
+            }, status=400)
+        
+        # Get the conversation
+        conversation = get_object_or_404(Conversation, id=conversation_id)
+        
+        # Verify user is part of this conversation
+        current_user = request.user
+        if current_user not in [conversation.recruiter, conversation.candidate]:
+            return JsonResponse({
+                'status': 'error',
+                'message': 'You are not authorized to send messages in this conversation'
+            }, status=403)
+        
         # Create the message
         message = Message.objects.create(
             conversation=conversation,
-            sender=request.user,
+            sender=current_user,
             content=content,
             created_at=timezone.now()
         )
@@ -71,23 +149,17 @@ def send_message(request):
             'status': 'success',
             'message': 'Message sent successfully',
             'data': {
-                'conversation_id': conversation.id,
                 'message_id': message.id,
+                'conversation_id': conversation.id,
                 'created_at': message.created_at.isoformat(),
-                'conversation_created': created
+                'sender_id': current_user.id
             }
         }, status=201)
         
-    except JobListing.DoesNotExist:
+    except Conversation.DoesNotExist:
         return JsonResponse({
             'status': 'error',
-            'message': 'Job listing not found'
-        }, status=404)
-        
-    except AppUser.DoesNotExist:
-        return JsonResponse({
-            'status': 'error',
-            'message': 'Candidate not found'
+            'message': 'Conversation not found'
         }, status=404)
         
     except json.JSONDecodeError:
