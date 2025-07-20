@@ -650,6 +650,7 @@
     function sendMessage() {
         const candidateId = document.getElementById('sendMessageBtn').dataset.candidateId;
         const content = document.getElementById('messageContent').value.trim();
+        const jobListingId = '{{ job.id }}'; // Get job listing ID from template
         
         if (!content) {
             showToast('Please enter a message content', false);
@@ -662,20 +663,61 @@
         sendBtn.innerHTML = '<i class="bi bi-hourglass-split me-1"></i>Sending...';
         sendBtn.disabled = true;
         
-        // Send the message (placeholder for now)
-        // TODO: Implement actual message sending endpoint
-        setTimeout(() => {
-            // Simulate API call
-            showToast('Message sent successfully!');
+        // Step 1: Initialize conversation
+        fetch('/messages/init-conversation/', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': CSRF_TOKEN,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                job_listing_id: jobListingId,
+                recipient_id: candidateId
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                // Step 2: Send message to the conversation
+                return fetch('/messages/send-message/', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': CSRF_TOKEN,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        conversation_id: data.data.conversation_id,
+                        content: content
+                    })
+                });
+            } else {
+                throw new Error(data.message || 'Failed to initialize conversation');
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                showToast('Message sent successfully!');
+                
+                // Reset button
+                sendBtn.innerHTML = originalText;
+                sendBtn.disabled = false;
+                
+                // Close modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('sendMessageModal'));
+                modal.hide();
+            } else {
+                throw new Error(data.message || 'Failed to send message');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showToast(error.message || 'An error occurred while sending the message', false);
             
             // Reset button
             sendBtn.innerHTML = originalText;
             sendBtn.disabled = false;
-            
-            // Close modal
-            const modal = bootstrap.Modal.getInstance(document.getElementById('sendMessageModal'));
-            modal.hide();
-        }, 1000);
+        });
     }
 
     document.addEventListener('DOMContentLoaded', function() {
