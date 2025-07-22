@@ -25,24 +25,23 @@
                         aria-expanded="false">
                     <span class="navbar-toggler-icon"></span>
                     <!-- Notification badge for new messages -->
-                    {% if has_unread_messages %}
                     <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" 
-                          style="font-size: 0.6rem; transform: translate(-50%, -50%);" id="messageNotificationBadge">
+                          style="font-size: 0.6rem; transform: translate(-50%, -50%);" 
+                          id="messageNotificationBadge" data-initial-state="{% if has_unread_messages %}visible{% else %}hidden{% endif %}">
                         !
                     </span>
-                    {% endif %}
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownArrow">
                     <li>
                         <a class="dropdown-item position-relative" href="{% url 'chat:index' %}">
                             <i class="bi bi-chat-dots me-1"></i> Messages
                             <!-- Notification badge for Messages menu item -->
-                            {% if has_unread_messages %}
                             <span class="position-absolute top-50 end-0 translate-middle-y badge rounded-pill bg-danger me-2" 
-                                  style="font-size: 0.7rem;" id="messagesMenuBadge">
-                                {{ unread_messages_count }}
+                                  style="font-size: 0.7rem;" 
+                                  id="messagesMenuBadge" 
+                                  data-initial-state="{% if has_unread_messages %}visible{% else %}hidden{% endif %}">
+                                {{ unread_messages_count|default:0 }}
                             </span>
-                            {% endif %}
                         </a>
                     </li>
                     {% if user.appuser.role == 'worker' %}
@@ -146,13 +145,35 @@
         });
     }
     
-    // Update notifications every 30 seconds
+    // Function to set initial badge states
+    function setInitialBadgeStates() {
+        const menuBadge = document.getElementById('messageNotificationBadge');
+        const messagesMenuBadge = document.getElementById('messagesMenuBadge');
+        
+        if (menuBadge) {
+            const initialState = menuBadge.getAttribute('data-initial-state');
+            if (initialState === 'hidden') {
+                menuBadge.style.display = 'none';
+            }
+        }
+        
+        if (messagesMenuBadge) {
+            const initialState = messagesMenuBadge.getAttribute('data-initial-state');
+            if (initialState === 'hidden') {
+                messagesMenuBadge.style.display = 'none';
+            }
+        }
+    }
+    
+    // Initialize and update notifications
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', function() {
-            setInterval(updateNotificationBadges, 30000);
+            setInitialBadgeStates();
+            setInterval(updateNotificationBadges, 10000);
         });
     } else {
-        setInterval(updateNotificationBadges, 30000);
+        setInitialBadgeStates();
+        setInterval(updateNotificationBadges, 10000);
     }
 </script>
 
