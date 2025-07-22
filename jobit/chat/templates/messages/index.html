@@ -23,6 +23,30 @@
         box-shadow: 0 2px 6px rgba(0,0,0,0.08);
     }
     
+    .message-bubble.new-message {
+        animation: newMessagePulse 2s ease-in-out;
+        border-left: 3px solid #0d6efd;
+    }
+    
+    @keyframes newMessagePulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.02); }
+        100% { transform: scale(1); }
+    }
+    
+    .message-bubble.new-message::before {
+        content: "NEW";
+        position: absolute;
+        top: -8px;
+        left: 10px;
+        background: #0d6efd;
+        color: white;
+        font-size: 0.6rem;
+        padding: 2px 6px;
+        border-radius: 10px;
+        font-weight: bold;
+    }
+    
     .conversation-item {
         transition: background-color 0.2s ease;
         cursor: pointer;
@@ -146,6 +170,14 @@
 
                 <!-- Messages Area -->
                 <div class="flex-grow-1 overflow-auto p-3" id="messagesArea" style="display: none;">
+                    <!-- New Messages Indicator -->
+                    <div id="newMessagesIndicator" class="text-center mb-3" style="display: none; position: sticky; top: 0; z-index: 10; background: white; padding: 10px 0;">
+                        <div class="alert alert-primary d-inline-flex align-items-center" role="alert" style="cursor: pointer; box-shadow: 0 2px 10px rgba(0,0,0,0.1);" onclick="scrollToBottom()">
+                            <i class="bi bi-arrow-down-circle me-2 fs-5"></i>
+                            <strong>New messages received!</strong>
+                            <span class="ms-2">Click to view</span>
+                        </div>
+                    </div>
                     <div id="messagesContainer">
                         <!-- Messages will be loaded here -->
                     </div>
@@ -168,10 +200,15 @@
 <script>
     let currentConversationId = null;
     let conversations = [];
+    let lastReadTime = null;
+    let readTimeout = null;
     
     // Initialize the chat interface
     document.addEventListener('DOMContentLoaded', function() {
         loadConversations();
+        updateNotifications(); // Initial notification update
+        
+
         
         // Send message on Enter
         const messageText = document.getElementById('messageText');
@@ -196,6 +233,18 @@
                 loadMessages(currentConversationId, true);
             }
         }, 5000);
+        
+        // Update notifications every 3 seconds (even when window is not focused)
+        setInterval(() => {
+            updateNotifications();
+        }, 3000);
+        
+        // Add event listeners for user activity
+        document.addEventListener('visibilitychange', checkUserActivity);
+        document.addEventListener('focus', checkUserActivity);
+        document.addEventListener('mousemove', throttledCheckUserActivity);
+        document.addEventListener('keydown', throttledCheckUserActivity);
+        document.addEventListener('scroll', throttledCheckUserActivity);
     });
     
     // Load conversations from API
@@ -212,6 +261,20 @@
             if (data.status === 'success') {
                 conversations = data.data;
                 renderConversations();
+                
+                // If there's a currently selected conversation, make sure its badge is hidden
+                if (currentConversationId) {
+                    const conversationElement = document.querySelector(`[data-conversation-id="${currentConversationId}"]`);
+                    if (conversationElement) {
+                        const badge = conversationElement.querySelector('.badge');
+                        if (badge) {
+                            badge.style.display = 'none';
+                        }
+                    }
+                }
+                
+                // Update global notifications after loading conversations
+                updateNotifications();
             } else {
                 console.error('Failed to load conversations:', data.message);
             }
@@ -263,9 +326,9 @@
                         <i class="bi bi-person-fill fs-4"></i>
                     </div>
                     <div>
-                        <h6 class="mb-1">${conversation.other_user.name}</h6>
+                        <h6 class="mb-1 ${conversation.unread_count > 0 ? 'fw-bold' : ''}">${conversation.other_user.name}</h6>
                         <p class="mb-1 text-muted small">${conversation.other_user.position || 'No position'}</p>
-                        <small class="text-muted">${lastMessage.substring(0, 30)}${lastMessage.length > 30 ? '...' : ''}</small>
+                        <small class="${conversation.unread_count > 0 ? 'fw-bold text-dark' : 'text-muted'}">${lastMessage.substring(0, 30)}${lastMessage.length > 30 ? '...' : ''}</small>
                     </div>
                 </div>
                 <div class="text-end">
@@ -297,6 +360,20 @@
         // Load conversation details and messages
         loadConversationDetails(conversationId);
         loadMessages(conversationId);
+        
+        // Mark conversation as read when selected
+        setTimeout(() => {
+            markConversationAsRead(conversationId);
+        }, 500);
+        
+        // Hide the unread badge
+        const conversationElement = document.querySelector(`[data-conversation-id="${conversationId}"]`);
+        if (conversationElement) {
+            const badge = conversationElement.querySelector('.badge');
+            if (badge) {
+                badge.style.display = 'none';
+            }
+        }
     }
     
     // Load conversation details for header
@@ -384,13 +461,26 @@
                         
                         newMessages.forEach(message => {
                             const messageTime = new Date(message.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-                            addMessageToUI(message.content, message.is_sent_by_me, messageTime, message.id);
+                            addMessageToUI(message.content, message.is_sent_by_me, messageTime, message.id, true); // Mark as new message
                         });
                         
-                        // Log for debugging (remove in production)
+                        // Show new messages indicator if new messages arrived and user is not at bottom
                         if (newMessages.length > 0) {
-                            console.log(`Added ${newMessages.length} new messages via auto-refresh`);
+                            const messagesArea = document.getElementById('messagesArea');
+                            const isAtBottom = messagesArea.scrollTop + messagesArea.clientHeight >= messagesArea.scrollHeight - 100;
+                            
+                            console.log('New messages arrived:', newMessages.length);
+                            console.log('Is at bottom:', isAtBottom);
+                            console.log('Scroll position:', messagesArea.scrollTop, messagesArea.scrollHeight);
+                            
+                            if (!isAtBottom) {
+                                console.log('Showing new messages indicator');
+                                showNewMessagesIndicator();
+                            } else {
+                                console.log('User is at bottom, not showing indicator');
+                            }
                         }
+                        
                     }
                 }
                 
@@ -482,7 +572,7 @@
     }
     
     // Add message to UI
-    function addMessageToUI(content, isSent, customTime = null, messageId = null) {
+    function addMessageToUI(content, isSent, customTime = null, messageId = null, isNewMessage = false) {
         const messagesContainer = document.getElementById('messagesContainer');
         const messageDiv = document.createElement('div');
         messageDiv.className = `d-flex justify-content-${isSent ? 'end' : 'start'} mb-3`;
@@ -490,9 +580,10 @@
         const bubbleClass = isSent ? 'bg-primary text-white' : 'bg-light';
         const timeClass = isSent ? 'text-white-50' : 'text-muted';
         const messageTime = customTime || new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        const newMessageClass = isNewMessage && !isSent ? 'new-message' : '';
         
         messageDiv.innerHTML = `
-            <div class="${bubbleClass} rounded p-3 message-bubble ${isSent ? 'sent' : 'received'}" style="max-width: 75%;" ${messageId ? `data-message-id="${messageId}"` : ''}>
+            <div class="${bubbleClass} rounded p-3 message-bubble ${isSent ? 'sent' : 'received'} ${newMessageClass}" style="max-width: 75%; position: relative;" ${messageId ? `data-message-id="${messageId}"` : ''}>
                 <p class="mb-0">${content}</p>
                 <small class="${timeClass}">${messageTime}</small>
             </div>
@@ -505,6 +596,180 @@
             const messagesArea = document.getElementById('messagesArea');
             messagesArea.scrollTop = messagesArea.scrollHeight;
         }
+        
+        // Note: New message styling will be removed when user interacts with conversation
+        // (clicking, scrolling, or any activity in the conversation window)
+    }
+    
+    // Mark conversation as read
+    function markConversationAsRead(conversationId) {
+        if (!conversationId) return;
+        
+        fetch(`/messages/conversations/${conversationId}/mark-read/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': CSRF_TOKEN,
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                // Update the conversation list to reflect read status
+                loadConversations();
+                
+                // Also update the current conversation's unread count in the UI
+                const conversationElement = document.querySelector(`[data-conversation-id="${conversationId}"]`);
+                if (conversationElement) {
+                    const badge = conversationElement.querySelector('.badge');
+                    if (badge) {
+                        badge.style.display = 'none';
+                    }
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Error marking conversation as read:', error);
+        });
+    }
+    
+    // Track previous notification state to detect changes
+    let previousNotificationState = {
+        hasUnread: false,
+        unreadCount: 0
+    };
+    
+    // Update notification badges globally
+    function updateNotifications() {
+        fetch('/messages/notifications/', {
+            method: 'GET',
+            headers: {
+                'X-CSRFToken': CSRF_TOKEN,
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                const unreadCount = data.data.unread_messages_count;
+                const hasUnread = data.data.has_unread_messages;
+                
+                // Check if notification state changed
+                const stateChanged = (
+                    previousNotificationState.hasUnread !== hasUnread ||
+                    previousNotificationState.unreadCount !== unreadCount
+                );
+                
+                // Update menu burger notification badge (same as base.html)
+                const menuBadge = document.getElementById('messageNotificationBadge');
+                if (menuBadge) {
+                    if (hasUnread) {
+                        menuBadge.textContent = '!';
+                        menuBadge.style.display = 'block';
+                    } else {
+                        menuBadge.style.display = 'none';
+                    }
+                }
+                
+                // Update messages menu badge (same as base.html)
+                const messagesMenuBadge = document.getElementById('messagesMenuBadge');
+                if (messagesMenuBadge) {
+                    if (hasUnread) {
+                        messagesMenuBadge.textContent = unreadCount;
+                        messagesMenuBadge.style.display = 'block';
+                    } else {
+                        messagesMenuBadge.style.display = 'none';
+                    }
+                }
+                
+                // Update page title if there are unread messages
+                updatePageTitle(hasUnread, unreadCount);
+                
+                // Store current state for next comparison
+                previousNotificationState = {
+                    hasUnread: hasUnread,
+                    unreadCount: unreadCount
+                };
+            }
+        })
+        .catch(error => {
+            console.error('Error updating notifications:', error);
+        });
+    }
+    
+    // Update page title to show unread count
+    function updatePageTitle(hasUnread, unreadCount) {
+        const originalTitle = 'Messages - Job.it';
+        
+        if (hasUnread) {
+            document.title = `(${unreadCount}) ${originalTitle}`;
+        } else {
+            document.title = originalTitle;
+        }
+    }
+    
+    // Check if user is actively viewing the conversation
+    function checkUserActivity() {
+        if (currentConversationId && document.visibilityState === 'visible') {
+            // Clear existing timeout
+            if (readTimeout) {
+                clearTimeout(readTimeout);
+            }
+            
+            // Set a new timeout to mark as read after 1 second of activity
+            readTimeout = setTimeout(() => {
+                markConversationAsRead(currentConversationId);
+            }, 1000);
+            
+            // Remove new message styling when user interacts with conversation
+            removeNewMessageStyling();
+        }
+    }
+    
+    // Remove new message styling from all messages
+    function removeNewMessageStyling() {
+        const newMessageBubbles = document.querySelectorAll('.message-bubble.new-message');
+        newMessageBubbles.forEach(bubble => {
+            bubble.classList.remove('new-message');
+        });
+    }
+    
+    // Throttled version of checkUserActivity to prevent too many calls
+    let activityThrottle = null;
+    function throttledCheckUserActivity() {
+        if (activityThrottle) return;
+        
+        activityThrottle = setTimeout(() => {
+            checkUserActivity();
+            activityThrottle = null;
+        }, 200); // Throttle to 200ms
+    }
+    
+    // Show new messages indicator
+    function showNewMessagesIndicator() {
+        const indicator = document.getElementById('newMessagesIndicator');
+        console.log('showNewMessagesIndicator called, indicator found:', !!indicator);
+        if (indicator) {
+            indicator.style.display = 'block';
+            console.log('New messages indicator should now be visible');
+        } else {
+            console.error('New messages indicator element not found!');
+        }
+    }
+    
+    // Hide new messages indicator
+    function hideNewMessagesIndicator() {
+        const indicator = document.getElementById('newMessagesIndicator');
+        if (indicator) {
+            indicator.style.display = 'none';
+        }
+    }
+    
+    // Scroll to bottom of messages
+    function scrollToBottom() {
+        const messagesArea = document.getElementById('messagesArea');
+        messagesArea.scrollTop = messagesArea.scrollHeight;
+        hideNewMessagesIndicator();
     }
     
     // Refresh conversations
