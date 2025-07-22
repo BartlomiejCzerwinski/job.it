@@ -101,6 +101,7 @@
 
 <script>
     var CSRF_TOKEN = '{{ csrf_token }}';
+    var updateInterval = 3000;
     
     // Function to update notification badges
     function updateNotificationBadges() {
@@ -169,11 +170,11 @@
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', function() {
             setInitialBadgeStates();
-            setInterval(updateNotificationBadges, 10000);
+            setInterval(updateNotificationBadges, updateInterval);
         });
     } else {
         setInitialBadgeStates();
-        setInterval(updateNotificationBadges, 10000);
+        setInterval(updateNotificationBadges, updateInterval);
     }
 </script>
 
