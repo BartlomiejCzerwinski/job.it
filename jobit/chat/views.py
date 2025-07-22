@@ -345,3 +345,51 @@ def get_messages(request, conversation_id):
             'status': 'error',
             'message': f'An error occurred: {str(e)}'
         }, status=500)
+
+@login_required
+@require_http_methods(["POST"])
+def mark_conversation_read(request, conversation_id):
+    """
+    Mark all messages in a conversation as read for the current user.
+    """
+    try:
+        # Get the conversation
+        conversation = get_object_or_404(Conversation, id=conversation_id)
+        
+        # Verify user is part of this conversation
+        current_user = request.user
+        if current_user not in [conversation.recruiter, conversation.candidate]:
+            return JsonResponse({
+                'status': 'error',
+                'message': 'You are not authorized to mark messages as read in this conversation'
+            }, status=403)
+        
+        # Mark all unread messages as read
+        unread_messages = conversation.messages.exclude(
+            sender=current_user  # Messages from the other person
+        ).filter(
+            read_at__isnull=True
+        )
+        
+        updated_count = unread_messages.update(read_at=timezone.now())
+        
+        return JsonResponse({
+            'status': 'success',
+            'message': f'Marked {updated_count} messages as read',
+            'data': {
+                'conversation_id': conversation.id,
+                'messages_marked': updated_count
+            }
+        }, status=200)
+        
+    except Conversation.DoesNotExist:
+        return JsonResponse({
+            'status': 'error',
+            'message': 'Conversation not found'
+        }, status=404)
+        
+    except Exception as e:
+        return JsonResponse({
+            'status': 'error',
+            'message': f'An error occurred: {str(e)}'
+        }, status=500)
