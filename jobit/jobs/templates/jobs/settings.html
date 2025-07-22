@@ -24,9 +24,7 @@
                 <div class="mb-3">
                     <label for="accountVisibility" class="form-label">Account Visibility</label>
                     <select class="form-select" id="accountVisibility" disabled>
-                        <option selected>Visible to recruiters only</option>
-                        <option>Public</option>
-                        <option>Private</option>
+                        <option selected>Visible to everyone</option>
                     </select>
                 </div>
 
@@ -41,7 +39,7 @@
                 </div>
 
                 <div class="form-check form-switch mb-3">
-                    <input class="form-check-input" type="checkbox" id="betaAccess" disabled>
+                    <input class="form-check-input" type="checkbox" id="betaAccess" disabled checked>
                     <label class="form-check-label" for="betaAccess">Join beta testing program</label>
                 </div>
 
@@ -73,9 +71,9 @@
                 <div class="mb-3">
                     <label for="2fa" class="form-label">Two-Factor Authentication</label>
                     <select class="form-select" id="2fa" disabled>
-                        <option selected>Enabled (Authenticator App)</option>
+                        <option>Enabled (Authenticator App)</option>
                         <option>Enabled (SMS)</option>
-                        <option>Disabled</option>
+                        <option selected>Disabled</option>
                     </select>
                 </div>
 
@@ -83,16 +81,10 @@
                     <label for="sessionTimeout" class="form-label">Auto-Logout After Inactivity</label>
                     <select class="form-select" id="sessionTimeout" disabled>
                         <option>15 minutes</option>
-                        <option selected>30 minutes</option>
+                        <option>30 minutes</option>
                         <option>1 hour</option>
-                        <option>Never</option>
+                        <option selected>Never</option>
                     </select>
-                </div>
-
-                <div class="mb-3">
-                    <label for="lastLogin" class="form-label">Last Login Location</label>
-                    <input type="text" class="form-control" id="lastLogin" value="Warsaw, PL (Chrome - 03.04.2025)"
-                           disabled>
                 </div>
 
                 <hr class="my-4"/>
