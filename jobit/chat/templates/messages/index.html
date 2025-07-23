@@ -166,6 +166,11 @@
                             <div class="mt-1" id="chatLocationTags">
                                 <!-- Location tags will be added here -->
                             </div>
+                            <div class="mt-2">
+                                <button class="btn btn-outline-primary btn-sm" id="viewJobButton" onclick="viewJobListing()" title="View Job Listing">
+                                    <i class="bi bi-briefcase me-1"></i>View Job
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -208,6 +213,7 @@
 
 <script>
     let currentConversationId = null;
+    let currentJobListingId = null;
     let conversations = [];
     let lastReadTime = null;
     let readTimeout = null;
@@ -389,6 +395,9 @@
     function loadConversationDetails(conversationId) {
         const conversation = conversations.find(c => c.id == conversationId);
         if (!conversation) return;
+        
+        // Store the job listing ID for the view button
+        currentJobListingId = conversation.job_listing.id;
         
         // Update header information
         document.getElementById('chatName').textContent = conversation.other_user.name;
@@ -779,6 +788,15 @@
         const messagesArea = document.getElementById('messagesArea');
         messagesArea.scrollTop = messagesArea.scrollHeight;
         hideNewMessagesIndicator();
+    }
+    
+    // View job listing in new tab
+    function viewJobListing() {
+        if (currentJobListingId) {
+            window.open(`/listings/${currentJobListingId}`, '_blank');
+        } else {
+            console.error('No job listing ID available');
+        }
     }
     
 
