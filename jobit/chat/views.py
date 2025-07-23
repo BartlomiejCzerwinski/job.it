@@ -192,6 +192,10 @@ def get_conversations(request):
         
         for conversation in recruiter_conversations:
             last_message = conversation.get_last_message()
+            # Get profile photo for the candidate
+            from jobs.views import get_profile_photo
+            profile_photo = get_profile_photo(conversation.candidate.id)
+            
             conversations_data.append({
                 'id': conversation.id,
                 'job_listing': {
@@ -205,6 +209,7 @@ def get_conversations(request):
                     'id': conversation.candidate.id,
                     'name': f"{conversation.candidate.first_name} {conversation.candidate.last_name}",
                     'position': getattr(conversation.candidate.appuser, 'position', ''),
+                    'profile_photo': profile_photo
                 },
                 'last_message': {
                     'content': last_message.content if last_message else '',
@@ -218,6 +223,10 @@ def get_conversations(request):
         
         for conversation in candidate_conversations:
             last_message = conversation.get_last_message()
+            # Get profile photo for the recruiter
+            from jobs.views import get_profile_photo
+            profile_photo = get_profile_photo(conversation.recruiter.id)
+            
             conversations_data.append({
                 'id': conversation.id,
                 'job_listing': {
@@ -231,6 +240,7 @@ def get_conversations(request):
                     'id': conversation.recruiter.id,
                     'name': f"{conversation.recruiter.first_name} {conversation.recruiter.last_name}",
                     'position': getattr(conversation.recruiter.appuser, 'position', ''),
+                    'profile_photo': profile_photo
                 },
                 'last_message': {
                     'content': last_message.content if last_message else '',
