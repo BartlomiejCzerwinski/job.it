@@ -103,23 +103,7 @@
         border-color: #dee2e6;
     }
     
-    .avatar-placeholder {
-        width: 48px;
-        height: 48px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-size: 1.2rem;
-    }
-    
-    .avatar-placeholder.primary { background-color: #0d6efd; }
-    .avatar-placeholder.success { background-color: #198754; }
-    .avatar-placeholder.warning { background-color: #ffc107; color: #212529; }
-    .avatar-placeholder.danger { background-color: #dc3545; }
-    .avatar-placeholder.info { background-color: #0dcaf0; }
-    .avatar-placeholder.secondary { background-color: #6c757d; }
+
 </style>
 
 <div class="container-fluid">
@@ -334,12 +318,18 @@
         const lastMessageTime = conversation.last_message.created_at ? 
             new Date(conversation.last_message.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '';
         
+        // Create avatar HTML - use profile photo if available, otherwise use placeholder
+        let avatarHtml;
+        if (conversation.other_user.profile_photo) {
+            avatarHtml = `<img src="data:image/jpeg;base64,${conversation.other_user.profile_photo}" class="rounded-circle me-3" style="width: 48px; height: 48px; object-fit: cover;" alt="Profile Photo">`;
+        } else {
+            avatarHtml = `<img src="/static/images/avatar.png" class="rounded-circle me-3" style="width: 48px; height: 48px; object-fit: cover;" alt="Profile Photo">`;
+        }
+        
         div.innerHTML = `
             <div class="d-flex w-100 justify-content-between align-items-center">
                 <div class="d-flex align-items-center">
-                    <div class="avatar-placeholder ${avatarColor} me-3">
-                        <i class="bi bi-person-fill fs-4"></i>
-                    </div>
+                    ${avatarHtml}
                     <div>
                         <h6 class="mb-1 ${conversation.unread_count > 0 ? 'fw-bold' : ''}">${conversation.other_user.name}</h6>
                         <p class="mb-1 text-muted small">${conversation.other_user.position || 'No position'}</p>
@@ -422,12 +412,16 @@
             }
         }
         
-        // Update avatar
-        const avatarColors = ['primary', 'success', 'warning', 'danger', 'info', 'secondary'];
-        const avatarColor = avatarColors[conversation.id % avatarColors.length];
+        // Update avatar - use profile photo if available, otherwise use placeholder
         const avatar = document.getElementById('chatAvatar');
-        avatar.className = `avatar-placeholder ${avatarColor} me-3`;
-        avatar.innerHTML = '<i class="bi bi-person-fill fs-4"></i>';
+        
+        if (conversation.other_user.profile_photo) {
+            avatar.className = 'me-3';
+            avatar.innerHTML = `<img src="data:image/jpeg;base64,${conversation.other_user.profile_photo}" class="rounded-circle" style="width: 48px; height: 48px; object-fit: cover;" alt="Profile Photo">`;
+        } else {
+            avatar.className = 'me-3';
+            avatar.innerHTML = `<img src="/static/images/avatar.png" class="rounded-circle" style="width: 48px; height: 48px; object-fit: cover;" alt="Profile Photo">`;
+        }
         
         // Show/hide remote/hybrid badges (placeholder - would need user data)
         document.getElementById('chatRemote').style.display = 'none';
