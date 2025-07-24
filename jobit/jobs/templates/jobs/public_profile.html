@@ -1,12 +1,7 @@
 {% extends "base.html" %} {% load static %}
 <link rel="stylesheet" href="{% static '/css/styles.css' %}"/>
 {% block title %}Profile - Job.it{% endblock %}
-{% block navbar_extra %}
-    <div class="position-absolute top-50 start-50 translate-middle">
-        <button type="button" class="btn btn-secondary me-2" onclick="window.location.href='/'">Candidates</button>
-        <button type="button" class="btn btn-secondary" onclick="window.location.href='/listings'">My Listings</button>
-    </div>
-{% endblock %}
+
 {% block content %}
     <div class="container mt-5">
         <div class="row gutters-sm">

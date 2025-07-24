@@ -2,17 +2,7 @@
 
 {% block title %}Messages - Job.it{% endblock %}
 
-{% block navbar_extra %}
-    <div class="position-absolute top-50 start-50 translate-middle">
-        {% if user.appuser.role == 'recruiter' %}
-            <button type="button" class="btn btn-secondary me-2" onclick="window.location.href='/'">Candidates</button>
-            <button type="button" class="btn btn-secondary" onclick="window.location.href='/listings'">My Listings</button>
-        {% else %}
-            <button type="button" class="btn btn-secondary me-2" onclick="window.location.href='/'">Search Jobs</button>
-            <button type="button" class="btn btn-secondary" onclick="window.location.href='/worker_profile'">My Profile</button>
-        {% endif %}
-    </div>
-{% endblock %}
+
 
 {% block content %}
 <style>
