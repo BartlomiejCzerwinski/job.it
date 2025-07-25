@@ -25,11 +25,10 @@ The following diagram illustrates how the internal components of the system inte
 ---
 
 ## 🗃️ Database Schema
-*TODO: Add application for job listing*
 
 This relational model outlines how the core entities relate to one another:
 
-![database](https://github.com/user-attachments/assets/d172af03-ad89-434a-9807-473caad89b6f)
+<img width="698" height="690" alt="database" src="https://github.com/user-attachments/assets/0b58fbdc-fc58-4424-bcfc-d9eac83ae136" />
 
 *The database schema supports users, job applications, communication logs, job offers, and matching metadata.*
 
