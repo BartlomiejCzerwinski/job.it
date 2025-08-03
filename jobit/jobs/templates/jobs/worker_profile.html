@@ -771,11 +771,13 @@
         function toggleEdit(field) {
             const content = document.getElementById(field + 'Content');
             const edit = document.getElementById(field + 'Edit');
-            const editButtons = edit.querySelector('.edit-buttons');
+            const editIcon = content.closest('.d-flex').querySelector('.edit-icon');
+            const editButtons = editIcon.nextElementSibling;
             
             if (content.style.display !== 'none') {
                 content.style.display = 'none';
                 edit.style.display = 'block';
+                editIcon.classList.add('d-none');
                 if (editButtons) {
                     editButtons.classList.remove('d-none');
                 }
@@ -808,6 +810,7 @@
             } else {
                 content.style.display = 'block';
                 edit.style.display = 'none';
+                editIcon.classList.remove('d-none');
                 if (editButtons) {
                     editButtons.classList.add('d-none');
                 }
@@ -882,8 +885,10 @@
         async function saveEdit(field) {
             const content = document.getElementById(field + 'Content');
             const edit = document.getElementById(field + 'Edit');
-            const editButtons = edit.querySelector('.edit-buttons');
+            const editIcon = content.closest('.d-flex').querySelector('.edit-icon');
+            const editButtons = editIcon.nextElementSibling;
             let value;
+            let endpoint;
             let payload;
 
             if (field === 'location') {
@@ -903,18 +908,46 @@
                     is_remote: remoteCheck.checked,
                     is_hybrid: hybridCheck.checked
                 };
+                endpoint = '/users/update-location';
                 payload = value;
             } else {
-                const input = document.getElementById(field + 'Input');
-                value = input.value;
-                payload = {
-                    field: field,
-                    value: value
-                };
+                // Handle startsIn field specially since it uses a select element
+                if (field === 'startsIn') {
+                    const select = document.getElementById('startsInSelect');
+                    value = select.value;
+                    endpoint = '/update_starts_in';
+                    payload = { starts_in: value };
+                } else {
+                    const input = document.getElementById(field + 'Input');
+                    value = input.value;
+                    
+                    // Determine endpoint and payload based on field type
+                    switch(field) {
+                        case 'firstName':
+                            endpoint = '/update_first_name';
+                            payload = { first_name: value };
+                            break;
+                        case 'lastName':
+                            endpoint = '/update_last_name';
+                            payload = { last_name: value };
+                            break;
+                        case 'email':
+                            endpoint = '/update_email';
+                            payload = { email: value };
+                            break;
+                        case 'mobile':
+                            endpoint = '/update_mobile';
+                            payload = { mobile: value };
+                            break;
+                        default:
+                            showToast('Unknown field type', false);
+                            return;
+                    }
+                }
             }
 
             try {
-                const response = await fetch('/update-location', {
+                const response = await fetch(endpoint, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -934,6 +967,10 @@
                     }
                     edit.style.display = 'none';
                     content.style.display = 'block';
+                    editIcon.classList.remove('d-none');
+                    if (editButtons) {
+                        editButtons.classList.add('d-none');
+                    }
                     showToast('Profile updated successfully');
                 } else {
                     showToast(data.error || 'Failed to update profile', false);
