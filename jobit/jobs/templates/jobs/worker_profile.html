@@ -1182,7 +1182,39 @@
         let projectToDelete = null;
 
         function addTechnology(button) {
-            // Implementation of addTechnology function
+            const inputGroup = button.closest('.input-group');
+            const input = inputGroup.querySelector('input');
+            const technology = input.value.trim();
+            
+            if (technology) {
+                // Add to technologies set
+                technologies.add(technology);
+                
+                // Create technology tag
+                const tag = document.createElement('span');
+                tag.className = 'badge bg-primary me-2 mb-2';
+                tag.innerHTML = `
+                    ${technology}
+                    <button type="button" class="btn-close btn-close-white ms-2" 
+                            onclick="removeTechnology(this, '${technology}')" 
+                            style="font-size: 0.5rem;"></button>
+                `;
+                
+                // Add to technologies list
+                const technologiesList = document.getElementById('technologiesList');
+                technologiesList.appendChild(tag);
+                
+                // Clear input
+                input.value = '';
+            }
+        }
+
+        function removeTechnology(button, technology) {
+            // Remove from technologies set
+            technologies.delete(technology);
+            
+            // Remove tag from DOM
+            button.closest('.badge').remove();
         }
 
         function updateFullName() {
