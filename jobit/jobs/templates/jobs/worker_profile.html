@@ -940,6 +940,10 @@
                             endpoint = '/update_mobile';
                             payload = { mobile: value };
                             break;
+                        case 'position':
+                            endpoint = '/update-position';
+                            payload = { position: value };
+                            break;
                         default:
                             showToast('Unknown field type', false);
                             return;
