@@ -964,6 +964,11 @@
                         updateLocationBadges();
                     } else {
                         content.textContent = value;
+                        
+                        // Update full name if firstName or lastName was changed
+                        if (field === 'firstName' || field === 'lastName') {
+                            updateFullName();
+                        }
                     }
                     edit.style.display = 'none';
                     content.style.display = 'block';
@@ -1178,6 +1183,25 @@
 
         function addTechnology(button) {
             // Implementation of addTechnology function
+        }
+
+        function updateFullName() {
+            // Get the current values of firstName and lastName
+            const firstNameContent = document.getElementById('firstNameContent');
+            const lastNameContent = document.getElementById('lastNameContent');
+            
+            if (firstNameContent && lastNameContent) {
+                const firstName = firstNameContent.textContent.trim();
+                const lastName = lastNameContent.textContent.trim();
+                
+                // Find the full name element (h4 tag under the profile photo)
+                const fullNameElement = document.querySelector('.d-flex.flex-column.align-items-center.text-center h4');
+                
+                if (fullNameElement) {
+                    // Update the full name
+                    fullNameElement.textContent = `${firstName} ${lastName}`;
+                }
+            }
         }
 
     </script>
