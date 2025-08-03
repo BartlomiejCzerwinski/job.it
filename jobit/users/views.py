@@ -291,24 +291,50 @@ def update_location(request):
         return JsonResponse({'error': str(e)}, status=500)
 
 
-@api_view(['POST'])
+@login_required
+@require_http_methods(["POST"])
 def add_project(request):
-    if not request.user.is_authenticated:
-        return Response({'error': 'Authentication required'}, status=status.HTTP_401_UNAUTHORIZED)
-    
-    app_user = get_user(request.user)
-    if not app_user:
-        return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
-    
-    serializer = ProjectSerializer(data=request.data)
-    if serializer.is_valid():
-        serializer.save(user=app_user)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    try:
+        data = json.loads(request.body)
+        user = get_user(request.user)
+        if not user:
+            return JsonResponse({'error': 'User not found'}, status=404)
+        
+        # Create project
+        project = Project.objects.create(
+            user=user,
+            title=data.get('title'),
+            description=data.get('description'),
+            github_link=data.get('githubLink'),
+            demo_link=data.get('demoLink')
+        )
+        
+        # Set technologies
+        if data.get('technologies'):
+            project.set_technologies(data['technologies'])
+        
+        project.save()
+        
+        return JsonResponse({
+            'success': True,
+            'project': {
+                'id': project.id,
+                'title': project.title,
+                'description': project.description,
+                'technologies': project.get_technologies(),
+                'githubLink': project.github_link,
+                'demoLink': project.demo_link
+            }
+        }, status=201)
+        
+    except json.JSONDecodeError:
+        return JsonResponse({'error': 'Invalid JSON data'}, status=400)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
 
 
 @login_required
-@require_http_methods(["POST"])
+@require_http_methods(["DELETE"])
 def delete_project(request, project_id):
     try:
         user = get_user(request.user)
@@ -318,7 +344,7 @@ def delete_project(request, project_id):
         try:
             project = user.projects.get(id=project_id)
             project.delete()
-            return JsonResponse({'message': 'Project deleted successfully'}, status=200)
+            return JsonResponse({'success': True, 'message': 'Project deleted successfully'}, status=200)
         except user.projects.model.DoesNotExist:
             return JsonResponse({'error': 'Project not found'}, status=404)
             
@@ -327,7 +353,7 @@ def delete_project(request, project_id):
 
 
 @login_required
-@require_http_methods(["POST"])
+@require_http_methods(["PUT"])
 def update_project(request, project_id):
     try:
         data = json.loads(request.body)
@@ -349,7 +375,7 @@ def update_project(request, project_id):
         project.save()
         
         return JsonResponse({
-            'message': 'Project updated successfully',
+            'success': True,
             'project': {
                 'id': project.id,
                 'title': project.title,

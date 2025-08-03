@@ -682,6 +682,7 @@
     <script src="{% static 'js/worker-profile-common.js' %}"></script>
     <script src="{% static 'js/worker-profile-edit-about-me.js' %}"></script>
     <script src="{% static 'js/worker-profile-social-links.js' %}"></script>
+    <script src="{% static 'js/worker-profile-projects.js' %}"></script>
     <script>
         const locations = {{ locations_json|safe }};
         const initialCountry = "{{ user_data.country|escapejs }}";
@@ -1166,7 +1167,8 @@
             photoModal.hide();
         }
 
-        let projects = [
+        // Initialize projects from Django template
+        const projectsData = [
             {% for project in projects %}
             {
                 id: {{ project.id }},
@@ -1178,44 +1180,12 @@
             }{% if not forloop.last %},{% endif %}
             {% endfor %}
         ];
-        let technologies = new Set();
-        let projectToDelete = null;
-
-        function addTechnology(button) {
-            const inputGroup = button.closest('.input-group');
-            const input = inputGroup.querySelector('input');
-            const technology = input.value.trim();
-            
-            if (technology) {
-                // Add to technologies set
-                technologies.add(technology);
-                
-                // Create technology tag
-                const tag = document.createElement('span');
-                tag.className = 'badge bg-primary me-2 mb-2';
-                tag.innerHTML = `
-                    ${technology}
-                    <button type="button" class="btn-close btn-close-white ms-2" 
-                            onclick="removeTechnology(this, '${technology}')" 
-                            style="font-size: 0.5rem;"></button>
-                `;
-                
-                // Add to technologies list
-                const technologiesList = document.getElementById('technologiesList');
-                technologiesList.appendChild(tag);
-                
-                // Clear input
-                input.value = '';
-            }
-        }
-
-        function removeTechnology(button, technology) {
-            // Remove from technologies set
-            technologies.delete(technology);
-            
-            // Remove tag from DOM
-            button.closest('.badge').remove();
-        }
+        
+        // Initialize projects when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeProjects(projectsData);
+            displayProjects();
+        });
 
         function updateFullName() {
             // Get the current values of firstName and lastName
