@@ -317,6 +317,8 @@ def get_listings_tiles(job_listings, number_of_skills_per_tile):
     result = []
     for job_listing in job_listings:
         skills = get_listing_skills(job_listing)[:number_of_skills_per_tile]
+        # Count applications for this job listing
+        applications_count = Application.objects.filter(job_listing=job_listing).count()
         result.append({
             "id": job_listing.id,
             "job_title": job_listing.job_title,
@@ -328,7 +330,8 @@ def get_listings_tiles(job_listings, number_of_skills_per_tile):
             "skills": skills,
             "is_remote": job_listing.job_model == 'REMOTE',
             "is_hybrid": job_listing.job_model == 'HYBRID',
-            "status": job_listing.status
+            "status": job_listing.status,
+            "applications_count": applications_count
         })
     return result
 
