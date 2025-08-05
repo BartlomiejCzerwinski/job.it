@@ -39,8 +39,8 @@
         <div class="row mb-5">
             {% for listing in listings_tiles %}
                 <div class="col-lg-4 col-md-6 mb-3">
-                    <div class="card h-100 shadow-sm border-0 hover-shadow">
-                        <div class="card-body p-3">
+                                         <div class="card h-100 shadow-sm border-0 hover-shadow">
+                         <div class="card-body p-3 d-flex flex-column">
                             <div class="d-flex justify-content-between align-items-start mb-2">
                                 <h6 class="card-title mb-0 text-primary fw-semibold">{{ listing.job_title }}</h6>
                                 <div class="d-flex align-items-center gap-2">
@@ -58,7 +58,7 @@
                             </p>
                             {% if listing.salary_min and listing.salary_max %}
                                 <p class="text-success small fw-semibold mb-2">
-                                    <i class="bi bi-currency-dollar me-1"></i>{{ listing.salary_min }} - {{ listing.salary_max }} {{ listing.salary_currency }}
+                                    {{ listing.salary_min }} - {{ listing.salary_max }} {{ listing.salary_currency }}
                                 </p>
                             {% endif %}
                             <div class="mb-2">
@@ -66,19 +66,19 @@
                                     <span class="badge bg-light text-dark me-1 mb-1">{{ skill.name }}</span>
                                 {% endfor %}
                             </div>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div class="small text-muted">
-                                    {% if listing.is_remote %}
-                                        <span class="badge bg-info me-1">Remote</span>
-                                    {% endif %}
-                                    {% if listing.is_hybrid %}
-                                        <span class="badge bg-warning me-1">Hybrid</span>
-                                    {% endif %}
-                                </div>
-                                <a href="/listings/{{ listing.id }}" class="btn btn-outline-primary btn-sm">
-                                    View Details
-                                </a>
-                            </div>
+                                                         <div class="d-flex justify-content-between align-items-center mt-auto">
+                                 <div class="small text-muted">
+                                     {% if listing.is_remote %}
+                                         <span class="badge bg-info me-1">Remote</span>
+                                     {% endif %}
+                                     {% if listing.is_hybrid %}
+                                         <span class="badge bg-warning me-1">Hybrid</span>
+                                     {% endif %}
+                                 </div>
+                                 <a href="/listings/{{ listing.id }}" class="btn btn-outline-primary btn-sm">
+                                     View Details
+                                 </a>
+                             </div>
                         </div>
                     </div>
                 </div>
@@ -203,17 +203,35 @@
 {% endblock %}
 
 <style>
-    .hover-shadow:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
-        transition: all 0.3s ease;
-    }
-    
-    .candidate-row:hover {
-        background-color: rgba(13, 110, 253, 0.05) !important;
-    }
-    
-    .card {
-        transition: all 0.3s ease;
-    }
+.card.hover-shadow {
+    transition: all 0.3s ease !important;
+    cursor: pointer !important;
+}
+
+.card.hover-shadow:hover {
+    transform: translateY(-5px) !important;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2) !important;
+    border-color: #007bff !important;
+}
+
+.card.hover-shadow:hover .card-title {
+    color: #0056b3 !important;
+}
+
+.candidate-row:hover {
+    background-color: rgba(13, 110, 253, 0.08) !important;
+    transform: scale(1.01);
+    transition: all 0.2s ease;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    transition: all 0.2s ease;
+}
+
+.badge:hover {
+    transform: scale(1.05);
+    transition: transform 0.2s ease;
+}
 </style>
