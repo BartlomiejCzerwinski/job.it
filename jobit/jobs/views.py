@@ -42,7 +42,17 @@ def index(request):
             "remote_offers": remote_tiles
         })
     elif role == ROLE_RECRUITER:
-        return render(request, 'jobs/index_recruiter.html')
+        # Get only active job listings for tiles
+        active_listings = JobListing.objects.filter(status='ACTIVE')
+        listings_tiles = get_listings_tiles(active_listings, 3)
+        
+        # Get all workers/candidates
+        all_candidates = get_all_candidates()
+        
+        return render(request, 'jobs/index_recruiter.html', {
+            "listings_tiles": listings_tiles,
+            "candidates": all_candidates
+        })
 
 
 @login_required
@@ -266,6 +276,35 @@ def add_skills_to_job_listing(job_listing, skills):
     for skill in skills:
         print(skill)
         JobListingSkill.objects.create(job_listing=job_listing, skill=get_skill_by_id(skill['id']), level=skill['level'])
+
+
+def get_all_candidates():
+    """Get all workers/candidates with their skills and profile information"""
+    candidates = AppUser.objects.filter(role='worker').select_related('user', 'location')
+    data = []
+    
+    for candidate in candidates:
+        user = candidate.user
+        skills = candidate.userskill_set.select_related('skill').all()
+        skills_data = sorted(
+            [{'name': s.skill.name, 'level': s.level} for s in skills],
+            key=lambda x: x['level'], reverse=True
+        )
+        
+        data.append({
+            'id': candidate.id,
+            'name': f"{user.first_name} {user.last_name}",
+            'position': candidate.position or "Not specified",
+            'location': str(candidate.location) if candidate.location else "Not specified",
+            'skills': skills_data,
+            'profile_photo': get_profile_photo(candidate.id),
+            'about_me': candidate.about_me or "No description available",
+            'is_remote': candidate.is_remote,
+            'is_hybrid': candidate.is_hybrid,
+            'starts_in': candidate.starts_in or "Not specified"
+        })
+    
+    return data
 
 
 def get_recruiter_listings(email):
