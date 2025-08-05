@@ -43,18 +43,32 @@
         </script>
     {% endif %}
 
-    {% if job_listings %}
+    {% if job_listings or active_count > 0 or closed_count > 0 or archived_count > 0 %}
         <div class="d-flex justify-content-end gap-2 mb-3">
-            <button type="button" class="btn btn-success">Active</button>
-            <button type="button" class="btn btn-outline-danger disabled">Closed</button>
-            <button type="button" class="btn btn-outline-secondary disabled">Archived</button>
+            <a href="?status=ACTIVE" class="btn {% if current_filter == 'ACTIVE' %}btn-success{% else %}btn-outline-success{% endif %}">
+                Active {% if active_count > 0 %}({{ active_count }}){% endif %}
+            </a>
+            <a href="?status=CLOSED" class="btn {% if current_filter == 'CLOSED' %}btn-danger{% else %}btn-outline-danger{% endif %}">
+                Closed {% if closed_count > 0 %}({{ closed_count }}){% endif %}
+            </a>
+            <a href="?status=ARCHIVED" class="btn {% if current_filter == 'ARCHIVED' %}btn-secondary{% else %}btn-outline-secondary{% endif %}">
+                Archived {% if archived_count > 0 %}({{ archived_count }}){% endif %}
+            </a>
         </div>
 
 
         <div class="list-group-item p-4 border border-primary rounded mb-3 shadow-sm">
             <div class="d-flex w-100 justify-content-between align-items-center">
                 <div>
-                    <h5 class="mb-1 fw-bold text-primary">You have {{ num_of_listings }} active job listings</h5>
+                    <h5 class="mb-1 fw-bold text-primary">
+                        {% if current_filter == 'ACTIVE' %}
+                            You have {{ num_of_listings }} active job listing{{ num_of_listings|pluralize }}
+                        {% elif current_filter == 'CLOSED' %}
+                            You have {{ num_of_listings }} closed job listing{{ num_of_listings|pluralize }}
+                        {% elif current_filter == 'ARCHIVED' %}
+                            You have {{ num_of_listings }} archived job listing{{ num_of_listings|pluralize }}
+                        {% endif %}
+                    </h5>
                 </div>
                 <button type="button" class="btn btn-success" onclick="window.location.href='/listings/add_listing'">
                     Add new offer <i class="bi bi-plus-circle"></i>
@@ -88,20 +102,35 @@
         {% endfor %}
 
     {% else %}
-
-        <div class="container mt-5 border p-4 shadow rounded text-center">
-            <i class="bi bi-exclamation-diamond text-muted" style="font-size: 10rem;"></i>
-            <h2 class="text-muted fw-semibold"
-                style="font-size: 2rem; letter-spacing: 0.5px; text-transform: capitalize;">
-                No listing here :(
-            </h2>
-            <h2 class="text-muted fw-semibold mt-4"
-                style="font-size: 1.5rem; letter-spacing: 0.5px; text-transform: capitalize;">
-                Try to add new offer!
-            </h2>
-            <button type="button" class="btn btn-success mt-4 mb-4" style="font-size: 1.0rem"
-                    onclick="window.location.href='/listings/add_listing'">Add new offer <i
-                    class="bi bi-plus-circle"></i></button>
-        </div>
+        {% if active_count > 0 or closed_count > 0 or archived_count > 0 %}
+            <!-- Show message for current filter when no listings in that filter -->
+            <div class="container mt-5 border p-4 shadow rounded text-center">
+                <i class="bi bi-exclamation-diamond text-muted" style="font-size: 10rem;"></i>
+                <h2 class="text-muted fw-semibold"
+                    style="font-size: 2rem; letter-spacing: 0.5px; text-transform: capitalize;">
+                    No {{ current_filter|lower }} listings here :(
+                </h2>
+                <h2 class="text-muted fw-semibold mt-4"
+                    style="font-size: 1.5rem; letter-spacing: 0.5px; text-transform: capitalize;">
+                    Try switching to another filter!
+                </h2>
+            </div>
+        {% else %}
+            <!-- Show message when no listings at all -->
+            <div class="container mt-5 border p-4 shadow rounded text-center">
+                <i class="bi bi-exclamation-diamond text-muted" style="font-size: 10rem;"></i>
+                <h2 class="text-muted fw-semibold"
+                    style="font-size: 2rem; letter-spacing: 0.5px; text-transform: capitalize;">
+                    No listing here :(
+                </h2>
+                <h2 class="text-muted fw-semibold mt-4"
+                    style="font-size: 1.5rem; letter-spacing: 0.5px; text-transform: capitalize;">
+                    Try to add new offer!
+                </h2>
+                <button type="button" class="btn btn-success mt-4 mb-4" style="font-size: 1.0rem"
+                        onclick="window.location.href='/listings/add_listing'">Add new offer <i
+                        class="bi bi-plus-circle"></i></button>
+            </div>
+        {% endif %}
     {% endif %}
 {% endblock %}

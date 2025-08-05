@@ -167,13 +167,38 @@ def worker_profile(request):
 
 @login_required
 def listings_view(request):
-    job_listings = get_recruiter_listings(request.user)
+    # Get filter parameter from URL, default to 'ACTIVE'
+    status_filter = request.GET.get('status', 'ACTIVE')
+    
+    # Get all listings for the recruiter
+    all_listings = get_recruiter_listings(request.user)
+    
+    # Filter by status
+    if status_filter == 'ACTIVE':
+        job_listings = all_listings.filter(status='ACTIVE')
+    elif status_filter == 'CLOSED':
+        job_listings = all_listings.filter(status='CLOSED')
+    elif status_filter == 'ARCHIVED':
+        job_listings = all_listings.filter(status='ARCHIVED')
+    else:
+        job_listings = all_listings.filter(status='ACTIVE')
+    
+    # Get counts for each status
+    active_count = all_listings.filter(status='ACTIVE').count()
+    closed_count = all_listings.filter(status='CLOSED').count()
+    archived_count = all_listings.filter(status='ARCHIVED').count()
+    
     num_of_listings = len(job_listings)
     is_successful_add_listing = request.GET.get('success')
+    
     return render(request, 'jobs/listings.html',
                   {"job_listings": job_listings,
                    "is_success": is_successful_add_listing,
-                   "num_of_listings": num_of_listings})
+                   "num_of_listings": num_of_listings,
+                   "current_filter": status_filter,
+                   "active_count": active_count,
+                   "closed_count": closed_count,
+                   "archived_count": archived_count})
 
 
 def listing_details_view(request, id):
