@@ -81,7 +81,7 @@
             <div class="list-group-item list-group-item-action p-4 border rounded mb-3">
                 <div class="d-flex w-100 justify-content-between">
                     <h5 class="mb-1 fw-semibold text-primary">{{ job.job_title }}</h5>
-                    <small class="text-muted">{{ job.job_location }}</small>
+                    <small class="text-muted">{{ job.location|default:"Location not specified" }}</small>
                 </div>
                 <p class="mb-1 text-muted">{{ job.company_name }}</p>
                 <p class="text-secondary">{{ job.job_description|truncatewords:20 }}</p>

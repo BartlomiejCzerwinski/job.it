@@ -151,7 +151,7 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-8">
-                            <p class="text-muted mb-2"><strong><i class="bi bi-geo-alt"></i> Location:</strong> {{ job.job_location }}</p>
+                            <p class="text-muted mb-2"><strong><i class="bi bi-geo-alt"></i> Location:</strong> {{ job.location|default:"Location not specified" }}</p>
                             {% if job.salary_min and job.salary_max %}
                                 <p class="text-muted mb-2"><strong><i class="bi bi-cash"></i> Salary:</strong>
                                     <span class="fw-bold text-success">{{ job.salary_min }} - {{ job.salary_max }} {{ job.salary_currency }}</span>
@@ -370,7 +370,7 @@
                     <h5 class="fw-light">{{ job.company_name }}</h5>
                 </div>
                 <div class="card-body">
-                    <p class="text-muted"><strong><i class="bi bi-geo-alt"></i> Location:</strong> {{ job.job_location }}</p>
+                    <p class="text-muted"><strong><i class="bi bi-geo-alt"></i> Location:</strong> {{ job.location|default:"Location not specified" }}</p>
 
                     {% if job.salary_min and job.salary_max %}
                         <p class="text-muted"><strong><i class="bi bi-cash"></i> Salary:</strong>
