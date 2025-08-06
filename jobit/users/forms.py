@@ -1,4 +1,5 @@
 from django import forms
+from django.contrib.auth.forms import SetPasswordForm
 from .models import AppUser
 from .locations import LOCATIONS
 import re
@@ -163,3 +164,30 @@ class RegisterForm(forms.Form):
                 self.add_error('city', 'Please select a valid city for the chosen country')
         
         return cleaned_data
+
+
+class PasswordResetForm(SetPasswordForm):
+    new_password1 = forms.CharField(
+        label='New Password',
+        widget=forms.PasswordInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Enter your new password'
+        }),
+        strip=False,
+    )
+    new_password2 = forms.CharField(
+        label='Confirm New Password',
+        widget=forms.PasswordInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Confirm your new password'
+        }),
+        strip=False,
+    )
+
+    def clean_new_password2(self):
+        password1 = self.cleaned_data.get('new_password1')
+        password2 = self.cleaned_data.get('new_password2')
+        if password1 and password2:
+            if password1 != password2:
+                raise forms.ValidationError("The two password fields didn't match.")
+        return password2
