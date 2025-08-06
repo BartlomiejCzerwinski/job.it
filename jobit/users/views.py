@@ -1,6 +1,6 @@
 import json
 
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.views.decorators.http import require_http_methods, require_GET
 from users.models import AppUser, UserSkill, Skill, SocialLink, Project, Location
 from .forms import LoginForm, RegisterForm
@@ -20,6 +20,12 @@ from django.core.files.base import ContentFile
 from azure.storage.blob import BlobServiceClient
 import base64
 from .azure_storage import load_azure_storage_connection_string
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.http import urlsafe_base64_decode
+from django.utils.encoding import force_str
+from django.contrib.auth import get_user_model
+from .forms import PasswordResetForm
+from users.email_utils import send_password_reset_email, send_password_reset_success_email, generate_password_reset_url
 
 # Azure Storage configuration
 PROFILE_PHOTOS_CONTAINER = 'profile-photos'
@@ -514,3 +520,80 @@ def get_user_profile_context(app_user, read_only=False):
         "social_links": social_links
     }
     return context
+
+
+def password_reset_request(request):
+    """
+    Handle password reset request form
+    """
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        if email:
+            try:
+                user = User.objects.get(email=email)
+                if user.is_active:
+                    # Generate reset URL
+                    reset_url = generate_password_reset_url(user, request)
+                    
+                    # Send email
+                    if send_password_reset_email(user, reset_url):
+                        messages.success(request, 'Password reset email has been sent to your email address.')
+                    else:
+                        messages.error(request, 'Failed to send password reset email. Please try again.')
+                else:
+                    messages.error(request, 'This account is inactive.')
+            except User.DoesNotExist:
+                # Don't reveal if email exists or not for security
+                messages.success(request, 'If an account with this email exists, a password reset email has been sent.')
+        
+        return redirect('password_reset_done')
+    
+    return render(request, 'users/password_reset_request.html')
+
+
+def password_reset_done(request):
+    """
+    Show password reset email sent confirmation
+    """
+    return render(request, 'users/password_reset_done.html')
+
+
+def password_reset_confirm(request, uidb64, token):
+    """
+    Handle password reset confirmation and form
+    """
+    try:
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = None
+    
+    if user is not None and default_token_generator.check_token(user, token):
+        if request.method == 'POST':
+            form = PasswordResetForm(user, request.POST)
+            if form.is_valid():
+                form.save()
+                # Send success email
+                send_password_reset_success_email(user)
+                messages.success(request, 'Your password has been successfully reset. You can now log in with your new password.')
+                return redirect('login')
+        else:
+            form = PasswordResetForm(user)
+        
+        return render(request, 'users/password_reset_confirm.html', {
+            'form': form,
+            'validlink': True
+        })
+    else:
+        return render(request, 'users/password_reset_confirm.html', {
+            'validlink': False
+        })
+
+
+def password_reset_complete(request):
+    """
+    Show password reset completion page
+    """
+    return render(request, 'users/password_reset_complete.html')
+
+
