@@ -244,6 +244,9 @@ def add_listing_view(request):
         country = request.POST.get("country")
         city = request.POST.get("city")
         skills_string = request.POST.get("skillsListForListing")
+        
+        print(f"Form data - country: {country}, city: {city}")
+        print(f"Skills string from form: {skills_string}")
 
         if not country or not city:
             form.add_error(None, "Please select both country and city")
@@ -287,20 +290,38 @@ def add_listing_view(request):
 
 
 def parse_skills_from_form(skills_string):
+    print(f"Parsing skills string: {skills_string}")
     if skills_string:
         try:
             skills_data = json.loads(skills_string)
-        except json.JSONDecodeError:
+            print(f"Successfully parsed skills data: {skills_data}")
+        except json.JSONDecodeError as e:
+            print(f"JSON decode error: {e}")
             skills_data = []
     else:
+        print("No skills string provided")
         skills_data = []
     return skills_data
 
 
 def add_skills_to_job_listing(job_listing, skills):
+    print(f"Adding {len(skills)} skills to job listing {job_listing.id}")
     for skill in skills:
-        print(skill)
-        JobListingSkill.objects.create(job_listing=job_listing, skill=get_skill_by_id(skill['id']), level=skill['level'])
+        print(f"Processing skill: {skill}")
+        try:
+            skill_id = skill.get('id')
+            skill_level = skill.get('level')
+            
+            if not skill_id or not skill_level:
+                print(f"Invalid skill data: {skill}")
+                continue
+                
+            skill_obj = get_skill_by_id(skill_id)
+            JobListingSkill.objects.create(job_listing=job_listing, skill=skill_obj, level=skill_level)
+            print(f"Successfully added skill {skill_obj.name} with level {skill_level}")
+        except Exception as e:
+            print(f"Error adding skill {skill}: {e}")
+            raise
 
 
 def get_all_candidates():
@@ -381,7 +402,10 @@ def get_skills(request):
 
 
 def get_skill_by_id(skill_id):
-    return Skill.objects.filter(id=skill_id)[0]
+    skill = Skill.objects.filter(id=skill_id).first()
+    if not skill:
+        raise ValueError(f"Skill with id {skill_id} not found")
+    return skill
 
 
 def add_skill(request):
