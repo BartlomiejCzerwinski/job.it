@@ -89,3 +89,4 @@ The command generates realistic-looking profiles with:
 - Realistic project descriptions
 - Proper formatting for phone numbers (xxx xxx xxx)
 - Valid-looking social media URLs
+

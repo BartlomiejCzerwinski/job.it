@@ -69,7 +69,7 @@
                 <div class="position-absolute top-50 start-50 translate-middle d-none d-md-block">
                     {% if user.appuser.role == 'recruiter' %}
                         <button type="button" class="btn {% if request.path == '/' %}btn-primary{% else %}btn-secondary{% endif %} me-2" onclick="window.location.href='/'">Candidates</button>
-                        <button type="button" class="btn {% if '/listings' in request.path %}btn-primary{% else %}btn-secondary{% endif %}" onclick="window.location.href='/listings'">My Listings</button>
+                        <button type="button" class="btn {% if request.path == '/listings' %}btn-primary{% else %}btn-secondary{% endif %}" onclick="window.location.href='/listings'">My Listings</button>
                     {% else %}
                         <button type="button" class="btn {% if request.path == '/' %}btn-primary{% else %}btn-secondary{% endif %} me-2" onclick="window.location.href='/'">Search Jobs</button>
                         <button type="button" class="btn {% if '/worker_profile' in request.path %}btn-primary{% else %}btn-secondary{% endif %}" onclick="window.location.href='/worker_profile'">My Profile</button>
@@ -79,7 +79,7 @@
                 <div class="position-absolute top-50 start-50 translate-middle d-md-none">
                     {% if user.appuser.role == 'recruiter' %}
                         <button type="button" class="btn btn-sm {% if request.path == '/' %}btn-primary{% else %}btn-secondary{% endif %} me-1" onclick="window.location.href='/'">Candidates</button>
-                        <button type="button" class="btn btn-sm {% if '/listings' in request.path %}btn-primary{% else %}btn-secondary{% endif %}" onclick="window.location.href='/listings'">Listings</button>
+                        <button type="button" class="btn btn-sm {% if request.path == '/listings' %}btn-primary{% else %}btn-secondary{% endif %}" onclick="window.location.href='/listings'">Listings</button>
                     {% else %}
                         <button type="button" class="btn btn-sm {% if request.path == '/' %}btn-primary{% else %}btn-secondary{% endif %} me-1" onclick="window.location.href='/'">Jobs</button>
                         <button type="button" class="btn btn-sm {% if '/worker_profile' in request.path %}btn-primary{% else %}btn-secondary{% endif %}" onclick="window.location.href='/worker_profile'">Profile</button>
