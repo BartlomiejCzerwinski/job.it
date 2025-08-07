@@ -42,8 +42,9 @@ def index(request):
             "remote_offers": remote_tiles
         })
     elif role == ROLE_RECRUITER:
-        # Get only active job listings for tiles
-        active_listings = JobListing.objects.filter(status='ACTIVE')
+        # Get only active job listings 
+        recruiter_listings = get_recruiter_listings(request.user)
+        active_listings = recruiter_listings.filter(status='ACTIVE')
         listings_tiles = get_listings_tiles(active_listings, 3)
         
         # Get all workers/candidates
@@ -63,9 +64,15 @@ def search_results_view(request):
     salary_max = request.GET.get('salary_max')
     currency = request.GET.get('currency', '')
     skills = request.GET.getlist('skills')  # Get list of skills from query params
+    user_role = get_user_role(request.user)
 
-    # Start with all job listings
-    job_listings = JobListing.objects.all()
+    # Start with appropriate job listings based on user role
+    if user_role == ROLE_RECRUITER:
+        # Recruiters can only search their own listings
+        job_listings = get_recruiter_listings(request.user)
+    else:
+        # Workers can search all active listings
+        job_listings = JobListing.objects.filter(status='ACTIVE')
 
     # Apply search query filter
     if search_query:
@@ -205,6 +212,12 @@ def listing_details_view(request, id):
     job_listing = get_object_or_404(JobListing, id=id)
     listing_skills = get_listing_skills(job_listing)
     user_role = get_user_role(request.user)
+    
+    # Security check: Recruiters can only view their own listings
+    if user_role == ROLE_RECRUITER:
+        current_user = get_user(request.user)
+        if job_listing.owner != current_user:
+            return redirect('listings')  # Redirect to their own listings
     
     has_applied = False
     if user_role == ROLE_WORKER:
@@ -354,9 +367,12 @@ def get_all_candidates():
 
 
 def get_recruiter_listings(email):
-    recruiter = AppUser.objects.filter(user=email)[0]
-    job_listings = JobListing.objects.filter(owner=recruiter)
-    return job_listings
+    try:
+        recruiter = AppUser.objects.get(user=email)
+        job_listings = JobListing.objects.filter(owner=recruiter)
+        return job_listings
+    except AppUser.DoesNotExist:
+        return JobListing.objects.none()
 
 
 def get_listings_tiles(job_listings, number_of_skills_per_tile):
