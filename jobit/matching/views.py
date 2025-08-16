@@ -21,6 +21,16 @@ SYSTEM_PROMPT = (
 )
 
 def load_api_key():
+    """
+    Load OpenAI API key from environment variable or fallback to file.
+    Environment variable takes precedence for Docker deployments.
+    """
+    # First try to get from environment variable (Docker-friendly)
+    api_key = os.environ.get('OPENAI_API_KEY')
+    if api_key:
+        return api_key.strip()
+    
+    # Fallback to file-based approach (for local development)
     try:
         api_key_path = os.path.join(os.path.dirname(__file__), 'api_key.txt')
         with open(api_key_path, 'r') as file:
