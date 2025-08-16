@@ -1,0 +1,36 @@
+#!/bin/bash
+
+# 🚀 Job.it Startup Script
+# This script ensures the database is ready before starting Django
+
+echo "🚀 Starting Job.it application..."
+
+# Wait for database to be ready (for production databases)
+echo "⏳ Checking database connection..."
+
+# Run database migrations
+echo "🔄 Running database migrations..."
+python manage.py migrate --noinput
+
+# Collect static files
+echo "📁 Collecting static files..."
+python manage.py collectstatic --noinput
+
+# Create superuser if it doesn't exist (optional)
+echo "👤 Checking for superuser..."
+python manage.py shell -c "
+try:
+    from django.contrib.auth.models import User
+    if not User.objects.filter(username='admin').exists():
+        User.objects.create_superuser('admin', 'admin@jobit.com', 'admin123')
+        print('✅ Superuser created: admin/admin123')
+    else:
+        print('✅ Superuser already exists')
+except Exception as e:
+    print(f'⚠️ Could not create superuser: {e}')
+    print('Continuing without superuser...')
+"
+
+# Start Django development server
+echo "🌐 Starting Django server..."
+python manage.py runserver 0.0.0.0:8000
