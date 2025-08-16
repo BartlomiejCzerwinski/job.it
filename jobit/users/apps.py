@@ -11,22 +11,25 @@ def update_locations(sender, **kwargs):
     
     print("Checking for new locations...")
     
-    # Get all existing locations from database
-    existing_locations = set(
-        (loc.country, loc.city) 
-        for loc in Location.objects.all()
-    )
-    
-    # Check all locations from LOCATIONS dictionary
-    new_locations_count = 0
-    for country, cities in LOCATIONS.items():
-        for city in cities:
-            if (country, city) not in existing_locations:
-                Location.objects.create(country=country, city=city)
-                new_locations_count += 1
-    
-    if new_locations_count > 0:
-        print(f"Added {new_locations_count} new locations to database")
+    try:
+        # Get all existing locations from database
+        existing_locations = set(
+            (loc.country, loc.city) 
+            for loc in Location.objects.all()
+        )
+        
+        # Check all locations from LOCATIONS dictionary
+        new_locations_count = 0
+        for country, cities in LOCATIONS.items():
+            for city in cities:
+                if (country, city) not in existing_locations:
+                    Location.objects.create(country=country, city=city)
+                    new_locations_count += 1
+        
+        if new_locations_count > 0:
+            print(f"Added {new_locations_count} new locations to database")
+    except OperationalError:
+        print("Database not ready yet, skipping location update")
 
 
 class UsersConfig(AppConfig):
@@ -34,9 +37,8 @@ class UsersConfig(AppConfig):
     name = 'users'
 
     def ready(self):
-        # Run location update
-        update_locations(self)
-        # Connect the signal to update locations after migrations
+        # Only connect the signal to update locations after migrations
+        # Don't run update_locations immediately during startup
         post_migrate.connect(update_locations, sender=self)
 
 
