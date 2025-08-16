@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  web:
+    build: 
+      context: .          
+      dockerfile: Dockerfile 
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+      - static_volume:/app/staticfiles 
+      - media_volume:/app/media        
+    environment:
+      - DEBUG=False                                   
+      - DJANGO_SETTINGS_MODULE=jobit.settings       
+      - ALLOWED_HOSTS=localhost,127.0.0.1,0.0.0.0  
+      - SECRET_KEY=your-secret-key-here-change-in-production 
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}          
+      - AZURE_STORAGE_CONNECTION_STRING=${AZURE_STORAGE_CONNECTION_STRING:-} 
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py collectstatic --noinput &&
+             python manage.py runserver 0.0.0.0:8000"
+    
+    restart: unless-stopped
+    
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/')"]
+      interval: 30s
+      timeout: 10s       
+      retries: 3         
+      start_period: 40s  
+
+volumes:
+  static_volume:
+    driver: local
+  
+  media_volume:
+    driver: local
