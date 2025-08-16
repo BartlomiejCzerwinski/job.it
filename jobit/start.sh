@@ -10,15 +10,15 @@ echo "⏳ Checking database connection..."
 
 # Run database migrations
 echo "🔄 Running database migrations..."
-python manage.py migrate --noinput
+python jobit/manage.py migrate --noinput
 
 # Collect static files
 echo "📁 Collecting static files..."
-python manage.py collectstatic --noinput
+python jobit/manage.py collectstatic --noinput
 
 # Create superuser if it doesn't exist (optional)
 echo "👤 Checking for superuser..."
-python manage.py shell -c "
+python jobit/manage.py shell -c "
 try:
     from django.contrib.auth.models import User
     if not User.objects.filter(username='admin').exists():
@@ -33,4 +33,4 @@ except Exception as e:
 
 # Start Django development server
 echo "🌐 Starting Django server..."
-python manage.py runserver 0.0.0.0:8000
+python jobit/manage.py runserver 0.0.0.0:8000
