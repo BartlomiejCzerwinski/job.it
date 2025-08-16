@@ -19,13 +19,27 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
+import os
+
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-86o6s)$so^2-4es%xs!$j_1x(6r-t=mvakvfv1b6#x-ynmeblm'
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-86o6s)$so^2-4es%xs!$j_1x(6r-t=mvakvfv1b6#x-ynmeblm')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '127.0.0.1,localhost').split(',')
+
+# Add Azure Web App domains automatically
+if not DEBUG:
+    # In production, allow all Azure Web App domains
+    ALLOWED_HOSTS.extend([
+        '.azurewebsites.net',
+        '.azurecontainer.io',
+        '.azurewebsites.net:8000',
+        '.azurecontainer.io:8000',
+        '169.254.129.3',
+        'jobit-dwfja4cndkgyhven.polandcentral-01.azurewebsites.net'
+    ])
 
 
 # Application definition
@@ -37,6 +51,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
     'users',
     'jobs',
     'chat',
@@ -111,9 +126,9 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
-EMAIL_HOST_USER = 'notifications.jobit@gmail.com'
-EMAIL_HOST_PASSWORD = 'luvr rnup adns qthm'
-DEFAULT_FROM_EMAIL = 'notifications.jobit@gmail.com'
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', 'notifications.jobit@gmail.com')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', 'luvr rnup adns qthm')
+DEFAULT_FROM_EMAIL = os.environ.get('EMAIL_HOST_USER', 'notifications.jobit@gmail.com')
 
 
 
@@ -136,6 +151,13 @@ STATIC_URL = 'static/'
 STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
+
+# Static files collection for production/Docker
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+# Media files (user uploads)
+MEDIA_URL = 'media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
 
 # Default primary key field type
