@@ -52,3 +52,4 @@ To run the application locally:
    ```bash
    git clone https://github.com/your-username/job.it.git
    cd job.it
+ 
