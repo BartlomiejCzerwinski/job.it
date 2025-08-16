@@ -32,7 +32,7 @@ USER appuser
 COPY --chown=appuser:appuser . .
 RUN mkdir -p /app/staticfiles /app/media
 
-RUN chmod +x /jobit/start.sh
+RUN chmod +x start.sh
 
 EXPOSE 8000
 
