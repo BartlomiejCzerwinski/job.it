@@ -122,8 +122,14 @@
 </footer>
 
 <script>
+    // Django template variables
     var CSRF_TOKEN = '{{ csrf_token }}';
     var updateInterval = 3000;
+</script>
+
+<script>
+    // Check if user is authenticated (set by Django template)
+    var isAuthenticated = {% if user.is_authenticated %}true{% else %}false{% endif %};
     
     // Function to update notification badges
     function updateNotificationBadges() {
@@ -188,15 +194,17 @@
         }
     }
     
-    // Initialize and update notifications
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', function() {
+    // Initialize and update notifications ONLY for authenticated users
+    if (isAuthenticated) {
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', function() {
+                setInitialBadgeStates();
+                setInterval(updateNotificationBadges, updateInterval);
+            });
+        } else {
             setInitialBadgeStates();
             setInterval(updateNotificationBadges, updateInterval);
-        });
-    } else {
-        setInitialBadgeStates();
-        setInterval(updateNotificationBadges, updateInterval);
+        }
     }
 </script>
 
