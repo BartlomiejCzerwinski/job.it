@@ -41,6 +41,25 @@ if not DEBUG:
         'jobit-dwfja4cndkgyhven.polandcentral-01.azurewebsites.net'
     ])
 
+# CSRF Configuration for Production
+if not DEBUG:
+    # Trust your Azure domain for CSRF
+    CSRF_TRUSTED_ORIGINS = [
+        'https://*.azurewebsites.net',
+        'https://*.azurecontainer.io',
+        'https://jobit-dwfja4cndkgyhven.polandcentral-01.azurewebsites.net'
+    ]
+    
+    # Ensure HTTPS is used in production
+    SECURE_SSL_REDIRECT = True
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    
+    # Session and CSRF cookies should be secure in production
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SESSION_COOKIE_HTTPONLY = True
+    CSRF_COOKIE_HTTPONLY = True
+
 
 # Application definition
 
