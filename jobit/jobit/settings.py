@@ -31,13 +31,26 @@ ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '127.0.0.1,localhost').split(','
 
 # Add Azure Web App domains automatically
 if not DEBUG:
-    # In production, allow all Azure Web App domains
+    # In production, allow all Azure Web App domains and common internal IPs
     ALLOWED_HOSTS.extend([
         '.azurewebsites.net',
         '.azurecontainer.io',
         '.azurewebsites.net:8000',
         '.azurecontainer.io:8000',
         '169.254.129.3',
+        '169.254.129.5',  # Azure internal load balancer IP
+        '169.254.129.4',  # Additional Azure internal IPs
+        '169.254.129.6',
+        '169.254.129.7',
+        '169.254.129.8',
+        '169.254.129.9',
+        '10.0.0.1',       # Azure internal IPs
+        '10.0.0.2',
+        '10.0.0.3',
+        '172.16.0.1',     # Azure internal IPs
+        '172.16.0.2',
+        '192.168.0.1',    # Azure internal IPs
+        '192.168.0.2',
         'jobit-dwfja4cndkgyhven.polandcentral-01.azurewebsites.net'
     ])
 
