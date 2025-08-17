@@ -10,7 +10,16 @@ echo "⏳ Checking database connection..."
 
 # Run database migrations
 echo "🔄 Running database migrations..."
-python jobit/manage.py migrate --noinput
+python jobit/manage.py makemigrations chat
+python jobit/manage.py makemigrations users
+python jobit/manage.py makemigrations jobs
+python jobit/manage.py makemigrations applications
+python jobit/manage.py makemigrations matching
+python jobit/manage.py migrate chat
+python jobit/manage.py migrate users
+python jobit/manage.py migrate jobs
+python jobit/manage.py migrate applications
+python jobit/manage.py migrate matching
 
 # Collect static files
 echo "📁 Collecting static files..."
