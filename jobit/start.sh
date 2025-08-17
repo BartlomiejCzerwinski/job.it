@@ -15,11 +15,13 @@ python jobit/manage.py makemigrations users
 python jobit/manage.py makemigrations jobs
 python jobit/manage.py makemigrations applications
 python jobit/manage.py makemigrations matching
+python jobit/manage.py makemigrations
 python jobit/manage.py migrate chat
 python jobit/manage.py migrate users
 python jobit/manage.py migrate jobs
 python jobit/manage.py migrate applications
 python jobit/manage.py migrate matching
+python jobit/manage.py migrate
 
 # Collect static files
 echo "📁 Collecting static files..."
