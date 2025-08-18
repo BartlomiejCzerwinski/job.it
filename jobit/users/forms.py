@@ -103,7 +103,7 @@ class RegisterForm(forms.Form):
             'class': 'form-control',
             'placeholder': 'xxx xxx xxx',
             'pattern': r'\d{3} \d{3} \d{3}',
-            'oninput': 'this.value = this.value.replace(/[^0-9]/g, "").replace(/(\d{3})(?=\d)/g, "$1 ").substring(0, 11)'
+            'oninput': 'this.value = this.value.replace(/[^0-9]/g, "").replace(/(\\d{3})(?=\\d)/g, "$1 ").substring(0, 11)'
         })
     )
     starts_in = forms.ChoiceField(
