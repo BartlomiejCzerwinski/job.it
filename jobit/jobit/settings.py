@@ -128,12 +128,35 @@ WSGI_APPLICATION = 'jobit.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+# If PostgreSQL environment variables are provided, use Postgres (PROD).
+# Otherwise, fall back to SQLite for local development.
+db_name = os.environ.get('DB_NAME')
+db_user = os.environ.get('DB_USER')
+db_password = os.environ.get('DB_PASSWORD')
+db_host = os.environ.get('DB_HOST')
+db_port = os.environ.get('DB_PORT', '5432')
+db_ssl_require = os.environ.get('DB_SSL_REQUIRE', 'true').lower() == 'true'
+
+if all([db_name, db_user, db_password, db_host]):
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': db_name,
+            'USER': db_user,
+            'PASSWORD': db_password,
+            'HOST': db_host,
+            'PORT': db_port,
+            'CONN_MAX_AGE': int(os.environ.get('DB_CONN_MAX_AGE', '60')),
+            'OPTIONS': {'sslmode': 'require'} if db_ssl_require else {},
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 
 # Password validation
