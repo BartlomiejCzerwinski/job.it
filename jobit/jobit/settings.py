@@ -206,6 +206,7 @@ if not AZURE_STORAGE_CONNECTION_STRING:
 
 if not SECRET_KEY:
     raise ValueError("Django SECRET_KEY environment variable is required for Django functionality!")
+    
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
@@ -224,7 +225,6 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [
-    BASE_DIR / "static",
 ]
 
 # Static files collection for production/Docker
