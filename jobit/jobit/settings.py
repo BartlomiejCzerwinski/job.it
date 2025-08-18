@@ -184,10 +184,6 @@ if not AZURE_STORAGE_CONNECTION_STRING:
 if not SECRET_KEY:
     raise ValueError("Django SECRET_KEY environment variable is required for Django functionality!")
 
-if not SECRET_KEY_IT_WILL_CRASH_TEST:
-    raise ValueError("Django SECRET_KEY_IT_WILL_CRASH_TEST environment variable is required for Django functionality!")
-
-
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 
