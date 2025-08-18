@@ -21,8 +21,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 import os
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-86o6s)$so^2-4es%xs!$j_1x(6r-t=mvakvfv1b6#x-ynmeblm')
+SECRET_KEY = os.environ.get('SECRET_KEY')
+if not SECRET_KEY:
+    raise ValueError("SECRET_KEY environment variable is required!")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
@@ -159,10 +160,29 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
-EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', 'notifications.jobit@gmail.com')
-EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', 'luvr rnup adns qthm')
-DEFAULT_FROM_EMAIL = os.environ.get('EMAIL_HOST_USER', 'notifications.jobit@gmail.com')
 
+# Get secrets from environment variables
+EMAIL_HOST_USER = 'notifications.jobit@gmail.com'
+DEFAULT_FROM_EMAIL = 'notifications.jobit@gmail.com'
+OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')
+AZURE_STORAGE_CONNECTION_STRING = os.environ.get('AZURE_STORAGE_CONNECTION_STRING')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
+
+# Validate required secrets
+if not EMAIL_HOST_PASSWORD:
+    raise ValueError("EMAIL_HOST_PASSWORD environment variable is required for email functionality!")
+
+if not EMAIL_HOST_USER:
+    raise ValueError("EMAIL_HOST_USER environment variable is required for email functionality!")
+
+if not OPENAI_API_KEY:
+    raise ValueError("OPENAI_API_KEY environment variable is required for OpenAI functionality!")
+
+if not AZURE_STORAGE_CONNECTION_STRING:
+    raise ValueError("AZURE_STORAGE_CONNECTION_STRING environment variable is required for Azure Storage functionality!")
+
+if not SECRET_KEY:
+    raise ValueError("Django SECRET_KEY environment variable is required for Django functionality!")
 
 
 # Internationalization
