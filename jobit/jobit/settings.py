@@ -21,10 +21,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 import os
 
-SECRET_KEY = os.environ.get('SECRET_KEY')
-if not SECRET_KEY:
-    raise ValueError("SECRET_KEY environment variable is required!")
-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
 
@@ -190,22 +186,27 @@ DEFAULT_FROM_EMAIL = 'notifications.jobit@gmail.com'
 OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')
 AZURE_STORAGE_CONNECTION_STRING = os.environ.get('AZURE_STORAGE_CONNECTION_STRING')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
+SECRET_KEY = os.environ.get('SECRET_KEY')
 
-# Validate required secrets
-if not EMAIL_HOST_PASSWORD:
-    raise ValueError("EMAIL_HOST_PASSWORD environment variable is required for email functionality!")
+if SECRET_KEY is None and not DEBUG:
+    SECRET_KEY = 'django-insecure-secret-key'
 
-if not EMAIL_HOST_USER:
-    raise ValueError("EMAIL_HOST_USER environment variable is required for email functionality!")
+if not DEBUG:
+    # Validate required secrets
+    if not EMAIL_HOST_PASSWORD:
+        raise ValueError("EMAIL_HOST_PASSWORD environment variable is required for email functionality!")
 
-if not OPENAI_API_KEY:
-    raise ValueError("OPENAI_API_KEY environment variable is required for OpenAI functionality!")
+    if not EMAIL_HOST_USER:
+        raise ValueError("EMAIL_HOST_USER environment variable is required for email functionality!")
 
-if not AZURE_STORAGE_CONNECTION_STRING:
-    raise ValueError("AZURE_STORAGE_CONNECTION_STRING environment variable is required for Azure Storage functionality!")
+    if not OPENAI_API_KEY:
+        raise ValueError("OPENAI_API_KEY environment variable is required for OpenAI functionality!")
 
-if not SECRET_KEY:
-    raise ValueError("Django SECRET_KEY environment variable is required for Django functionality!")
+    if not AZURE_STORAGE_CONNECTION_STRING:
+        raise ValueError("AZURE_STORAGE_CONNECTION_STRING environment variable is required for Azure Storage functionality!")
+
+    if not SECRET_KEY:
+        raise ValueError("Django SECRET_KEY environment variable is required for Django functionality!")
     
 
 # Internationalization
