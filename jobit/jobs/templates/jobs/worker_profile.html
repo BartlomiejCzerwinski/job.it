@@ -260,7 +260,7 @@
                                             <small class="w-100 text-truncate">{{ skill.name }}</small>
                                             <i class="bi bi-pencil ms-auto"
                                                style="font-size: 1rem; color: black; cursor: pointer;"
-                                               onclick="editSkill('{{ skill.id }}', '{{ skill.level }}', '{{ skill.name }}')"
+                                               onclick="editSkill('{{ skill.id|escapejs }}', '{{ skill.level|escapejs }}', '{{ skill.name|escapejs }}')"
                                                data-bs-toggle="modal" data-bs-target="#editSkillModal"></i>
                                         </div>
                                         <div class="progress mb-3" style="height: 5px;">
@@ -283,7 +283,7 @@
                             </div>
                             <div class="mb-3 pb-2" style="height: 5px;">
                                 <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal"
-                                        data-bs-target="#addSkillModal" onclick="fetchSkills(SKILLS_URL)">Add skill <i
+                                        data-bs-target="#addSkillModal" onclick="fetchSkills('{{ skills_url|escapejs }}')">Add skill <i
                                         class="bi bi-plus-lg"></i></button>
                             </div>
                         </div>
@@ -311,8 +311,8 @@
                                                         <i class="bi bi-three-dots-vertical"></i>
                                                     </button>
                                                     <ul class="dropdown-menu">
-                                                        <li><a class="dropdown-item" href="javascript:void(0)" onclick="editProject({{ project.id }})"><i class="bi bi-pencil me-2"></i>Edit</a></li>
-                                                        <li><a class="dropdown-item text-danger" href="javascript:void(0)" onclick="deleteProject({{ project.id }})"><i class="bi bi-trash me-2"></i>Delete</a></li>
+                                                        <li><a class="dropdown-item" href="javascript:void(0)" onclick="editProject('{{ project.id|escapejs }}')"><i class="bi bi-pencil me-2"></i>Edit</a></li>
+                                                        <li><a class="dropdown-item text-danger" href="javascript:void(0)" onclick="deleteProject('{{ project.id|escapejs }}')"><i class="bi bi-trash me-2"></i>Delete</a></li>
                                                     </ul>
                                                 </div>
                                             </div>
@@ -684,7 +684,8 @@
     <script src="{% static 'js/worker-profile-social-links.js' %}"></script>
     <script src="{% static 'js/worker-profile-projects.js' %}"></script>
     <script>
-        const locations = {{ locations_json|safe }};
+        // Django template variables converted to JavaScript variables
+        const locations = JSON.parse('{{ locations_json|escapejs }}');
         const initialCountry = "{{ user_data.country|escapejs }}";
         const initialCity = "{{ user_data.city|escapejs }}";
         console.log(initialCountry, initialCity);
@@ -1096,7 +1097,6 @@
             const formData = new FormData();
             formData.append('image', base64Image);
 
-
             fetch('/profile-photo/add/', {
                 method: 'POST',
                 headers: {
@@ -1124,11 +1124,6 @@
             .catch(error => {
                 console.error('Error uploading photo:', error);
                 showToast('An error occurred while uploading photo', false);
-            })
-            .finally(() => {
-                // Reset button state
-                uploadButton.disabled = false;
-                uploadButton.innerHTML = originalText;
             });
         }
 
@@ -1171,19 +1166,8 @@
             photoModal.hide();
         }
 
-        // Initialize projects from Django template
-        const projectsData = [
-            {% for project in projects %}
-            {
-                id: {{ project.id }},
-                title: "{{ project.title }}",
-                description: "{{ project.description }}",
-                technologies: {{ project.get_technologies|safe }},
-                githubLink: "{{ project.github_link|default:'' }}",
-                demoLink: "{{ project.demo_link|default:'' }}"
-            }{% if not forloop.last %},{% endif %}
-            {% endfor %}
-        ];
+        // Initialize projects from Django template - properly escaped
+        const projectsData = JSON.parse('{{ projects_json|escapejs }}');
         
         // Initialize projects when DOM is loaded
         document.addEventListener('DOMContentLoaded', function() {

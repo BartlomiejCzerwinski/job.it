@@ -161,13 +161,27 @@ def worker_profile(request):
     skills = get_user_skills(user)
     projects = profile.projects.all()  
     profile_photo_b64 = get_profile_photo(user.id)
+
+    projects_json = []
+    for project in projects:
+        projects_json.append({
+            'id': project.id,
+            'title': project.title,
+            'description': project.description,
+            'technologies': list(project.get_technologies()),
+            'github_link': project.github_link or '',
+            'demo_link': project.demo_link or ''
+        })
+    
     context = {
         "user_data": user_data,
         "locations_json": json.dumps(LOCATIONS),
         "skills": skills,
         "about_me": getattr(profile, "about_me", ""),
         "projects": projects,
-        "profile_photo_b64": profile_photo_b64
+        "projects_json": json.dumps(projects_json),
+        "profile_photo_b64": profile_photo_b64,
+        "skills_url": "/get_skills"
     }
     return render(request, 'jobs/worker_profile.html', context)
 
