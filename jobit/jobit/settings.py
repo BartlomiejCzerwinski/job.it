@@ -188,7 +188,7 @@ AZURE_STORAGE_CONNECTION_STRING = os.environ.get('AZURE_STORAGE_CONNECTION_STRIN
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
 SECRET_KEY = os.environ.get('SECRET_KEY')
 
-if SECRET_KEY is None and not DEBUG:
+if SECRET_KEY is None and DEBUG:
     SECRET_KEY = 'django-insecure-secret-key'
 
 if not DEBUG:
