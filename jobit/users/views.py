@@ -19,7 +19,7 @@ from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 from azure.storage.blob import BlobServiceClient
 import base64
-from .azure_storage import load_azure_storage_connection_string
+from django.conf import settings
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import urlsafe_base64_decode
 from django.utils.encoding import force_str
@@ -56,35 +56,41 @@ def register(request):
     if request.method == 'POST':
         form = RegisterForm(request.POST)
         if form.is_valid():
-            first_name = form.cleaned_data.get('first_name')
-            last_name = form.cleaned_data.get('last_name')
-            email = form.cleaned_data.get('email')
-            password = form.cleaned_data.get('password')
-            repeated_password = form.cleaned_data.get('repeated_password')
-            role = form.cleaned_data.get('role')
-            position = form.cleaned_data.get('position')
-            country = form.cleaned_data.get('country')
-            city = form.cleaned_data.get('city')
-            mobile = form.cleaned_data.get('mobile')
-            starts_in = form.cleaned_data.get('starts_in')
-            is_remote = form.cleaned_data.get('is_remote')
-            is_hybrid = form.cleaned_data.get('is_hybrid')
+            try:
+                first_name = form.cleaned_data.get('first_name')
+                last_name = form.cleaned_data.get('last_name')
+                email = form.cleaned_data.get('email')
+                password = form.cleaned_data.get('password')
+                repeated_password = form.cleaned_data.get('repeated_password')
+                role = form.cleaned_data.get('role')
+                position = form.cleaned_data.get('position')
+                country = form.cleaned_data.get('country')
+                city = form.cleaned_data.get('city')
+                mobile = form.cleaned_data.get('mobile')
+                starts_in = form.cleaned_data.get('starts_in')
+                is_remote = form.cleaned_data.get('is_remote')
+                is_hybrid = form.cleaned_data.get('is_hybrid')
 
-            if not is_password_valid(password, repeated_password):
-                form.add_error('repeated_password', 'Passwords do not match')
+                if not is_password_valid(password, repeated_password):
+                    form.add_error('repeated_password', 'Passwords do not match')
+                    return render(request, 'users/register.html', {'form': form, 'locations_json': json.dumps(LOCATIONS)})
+
+                if User.objects.filter(email=email).exists():
+                    form.add_error('email', 'Email already taken')
+                    return render(request, 'users/register.html', {'form': form, 'locations_json': json.dumps(LOCATIONS)})
+
+                # Create Location object
+                location = None
+                if country and city:
+                    location, _ = Location.objects.get_or_create(country=country, city=city)
+
+                create_user(first_name, last_name, email, password, role, position, location, mobile, starts_in, is_remote, is_hybrid)
+                return HttpResponseRedirect('login?registration=true')
+            except Exception as e:
+                # Log the error for debugging
+                print(f"Registration error: {str(e)}")
+                messages.error(request, f"Registration failed: {str(e)}")
                 return render(request, 'users/register.html', {'form': form, 'locations_json': json.dumps(LOCATIONS)})
-
-            if User.objects.filter(email=email).exists():
-                form.add_error('email', 'Email already taken')
-                return render(request, 'users/register.html', {'form': form, 'locations_json': json.dumps(LOCATIONS)})
-
-            # Create Location object
-            location = None
-            if country and city:
-                location, _ = Location.objects.get_or_create(country=country, city=city)
-
-            create_user(first_name, last_name, email, password, role, position, location, mobile, starts_in, is_remote, is_hybrid)
-            return HttpResponseRedirect('login?registration=true')
         else:
             messages.error(request, "Please correct the errors below.")
             return render(request, 'users/register.html', {'form': form, 'locations_json': json.dumps(LOCATIONS)})
@@ -94,20 +100,39 @@ def register(request):
 
 
 def create_user(first_name, last_name, email, password, role, position=None, location=None, mobile=None, starts_in=None, is_remote=False, is_hybrid=False):
-    user = User.objects.create(username=email, first_name=first_name, last_name=last_name, email=email,
-                               password=make_password(password))
-    user.save()
-    app_user = AppUser.objects.create(
-        user=user,
-        role=role,
-        position=position,
-        location=location,
-        mobile=mobile,
-        starts_in=starts_in,
-        is_remote=is_remote,
-        is_hybrid=is_hybrid
-    )
-    app_user.save()
+    try:
+        # Create the Django User first
+        user = User.objects.create(
+            username=email, 
+            first_name=first_name, 
+            last_name=last_name, 
+            email=email,
+            password=make_password(password)
+        )
+        user.save()
+        
+        # Create the AppUser
+        app_user = AppUser.objects.create(
+            user=user,
+            role=role,
+            position=position,
+            location=location,
+            mobile=mobile,
+            starts_in=starts_in,
+            is_remote=is_remote,
+            is_hybrid=is_hybrid
+        )
+        app_user.save()
+        
+        print(f"Successfully created user: {email}")
+        return True
+        
+    except Exception as e:
+        print(f"Error creating user {email}: {str(e)}")
+        # If AppUser creation fails, clean up the User
+        if 'user' in locals():
+            user.delete()
+        raise e
 
 
 def is_password_valid(password, repeated_password):
@@ -404,7 +429,7 @@ def remove_profile_photo(request):
     if request.method == "POST":
         try:
             filename = f"{request.user.id}.jpg"
-            connection_string = load_azure_storage_connection_string()
+            connection_string = settings.AZURE_STORAGE_CONNECTION_STRING
             blob_service_client = BlobServiceClient.from_connection_string(connection_string)
             container_client = blob_service_client.get_container_client(PROFILE_PHOTOS_CONTAINER)
             blob_client = container_client.get_blob_client(filename)
@@ -435,7 +460,7 @@ def add_profile_photo(request):
             filename = f"{request.user.id}.jpg"
 
             # Get connection string and initialize the BlobServiceClient
-            connection_string = load_azure_storage_connection_string()
+            connection_string = settings.AZURE_STORAGE_CONNECTION_STRING
             blob_service_client = BlobServiceClient.from_connection_string(connection_string)
             container_client = blob_service_client.get_container_client(PROFILE_PHOTOS_CONTAINER)
 
@@ -466,7 +491,7 @@ def get_profile_photo(user_id):
     """
     try:
         filename = f"{user_id}.jpg"
-        connection_string = load_azure_storage_connection_string()
+        connection_string = settings.AZURE_STORAGE_CONNECTION_STRING
         blob_service_client = BlobServiceClient.from_connection_string(connection_string)
         container_client = blob_service_client.get_container_client(PROFILE_PHOTOS_CONTAINER)
         blob_client = container_client.get_blob_client(filename)
