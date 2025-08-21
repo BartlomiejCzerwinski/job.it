@@ -25,7 +25,11 @@ python jobit/manage.py migrate
 
 # Collect static files
 echo "📁 Collecting static files..."
-python jobit/manage.py collectstatic --noinput
+python jobit/manage.py collectstatic --noinput --verbosity=2
+echo "📁 Static files collected. Checking contents..."
+ls -la /app/staticfiles/
+ls -la /app/staticfiles/css/ || echo "CSS directory not found"
+ls -la /app/staticfiles/js/ || echo "JS directory not found"
 
 # Create superuser if it doesn't exist (optional)
 echo "👤 Checking for superuser..."

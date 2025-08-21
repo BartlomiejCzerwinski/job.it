@@ -232,6 +232,11 @@ STATICFILES_DIRS = [
 # Static files collection for production/Docker
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
+# Debug static files configuration
+print(f"DEBUG: BASE_DIR = {BASE_DIR}")
+print(f"DEBUG: STATICFILES_DIRS = {STATICFILES_DIRS}")
+print(f"DEBUG: STATIC_ROOT = {STATIC_ROOT}")
+
 # Media files (user uploads)
 MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR / 'media'
