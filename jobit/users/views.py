@@ -460,7 +460,7 @@ def add_profile_photo(request):
             filename = f"{request.user.id}.jpg"
 
             # Get connection string and initialize the BlobServiceClient
-            connection_string = settings.AZURE_STORAGE_CONNECTION_STRING
+            connection_string = settings.AZURE_STORAGE_CONNECTION_STRING.strip()
             blob_service_client = BlobServiceClient.from_connection_string(connection_string)
             container_client = blob_service_client.get_container_client(PROFILE_PHOTOS_CONTAINER)
 
@@ -491,14 +491,21 @@ def get_profile_photo(user_id):
     """
     try:
         filename = f"{user_id}.jpg"
-        connection_string = settings.AZURE_STORAGE_CONNECTION_STRING
+        connection_string = settings.AZURE_STORAGE_CONNECTION_STRING.strip()
         blob_service_client = BlobServiceClient.from_connection_string(connection_string)
         container_client = blob_service_client.get_container_client(PROFILE_PHOTOS_CONTAINER)
         blob_client = container_client.get_blob_client(filename)
+        
+        # Check if blob exists before trying to download
+        if not blob_client.exists():
+            print(f"Profile photo not found for user {user_id}: {filename}")
+            return None
+            
         stream = blob_client.download_blob()
         image_bytes = stream.readall()
         return base64.b64encode(image_bytes).decode('utf-8')
-    except Exception:
+    except Exception as e:
+        print(f"Error getting profile photo for user {user_id}: {str(e)}")
         return None
 
 
