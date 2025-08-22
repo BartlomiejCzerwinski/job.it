@@ -461,12 +461,17 @@ def add_profile_photo(request):
 
             # Get connection string and initialize the BlobServiceClient
             connection_string = settings.AZURE_STORAGE_CONNECTION_STRING.strip()
+            print(f"🔍 Azure Storage connection string length: {len(connection_string)}")
+            
             blob_service_client = BlobServiceClient.from_connection_string(connection_string)
             container_client = blob_service_client.get_container_client(PROFILE_PHOTOS_CONTAINER)
-
+            print(f"🔍 Container: {PROFILE_PHOTOS_CONTAINER}")
+            
             # Upload the blob
             blob_client = container_client.get_blob_client(filename)
+            print(f"🔍 Uploading to blob: {filename}")
             blob_client.upload_blob(image_bytes, overwrite=True)
+            print(f"✅ Blob uploaded successfully")
 
             # Get the blob URL
             blob_url = blob_client.url
@@ -491,21 +496,28 @@ def get_profile_photo(user_id):
     """
     try:
         filename = f"{user_id}.jpg"
+        print(f"🔍 Looking for profile photo: {filename}")
+        
         connection_string = settings.AZURE_STORAGE_CONNECTION_STRING.strip()
+        print(f"🔍 Azure Storage connection string length: {len(connection_string)}")
+        
         blob_service_client = BlobServiceClient.from_connection_string(connection_string)
         container_client = blob_service_client.get_container_client(PROFILE_PHOTOS_CONTAINER)
+        print(f"🔍 Container: {PROFILE_PHOTOS_CONTAINER}")
+        
         blob_client = container_client.get_blob_client(filename)
         
         # Check if blob exists before trying to download
         if not blob_client.exists():
-            print(f"Profile photo not found for user {user_id}: {filename}")
+            print(f"⚠️ Profile photo not found for user {user_id}: {filename}")
             return None
             
+        print(f"✅ Profile photo found for user {user_id}")
         stream = blob_client.download_blob()
         image_bytes = stream.readall()
         return base64.b64encode(image_bytes).decode('utf-8')
     except Exception as e:
-        print(f"Error getting profile photo for user {user_id}: {str(e)}")
+        print(f"❌ Error getting profile photo for user {user_id}: {str(e)}")
         return None
 
 
