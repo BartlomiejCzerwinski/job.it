@@ -230,7 +230,7 @@ STATICFILES_DIRS = [
 ]
 
 # Static files collection for production/Docker
-STATIC_ROOT = 'staticfiles'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # Debug static files configuration
 print(f"DEBUG: BASE_DIR = {BASE_DIR}")
@@ -238,6 +238,16 @@ print(f"DEBUG: STATICFILES_DIRS = {STATICFILES_DIRS}")
 print(f"DEBUG: STATIC_ROOT = {STATIC_ROOT}")
 print(f"DEBUG: STATIC_ROOT absolute = {(BASE_DIR / STATIC_ROOT).resolve()}")
 print(f"DEBUG: STATIC_URL = {STATIC_URL}")
+
+# Ensure STATIC_ROOT directory exists
+import os
+static_root_path = BASE_DIR / STATIC_ROOT
+if not static_root_path.exists():
+    print(f"⚠️ STATIC_ROOT directory does not exist: {static_root_path}")
+    static_root_path.mkdir(parents=True, exist_ok=True)
+    print(f"✅ Created STATIC_ROOT directory: {static_root_path}")
+else:
+    print(f"✅ STATIC_ROOT directory exists: {static_root_path}")
 
 # Media files (user uploads)
 MEDIA_URL = '/media/'

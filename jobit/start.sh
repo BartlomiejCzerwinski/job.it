@@ -27,9 +27,26 @@ python jobit/manage.py migrate
 echo "📁 Collecting static files..."
 python jobit/manage.py collectstatic --noinput --verbosity=2
 echo "📁 Static files collected. Checking contents..."
-ls -la /app/staticfiles/
-ls -la /app/staticfiles/css/ || echo "CSS directory not found"
-ls -la /app/staticfiles/js/ || echo "JS directory not found"
+echo "📁 STATIC_ROOT directory:"
+ls -la /app/jobit/staticfiles/ || echo "STATIC_ROOT directory not found"
+echo "📁 STATIC_ROOT/css directory:"
+ls -la /app/jobit/staticfiles/css/ || echo "CSS directory not found"
+echo "📁 STATIC_ROOT/js directory:"
+ls -la /app/jobit/staticfiles/js/ || echo "JS directory not found"
+echo "📁 STATIC_ROOT/images directory:"
+ls -la /app/jobit/staticfiles/images/ || echo "Images directory not found"
+
+# If collectstatic failed, try manual copy as fallback
+if [ ! -d "/app/jobit/staticfiles/css" ]; then
+    echo "⚠️ collectstatic failed, trying manual copy..."
+    mkdir -p /app/jobit/staticfiles
+    cp -r /app/jobit/jobs/static/* /app/jobit/staticfiles/
+    echo "📁 Manual copy completed. Checking contents..."
+    ls -la /app/jobit/staticfiles/
+    ls -la /app/jobit/staticfiles/css/ || echo "CSS directory still not found"
+    ls -la /app/jobit/staticfiles/js/ || echo "JS directory still not found"
+    ls -la /app/jobit/staticfiles/images/ || echo "Images directory still not found"
+fi
 
 # Create superuser if it doesn't exist (optional)
 echo "👤 Checking for superuser..."
