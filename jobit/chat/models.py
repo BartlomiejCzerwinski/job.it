@@ -27,7 +27,7 @@ class Conversation(models.Model):
         unique_together = ['job_listing', 'recruiter', 'candidate']
 
     def __str__(self):
-        return f"Conversation about {self.job_listing.title} - {self.candidate.username}"
+        return f"Conversation about {self.job_listing.job_title} - {self.candidate.username}"
 
     def get_last_message(self):
         return self.messages.order_by('-created_at').first()
