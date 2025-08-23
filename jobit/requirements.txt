@@ -30,3 +30,10 @@ openai
 # Production server
 gunicorn
 whitenoise
+
+# Testing dependencies
+pytest>=7.0.0
+pytest-django>=4.5.0
+pytest-cov>=4.0.0
+factory-boy>=3.2.0
+faker>=18.0.0
