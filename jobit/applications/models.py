@@ -16,5 +16,8 @@ class Application(models.Model):
         default='PENDING'
     )
 
+    class Meta:
+        unique_together = ['job_listing', 'candidate']
+    
     def __str__(self):
         return f"Application for {self.job_listing.job_title} by {self.candidate}"
