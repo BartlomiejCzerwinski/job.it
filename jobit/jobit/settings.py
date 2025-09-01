@@ -187,12 +187,34 @@ OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')
 AZURE_STORAGE_CONNECTION_STRING = os.environ.get('AZURE_STORAGE_CONNECTION_STRING')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
 SECRET_KEY = os.environ.get('SECRET_KEY')
+USE_LOCAL_STORAGE = os.environ.get('USE_LOCAL_STORAGE', 'False').lower() == 'true'
 
 if SECRET_KEY is None and DEBUG:
     SECRET_KEY = 'django-insecure-secret-key'
 
+# Configure email backend based on available credentials
+if EMAIL_HOST_PASSWORD and EMAIL_HOST_USER:
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+else:
+    # Use console backend for demo (emails printed to console)
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+    print("⚠️  Email functionality disabled - using console backend for demo")
+
+# Configure file storage based on available Azure credentials
+if AZURE_STORAGE_CONNECTION_STRING and not USE_LOCAL_STORAGE:
+    # Use Azure Blob Storage
+    DEFAULT_FILE_STORAGE = 'storages.backends.azure_storage.AzureStorage'
+    AZURE_ACCOUNT_NAME = 'your-account-name'
+    AZURE_ACCOUNT_KEY = 'your-account-key'
+    AZURE_CUSTOM_DOMAIN = f'{AZURE_ACCOUNT_NAME}.blob.core.windows.net'
+    AZURE_LOCATION = 'media'
+else:
+    # Use local file storage for demo
+    DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+    print("⚠️  Azure Storage disabled - using local file storage for demo")
+
 if not DEBUG:
-    # Validate required secrets
+    # Validate required secrets only in production
     if not EMAIL_HOST_PASSWORD:
         raise ValueError("EMAIL_HOST_PASSWORD environment variable is required for email functionality!")
 

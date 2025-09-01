@@ -18,22 +18,25 @@ RUN apt-get update \
         libpq-dev \
     && rm -rf /var/lib/apt/lists/*
 
-RUN useradd --create-home --shell /bin/bash appuser \
-    && chown -R appuser:appuser /app
-
-COPY jobit/requirements.txt .
+# Copy requirements first for better caching
+COPY requirements.txt .
 
 RUN pip install --no-cache-dir --upgrade pip \
     && pip install --no-cache-dir -r requirements.txt
 
-RUN chown -R appuser:appuser /app
-USER appuser
+# Copy the entire project
+COPY . .
 
-COPY --chown=appuser:appuser . .
+# Create necessary directories
 RUN mkdir -p /app/staticfiles /app/media
 
-RUN chmod +x jobit/start.sh
+# Create a non-root user
+RUN useradd --create-home --shell /bin/bash appuser \
+    && chown -R appuser:appuser /app
+
+USER appuser
 
 EXPOSE 8000
 
-CMD ["./jobit/start.sh"]
+# Simple command to run Django
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
