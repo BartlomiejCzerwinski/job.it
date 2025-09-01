@@ -4,13 +4,56 @@
 
 ---
 
+## 📸 Preview
+
+### 🔑 Login
+<img width="1920" height="919" alt="jobit_logowanie" src="https://github.com/user-attachments/assets/543fbd5d-c7e3-44df-907e-d763c285cc7b" />
+
+*Simple login page for accessing the platform.*
+
+---
+
+### 👤 User Profile
+<img width="1920" height="919" alt="jobit_panel" src="https://github.com/user-attachments/assets/c34147c9-9949-4a0c-b729-1512904d6683" />
+
+*Editable user profile with personal information, skills, projects, and social links.*
+
+---
+
+### 🏠 Dashboard with AI Assistant
+<img width="1920" height="878" alt="jobit_ai" src="https://github.com/user-attachments/assets/07ebde34-cf90-4287-997f-e4b15d2673f7" />
+
+*Personalized job recommendations and search assistance powered by AI.*
+
+---
+
+### 💼 Job Listing & Applications
+<img width="1920" height="919" alt="jobit_recruiter_listing_details" src="https://github.com/user-attachments/assets/8b0ec0d2-489a-40da-8612-b7806146fa9f" />
+
+*Recruiter view of a job listing with candidate applications, skill tags, and AI-based matching percentage.*
+
+---
+
+### 💬 Messaging
+<img width="1920" height="878" alt="jobit_send_message" src="https://github.com/user-attachments/assets/62633805-cb6e-46f7-9960-405591bc5473" />
+
+*Direct communication between recruiters and candidates for interview scheduling and feedback.*
+
+---
+
+### 🔐 Password Reset Flow
+<img width="1920" height="878" alt="jobit_reset_email_request" src="https://github.com/user-attachments/assets/2c53b90f-6b29-4594-b95d-258ceb189aac" />
+
+*Users can request a password reset link by providing their email address.*
+
+<img width="1897" height="875" alt="jobit_reset_email_password" src="https://github.com/user-attachments/assets/9b02bede-c9d2-4894-a2a7-148231e0a14a" />
+
+*Email with a secure link to reset the password, valid for 24 hours.*
+
+
 ## 🗺️ System Architecture
 
 The application follows a modular, scalable architecture built with Django. Each core functionality is implemented as a separate Django app to ensure maintainability and clarity.
-
-![Applications-Diagram](https://github.com/user-attachments/assets/6fba49a9-da47-4db6-9fb0-f52ea53d2b30)
-
-*The above diagram shows a high-level system architecture with separate modules for users, job offers, matching engine, and messaging.*
 
 ---
 
@@ -28,7 +71,7 @@ The following diagram illustrates how the internal components of the system inte
 
 This relational model outlines how the core entities relate to one another:
 
-<img width="698" height="690" alt="database" src="https://github.com/user-attachments/assets/0b58fbdc-fc58-4424-bcfc-d9eac83ae136" />
+<img width="698" height="690" alt="database" src="https://github.com/user-attachments/assets/fb2952c1-86ca-4593-a1b5-2478fd59a3d8" />
 
 *The database schema supports users, job applications, communication logs, job offers, and matching metadata.*
 
