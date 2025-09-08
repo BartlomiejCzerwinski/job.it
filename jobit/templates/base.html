@@ -26,7 +26,7 @@
                     <span class="navbar-toggler-icon"></span>
                     <!-- Notification badge for new messages -->
                     <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" 
-                          style="font-size: 0.6rem; transform: translate(-50%, -50%);" 
+                          style="font-size: 0.6rem; transform: translate(-50%, -50%); {% if not has_unread_messages %}display: none;{% endif %}" 
                           id="messageNotificationBadge" data-initial-state="{% if has_unread_messages %}visible{% else %}hidden{% endif %}">
                         !
                     </span>
@@ -37,7 +37,7 @@
                             <i class="bi bi-chat-dots me-1"></i> Messages
                             <!-- Notification badge for Messages menu item -->
                             <span class="position-absolute top-50 end-0 translate-middle-y badge rounded-pill bg-danger me-2" 
-                                  style="font-size: 0.7rem;" 
+                                  style="font-size: 0.7rem; {% if not has_unread_messages %}display: none;{% endif %}" 
                                   id="messagesMenuBadge" 
                                   data-initial-state="{% if has_unread_messages %}visible{% else %}hidden{% endif %}">
                                 {{ unread_messages_count|default:0 }}
@@ -144,14 +144,18 @@
                 const unreadCount = data.data.unread_messages_count;
                 const hasUnread = data.data.has_unread_messages;
                 
+                console.log('Notification update - unreadCount:', unreadCount, 'hasUnread:', hasUnread);
+                
                 // Update menu burger badge
                 const menuBadge = document.getElementById('messageNotificationBadge');
                 if (menuBadge) {
                     if (hasUnread) {
                         menuBadge.textContent = '!';
                         menuBadge.style.display = 'block';
+                        console.log('Menu badge shown');
                     } else {
                         menuBadge.style.display = 'none';
+                        console.log('Menu badge hidden');
                     }
                 }
                 
@@ -161,8 +165,10 @@
                     if (hasUnread) {
                         messagesMenuBadge.textContent = unreadCount;
                         messagesMenuBadge.style.display = 'block';
+                        console.log('Messages menu badge shown with count:', unreadCount);
                     } else {
                         messagesMenuBadge.style.display = 'none';
+                        console.log('Messages menu badge hidden');
                     }
                 }
             }
@@ -177,10 +183,18 @@
         const menuBadge = document.getElementById('messageNotificationBadge');
         const messagesMenuBadge = document.getElementById('messagesMenuBadge');
         
+        // Debug logging
+        console.log('Setting initial badge states...');
+        console.log('Menu badge initial state:', menuBadge ? menuBadge.getAttribute('data-initial-state') : 'not found');
+        console.log('Messages menu badge initial state:', messagesMenuBadge ? messagesMenuBadge.getAttribute('data-initial-state') : 'not found');
+        
         if (menuBadge) {
             const initialState = menuBadge.getAttribute('data-initial-state');
             if (initialState === 'hidden') {
                 menuBadge.style.display = 'none';
+                console.log('Menu badge hidden');
+            } else {
+                console.log('Menu badge visible');
             }
         }
         
@@ -188,6 +202,9 @@
             const initialState = messagesMenuBadge.getAttribute('data-initial-state');
             if (initialState === 'hidden') {
                 messagesMenuBadge.style.display = 'none';
+                console.log('Messages menu badge hidden');
+            } else {
+                console.log('Messages menu badge visible');
             }
         }
     }
