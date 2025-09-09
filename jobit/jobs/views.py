@@ -428,7 +428,9 @@ def view_settings(request):
 
 def get_skills(request):
     skills = Skill.objects.all().values("name", "id")
-    return JsonResponse(list(skills), safe=False)
+    skills_list = list(skills)
+    print(f"DEBUG: Found {len(skills_list)} skills in database")
+    return JsonResponse(skills_list, safe=False)
 
 
 def get_skill_by_id(skill_id):

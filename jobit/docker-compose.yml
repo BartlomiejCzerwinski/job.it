@@ -22,6 +22,7 @@ services:
       - DOCKER_BUILD=  # Clear build context for runtime 
     command: >
       sh -c "python jobit/manage.py migrate &&
+             python jobit/manage.py init_skills &&
              python jobit/manage.py collectstatic --noinput --clear &&
              python jobit/manage.py runserver 0.0.0.0:8000"
     

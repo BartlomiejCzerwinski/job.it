@@ -29,6 +29,10 @@ ls -la /app/jobit/jobs/static/css/ || echo "CSS directory not found"
 ls -la /app/jobit/jobs/static/js/ || echo "JS directory not found"  
 ls -la /app/jobit/jobs/static/images/ || echo "Images directory not found"
 
+# Initialize skills from CSV file
+echo "📚 Initializing skills from CSV..."
+python jobit/manage.py init_skills
+
 # Create superuser if it doesn't exist (optional)
 echo "👤 Checking for superuser..."
 python jobit/manage.py shell -c "
