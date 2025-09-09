@@ -33,6 +33,10 @@ ls -la /app/jobit/jobs/static/images/ || echo "Images directory not found"
 echo "📚 Initializing skills from CSV..."
 python jobit/manage.py init_skills
 
+# Generate sample data for production
+echo "🎯 Initializing production data..."
+python jobit/manage.py init_production_data
+
 # Create superuser if it doesn't exist (optional)
 echo "👤 Checking for superuser..."
 python jobit/manage.py shell -c "
