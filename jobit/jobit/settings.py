@@ -50,6 +50,7 @@ if not DEBUG:
         '192.168.0.1',    # Azure internal IPs
         '192.168.0.2',
         '169.254.130.3',
+        '169.254.130.2',
         'jobit-dwfja4cndkgyhven.polandcentral-01.azurewebsites.net'
     ])
 
