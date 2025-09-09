@@ -27,8 +27,8 @@ function saveProject() {
         title: title,
         description: description,
         technologies: Array.from(technologies),
-        githubLink: githubLink || null,
-        demoLink: demoLink || null
+        github_link: githubLink || null,
+        demo_link: demoLink || null
     };
     
 
@@ -134,8 +134,8 @@ function displayProjects() {
                     ${project.technologies.map(tech => `<span class="badge bg-primary me-1">${tech}</span>`).join('')}
                 </div>
                 <div class="d-flex gap-2">
-                    ${project.githubLink ? `<a href="${project.githubLink}" class="btn btn-outline-primary btn-sm" target="_blank"><i class="bi bi-github me-1"></i>GitHub</a>` : ''}
-                    ${project.demoLink ? `<a href="${project.demoLink}" class="btn btn-outline-secondary btn-sm" target="_blank"><i class="bi bi-globe me-1"></i>Live Demo</a>` : ''}
+                    ${project.github_link ? `<a href="${project.github_link}" class="btn btn-outline-primary btn-sm" target="_blank"><i class="bi bi-github me-1"></i>GitHub</a>` : ''}
+                    ${project.demo_link ? `<a href="${project.demo_link}" class="btn btn-outline-secondary btn-sm" target="_blank"><i class="bi bi-globe me-1"></i>Live Demo</a>` : ''}
                 </div>
             </div>
         `;
@@ -195,8 +195,8 @@ function editProject(projectId) {
     // Populate edit form
     document.getElementById('editProjectTitle').value = project.title;
     document.getElementById('editProjectDescription').value = project.description;
-    document.getElementById('editGithubLink').value = project.githubLink || '';
-    document.getElementById('editDemoLink').value = project.demoLink || '';
+    document.getElementById('editGithubLink').value = project.github_link || '';
+    document.getElementById('editDemoLink').value = project.demo_link || '';
     document.getElementById('editProjectId').value = project.id;
     
     // Clear and populate technologies
@@ -242,8 +242,8 @@ function updateProject() {
         title: title,
         description: description,
         technologies: Array.from(editTechnologies),
-        githubLink: githubLink || null,
-        demoLink: demoLink || null
+        github_link: githubLink || null,
+        demo_link: demoLink || null
     };
     
     fetch(`/projects/update/${projectId}`, {
