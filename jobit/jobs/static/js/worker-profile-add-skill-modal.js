@@ -128,6 +128,12 @@ function fetchSkills(endpointUrl) {
             return response.json();
         })
         .then(data => {
+            // Clear existing options first
+            const selectElement = document.getElementById('skillNameSelect');
+            selectElement.innerHTML = '';
+            
+            // Load the skills into the dropdown
+            loadSkills(data);
             return data;
         })
         .catch(error => {
