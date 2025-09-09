@@ -32,7 +32,7 @@ USER appuser
 COPY --chown=appuser:appuser . .
 RUN mkdir -p /app/staticfiles /app/media
 
-RUN python manage.py collectstatic --noinput
+RUN python jobit/manage.py collectstatic --noinput
 
 RUN chmod +x jobit/start.sh
 

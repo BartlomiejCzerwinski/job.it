@@ -227,9 +227,6 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [
-    BASE_DIR / 'jobs' / 'static',
-]
 
 # Static files collection for production/Docker
 STATIC_ROOT = BASE_DIR / 'staticfiles'
@@ -237,7 +234,7 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 # WhiteNoise configuration for serving static files
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-# Additional static files directories
+# Static files directories
 STATICFILES_DIRS = [
     BASE_DIR / 'jobs' / 'static',
     BASE_DIR / 'static', 
