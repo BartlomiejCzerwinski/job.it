@@ -92,6 +92,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware', 
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -231,7 +232,16 @@ STATICFILES_DIRS = [
 ]
 
 # Static files collection for production/Docker
-STATIC_ROOT = 'staticfiles'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+# WhiteNoise configuration for serving static files
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+# Additional static files directories
+STATICFILES_DIRS = [
+    BASE_DIR / 'jobs' / 'static',
+    BASE_DIR / 'static', 
+]
 
 # Media files (user uploads)
 MEDIA_URL = '/media/'
