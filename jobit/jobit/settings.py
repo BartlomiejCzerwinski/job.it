@@ -189,12 +189,22 @@ OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')
 AZURE_STORAGE_CONNECTION_STRING = os.environ.get('AZURE_STORAGE_CONNECTION_STRING')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
 SECRET_KEY = os.environ.get('SECRET_KEY')
+USE_LOCAL_STORAGE = os.environ.get('USE_LOCAL_STORAGE', 'False').lower() == 'true'
 
-if SECRET_KEY is None and DEBUG:
+# Check if we're in a build context
+IS_BUILD_CONTEXT = os.environ.get('DOCKER_BUILD') or os.environ.get('CI') or os.environ.get('GITHUB_ACTIONS')
+
+# Provide safe defaults during build
+if IS_BUILD_CONTEXT:
+    SECRET_KEY = SECRET_KEY or 'django-insecure-build-key'
+    EMAIL_HOST_PASSWORD = EMAIL_HOST_PASSWORD or 'build-password'
+    OPENAI_API_KEY = OPENAI_API_KEY or 'build-key'
+    AZURE_STORAGE_CONNECTION_STRING = AZURE_STORAGE_CONNECTION_STRING or 'build-connection'
+elif SECRET_KEY is None and DEBUG:
     SECRET_KEY = 'django-insecure-secret-key'
 
-if not DEBUG:
-    # Validate required secrets
+if not DEBUG and not IS_BUILD_CONTEXT:
+    # Validate required secrets only when running the app, not during build
     if not EMAIL_HOST_PASSWORD:
         raise ValueError("EMAIL_HOST_PASSWORD environment variable is required for email functionality!")
 

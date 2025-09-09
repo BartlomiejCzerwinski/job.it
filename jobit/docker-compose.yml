@@ -17,7 +17,9 @@ services:
       - ALLOWED_HOSTS=localhost,127.0.0.1,0.0.0.0  
       - SECRET_KEY=your-secret-key-here-change-in-production 
       - OPENAI_API_KEY=${OPENAI_API_KEY:-}          
-      - AZURE_STORAGE_CONNECTION_STRING=${AZURE_STORAGE_CONNECTION_STRING:-} 
+      - AZURE_STORAGE_CONNECTION_STRING=${AZURE_STORAGE_CONNECTION_STRING:-}
+      - EMAIL_HOST_PASSWORD=${EMAIL_HOST_PASSWORD:-}
+      - DOCKER_BUILD=  # Clear build context for runtime 
     command: >
       sh -c "python jobit/manage.py migrate &&
              python jobit/manage.py collectstatic --noinput --clear &&
