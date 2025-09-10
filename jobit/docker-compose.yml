@@ -23,7 +23,6 @@ services:
     command: >
       sh -c "python jobit/manage.py migrate &&
              python jobit/manage.py init_skills &&
-             timeout 300 python jobit/manage.py ensure_data || echo 'Main data init failed, trying simple init...' && python jobit/manage.py simple_init || echo 'All data init failed, continuing...' &&
              python jobit/manage.py collectstatic --noinput --clear &&
              python jobit/manage.py runserver 0.0.0.0:8000"
     

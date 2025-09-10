@@ -33,10 +33,8 @@ ls -la /app/jobit/jobs/static/images/ || echo "Images directory not found"
 echo "📚 Initializing skills from CSV..."
 python jobit/manage.py init_skills
 
-# Ensure we have sufficient data for the app to work
-echo "🎯 Ensuring sufficient data..."
-timeout 300 python jobit/manage.py ensure_data || echo "Main data init failed, trying simple init..." && python jobit/manage.py simple_init || echo "All data init failed, continuing..."
-echo "✅ Data check complete"
+# Skip sample data initialization for now
+echo "⏭️ Skipping sample data initialization"
 
 # Create superuser if it doesn't exist (optional)
 echo "👤 Checking for superuser..."
