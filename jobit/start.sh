@@ -33,10 +33,11 @@ ls -la /app/jobit/jobs/static/images/ || echo "Images directory not found"
 echo "📚 Initializing skills from CSV..."
 python jobit/manage.py init_skills
 
-# Generate sample data for production (simple approach)
+# Generate sample data for production
 echo "🎯 Generating sample data..."
-python jobit/manage.py generate_sample_candidates --count 25 || echo "Candidates generation failed or already exist"
-python jobit/manage.py generate_sample_jobs --count 15 || echo "Jobs generation failed or already exist"
+python jobit/manage.py quick_init || echo "Quick init failed, trying full generation..."
+python jobit/manage.py generate_sample_candidates --count 5 || echo "Candidates generation failed or already exist"
+python jobit/manage.py generate_sample_jobs --count 5 || echo "Jobs generation failed or already exist"
 echo "✅ Sample data generation complete"
 
 # Create superuser if it doesn't exist (optional)

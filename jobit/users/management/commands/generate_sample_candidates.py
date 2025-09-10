@@ -168,7 +168,11 @@ class Command(BaseCommand):
         self.stdout.write(f'Creating {count} candidate profiles...')
         
         created_count = 0
-        for i in range(count):
+        max_attempts = count * 2
+        attempts = 0
+        
+        while created_count < count and attempts < max_attempts:
+            attempts += 1
             try:
                 # Create unique email
                 first_name = random.choice(first_names)
@@ -281,6 +285,9 @@ class Command(BaseCommand):
             except Exception as e:
                 self.stdout.write(self.style.ERROR(f"Error creating profile: {str(e)}"))
                 continue
+        
+        if attempts >= max_attempts:
+            self.stdout.write(self.style.WARNING(f"Reached maximum attempts ({max_attempts}). Created {created_count} profiles."))
         
         self.stdout.write(self.style.SUCCESS(f'Successfully created {created_count} candidate profiles!'))
         self.stdout.write(self.style.SUCCESS('All test users have password: password123'))
