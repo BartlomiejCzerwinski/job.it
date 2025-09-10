@@ -51,6 +51,5 @@ except Exception as e:
     print('Continuing without superuser...')
 "
 
-# Start Django development server
-echo "🌐 Starting Django server..."
-python jobit/manage.py runserver 0.0.0.0:8000
+# Server startup is handled by Docker Compose
+echo "✅ Startup script completed - server will start via Docker Compose"

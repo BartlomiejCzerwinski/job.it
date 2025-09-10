@@ -35,8 +35,7 @@ RUN mkdir -p /app/staticfiles /app/media
 
 RUN python jobit/manage.py collectstatic --noinput
 
-RUN chmod +x jobit/start.sh
-
 EXPOSE 8000
 
-CMD ["./jobit/start.sh"]
+# Default command - will be overridden by docker-compose.yml
+CMD ["python", "jobit/manage.py", "runserver", "0.0.0.0:8000"]

@@ -21,9 +21,29 @@ services:
       - EMAIL_HOST_PASSWORD=${EMAIL_HOST_PASSWORD:-}
       - DOCKER_BUILD=  # Clear build context for runtime 
     command: >
-      sh -c "python jobit/manage.py migrate &&
+      sh -c "echo '🚀 Starting Job.it application...' &&
+             echo '⏳ Checking database connection...' &&
+             echo '🔄 Running database migrations...' &&
+             python jobit/manage.py migrate &&
+             echo '📚 Initializing skills from CSV...' &&
              python jobit/manage.py init_skills &&
+             echo '⏭️ Skipping sample data initialization' &&
+             echo '👤 Checking for superuser...' &&
+             python jobit/manage.py shell -c \"
+             try:
+                 from django.contrib.auth.models import User
+                 if not User.objects.filter(username='admin@jobit.com').exists():
+                     User.objects.create_superuser('admin@jobit.com', 'admin@jobit.com', 'admin123')
+                     print('✅ Created superuser: admin@jobit.com / admin123')
+                 else:
+                     print('✅ Superuser already exists')
+             except Exception as e:
+                 print(f'⚠️ Could not create superuser: {e}')
+                 print('Continuing without superuser...')
+             \" &&
+             echo '📁 Collecting static files...' &&
              python jobit/manage.py collectstatic --noinput --clear &&
+             echo '🌐 Starting Django server...' &&
              python jobit/manage.py runserver 0.0.0.0:8000"
     
     restart: unless-stopped
