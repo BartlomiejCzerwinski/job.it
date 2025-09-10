@@ -23,9 +23,7 @@ services:
     command: >
       sh -c "python jobit/manage.py migrate &&
              python jobit/manage.py init_skills &&
-             python jobit/manage.py quick_init || echo 'Quick init failed' &&
-             python jobit/manage.py generate_sample_candidates --count 5 || echo 'Candidates generation failed' &&
-             python jobit/manage.py generate_sample_jobs --count 5 || echo 'Jobs generation failed' &&
+             timeout 300 python jobit/manage.py ensure_data || echo 'Data ensure failed or timed out' &&
              python jobit/manage.py collectstatic --noinput --clear &&
              python jobit/manage.py runserver 0.0.0.0:8000"
     

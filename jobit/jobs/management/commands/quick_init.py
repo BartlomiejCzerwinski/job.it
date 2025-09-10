@@ -14,6 +14,8 @@ class Command(BaseCommand):
             candidates_count = AppUser.objects.filter(role='worker').count()
             jobs_count = JobListing.objects.count()
             
+            self.stdout.write(f'📊 Current data: {candidates_count} candidates, {jobs_count} jobs')
+            
             if candidates_count > 0 and jobs_count > 0:
                 self.stdout.write(self.style.SUCCESS('✅ Database already has sample data'))
                 return
@@ -22,11 +24,15 @@ class Command(BaseCommand):
             if candidates_count == 0:
                 self.stdout.write('👥 Creating 3 quick candidates...')
                 self.create_quick_candidates()
+            else:
+                self.stdout.write(f'👥 Found {candidates_count} candidates, skipping...')
             
             # Create 3 quick jobs
             if jobs_count == 0:
                 self.stdout.write('💼 Creating 3 quick job listings...')
                 self.create_quick_jobs()
+            else:
+                self.stdout.write(f'💼 Found {jobs_count} jobs, skipping...')
             
             self.stdout.write(self.style.SUCCESS('✅ Quick initialization complete!'))
             
