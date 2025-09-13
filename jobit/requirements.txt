@@ -1,33 +1,13 @@
-# Django and core dependencies
-Django>=4.0,<5.0
+    Django>=4.0,<5.0
 django-cors-headers
-
-# Django REST Framework
 djangorestframework
-
-# Database
-psycopg2-binary  # PostgreSQL adapter
-
-# Azure Storage (for profile photos)
+psycopg2-binary
 azure-storage-blob
-
-# Data processing
 pandas
 numpy
-
-# Email functionality (already included in Django)
-# Additional email backends can be added here if needed
-
-# Development tools (optional)
-python-dotenv  # For environment variables
-
-# Machine Learning / Matching (if needed)
+python-dotenv
 scikit-learn
-
-# OpenAI API for AI features
 openai
-
-# Production server
 gunicorn
 whitenoise
 

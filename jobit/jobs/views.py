@@ -102,7 +102,6 @@ def search_results_view(request):
         job_skills = get_listing_skills(job)
         job_skill_names = {skill['name'] for skill in job_skills}
         
-        # Count how many requested skills this job has
         matching_skills = sum(1 for skill in skills if skill in job_skill_names)
         
         # Only include jobs that have at least one matching skill if skills were specified
@@ -118,7 +117,7 @@ def search_results_view(request):
                 'skills': job_skills,
                 'is_remote': job.job_model == 'REMOTE',
                 'is_hybrid': job.job_model == 'HYBRID',
-                'matching_skills_count': matching_skills  # Add this for sorting
+                'matching_skills_count': matching_skills 
             })
 
     # Sort jobs by number of matching skills (descending)
@@ -188,10 +187,8 @@ def worker_profile(request):
 
 @login_required
 def listings_view(request):
-    # Get filter parameter from URL, default to 'ACTIVE'
     status_filter = request.GET.get('status', 'ACTIVE')
     
-    # Get all listings for the recruiter
     all_listings = get_recruiter_listings(request.user)
     
     # Filter by status
@@ -204,7 +201,6 @@ def listings_view(request):
     else:
         job_listings = all_listings.filter(status='ACTIVE')
     
-    # Get counts for each status
     active_count = all_listings.filter(status='ACTIVE').count()
     closed_count = all_listings.filter(status='CLOSED').count()
     archived_count = all_listings.filter(status='ARCHIVED').count()

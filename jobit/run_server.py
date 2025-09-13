@@ -11,7 +11,6 @@ def main():
     django.setup()
     print("Django setup complete")
     
-    # Update locations before starting the server
     print("Starting location update process...")
     try:
         call_command('update_locations')
@@ -19,7 +18,6 @@ def main():
     except Exception as e:
         print(f"Error updating locations: {str(e)}")
     
-    # Start the development server
     print("Starting development server...")
     from django.core.management import execute_from_command_line
     execute_from_command_line(['manage.py', 'runserver'])

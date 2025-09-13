@@ -2,8 +2,6 @@
 
 {% block title %}Job Search Results - Job.it{% endblock %}
 
-
-
 {% block content %}
     {% include "jobs/components/chat_widget.html" %}
     <div class="position-relative my-5">
@@ -251,7 +249,6 @@
                     
                     this.value = ''; // Clear the input after adding the label
                     
-                    // Submit the form
                     document.querySelector('form[action="/search"]').submit();
                 }
             }

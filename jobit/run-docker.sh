@@ -1,17 +1,12 @@
 #!/bin/bash
 
-# 🐳 Job.it Docker Runner Script
-# This script helps you run your Docker application easily
-
 echo "🚀 Starting Job.it Docker Application..."
 
-# Check if Docker is running
 if ! docker info > /dev/null 2>&1; then
     echo "❌ Docker is not running. Please start Docker Desktop or Docker daemon."
     exit 1
 fi
 
-# Check if Docker Compose is available
 if ! command -v docker-compose &> /dev/null; then
     echo "❌ Docker Compose is not available. Please install Docker Compose."
     exit 1
@@ -19,7 +14,6 @@ fi
 
 echo "✅ Docker and Docker Compose are available"
 
-# Check if .env file exists
 if [ ! -f .env ]; then
     echo "⚠️  No .env file found. Creating from template..."
     if [ -f env.example ]; then
@@ -36,11 +30,9 @@ fi
 
 echo "✅ Environment file found"
 
-# Build and start the application
 echo "🔨 Building and starting containers..."
 docker-compose up --build -d
 
-# Check if containers are running
 if [ $? -eq 0 ]; then
     echo "✅ Application started successfully!"
     echo ""

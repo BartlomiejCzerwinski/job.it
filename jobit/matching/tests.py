@@ -248,8 +248,6 @@ class MatchingUtilsTest(TestCase):
             level=5
         )
         
-        # Calculate matching score
-        # This would depend on your matching algorithm implementation
         pass
     
     def test_location_matching_score(self):
@@ -301,15 +299,10 @@ class MatchingUtilsTest(TestCase):
         self.job_listing.salary_min = 5000
         self.job_listing.salary_max = 8000
         self.job_listing.save()
-        
-        # Test salary within range
-        # This would depend on your salary matching algorithm
         pass
     
     def test_overall_matching_score(self):
         """Test overall matching score calculation"""
-        # This would test the complete matching algorithm
-        # combining all factors (skills, location, job model, salary, etc.)
         pass
 
 
@@ -383,8 +376,6 @@ class MatchingAlgorithmTest(TestCase):
             level=4
         )
         
-        # Should have high matching score
-        # This would depend on your matching algorithm
         pass
     
     def test_partial_skill_match(self):
@@ -395,9 +386,6 @@ class MatchingAlgorithmTest(TestCase):
             skill=self.python_skill,
             level=5
         )
-        # Missing Django skill
-        
-        # Should have medium matching score
         pass
     
     def test_no_skill_match(self):
@@ -418,7 +406,6 @@ class MatchingAlgorithmTest(TestCase):
         self.app_user.location = self.location
         self.app_user.save()
         
-        # Should have location bonus
         pass
     
     def test_remote_work_match(self):
@@ -434,11 +421,6 @@ class MatchingAlgorithmTest(TestCase):
         
         # Should have remote work bonus
         pass
-
-
-# =============================================================================
-# PYTEST STYLE TESTS (for better test discovery and fixtures)
-# =============================================================================
 
 @pytest.mark.django_db
 class TestMatchModels:

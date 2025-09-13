@@ -37,13 +37,10 @@ class UsersConfig(AppConfig):
     name = 'users'
 
     def ready(self):
-        # Only connect the signal to update locations after migrations
-        # Don't run update_locations immediately during startup
         post_migrate.connect(update_locations, sender=self)
 
 
 def init_skills_table():
-    # Delayed import (after loading Django app)
     from users.models import Skill
 
     file_path = os.path.join(os.path.dirname(__file__), "../skills.csv")

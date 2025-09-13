@@ -2,11 +2,8 @@
 
 {% block title %}Messages - Job.it{% endblock %}
 
-
-
 {% block content %}
 <style>
-    /* Light hover effects for chat message bubbles */
     .message-bubble {
         transition: all 0.15s ease;
         cursor: pointer;
@@ -197,9 +194,6 @@
         loadConversations();
         updateNotifications(); // Initial notification update
         
-
-        
-        // Send message on Enter
         const messageText = document.getElementById('messageText');
         messageText.addEventListener('keydown', function(e) {
             if (e.key === 'Enter') {

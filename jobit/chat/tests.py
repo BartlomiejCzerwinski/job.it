@@ -347,8 +347,6 @@ class ChatUtilsTest(TestCase):
             owner=self.recruiter_app_user
         )
         
-        # Chat room should be created automatically or through signal
-        # This depends on your implementation
         pass
 
 

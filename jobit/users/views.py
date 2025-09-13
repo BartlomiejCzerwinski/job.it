@@ -576,7 +576,6 @@ def password_reset_request(request):
             try:
                 user = User.objects.get(email=email)
                 if user.is_active:
-                    # Generate reset URL
                     reset_url = generate_password_reset_url(user, request)
                     
                     # Send email

@@ -9,7 +9,6 @@ from .models import Conversation, Message
 from jobs.models import JobListing
 from users.models import AppUser
 
-# Create your views here.
 
 @login_required
 def index(request):

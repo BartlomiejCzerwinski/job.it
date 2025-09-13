@@ -14,7 +14,6 @@ def calculate_match_percentage(job_listing, candidate):
     candidate_vector = vectorizer.create_skill_vector(candidate_skills)
     job_vector = vectorizer.create_skill_vector(job_skills)
 
-    # Use find_matches to get the match_score
     matches = vectorizer.find_matches(candidate_vector, [{
         'listing_id': job_listing.id,
         'title': job_listing.job_title,

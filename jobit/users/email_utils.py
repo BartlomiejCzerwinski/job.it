@@ -73,10 +73,8 @@ def generate_password_reset_url(user, request):
     """
     Generate password reset URL with token
     """
-    # Generate token
     token = default_token_generator.make_token(user)
     
-    # Encode user ID
     uid = urlsafe_base64_encode(force_bytes(user.pk))
     
     # Build reset URL

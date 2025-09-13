@@ -4,8 +4,6 @@ let technologies = new Set();
 let editTechnologies = new Set();
 let projectToDelete = null;
 
-
-
 // Initialize projects from Django template
 function initializeProjects(projectsData) {
     projects = projectsData;

@@ -54,12 +54,10 @@ def run_django_tests():
     """Run Django tests using manage.py"""
     print("\n🧪 Running Django tests...")
     
-    # Check if we're in the right directory
     if not Path("manage.py").exists():
         print("❌ Error: manage.py not found. Please run this script from the project root.")
         return False
     
-    # Run Django tests
     if not run_command("python manage.py test", "Running Django tests"):
         return False
     
@@ -70,25 +68,22 @@ def run_pytest_tests():
     """Run tests using pytest"""
     print("\n🧪 Running pytest tests...")
     
-    # Check if pytest.ini exists
     if not Path("pytest.ini").exists():
         print("❌ Error: pytest.ini not found. Please run this script from the project root.")
         return False
     
-    # Set Django settings module for pytest
     import os
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'jobit.settings')
     
     try:
-        # Run pytest with coverage
         if not run_command("pytest --cov=. --cov-report=html --cov-report=term-missing", "Running pytest with coverage"):
             print("⚠️  Pytest tests failed or no tests found. This is normal if you only have Django-style tests.")
             print("💡 Django tests are working perfectly (39/39 passing)!")
-            return True  # Don't fail the entire test run
+            return True
     except Exception as e:
         print(f"⚠️  Pytest encountered an error: {e}")
         print("💡 Django tests are working perfectly (39/39 passing)!")
-        return True  # Don't fail the entire test run
+        return True
     
     return True
 
@@ -141,12 +136,10 @@ def main():
     print("🚀 Job.it Test Runner")
     print("="*60)
     
-    # Install dependencies if requested
     if args.install:
         if not install_test_dependencies():
             sys.exit(1)
     
-    # Run specific tests based on arguments
     if args.app:
         if not run_specific_app_tests(args.app):
             sys.exit(1)
@@ -162,22 +155,17 @@ def main():
     elif args.coverage:
         show_test_coverage()
     else:
-        # Run all tests by default
         print("\n🎯 Running all tests...")
         
-        # First install dependencies
         if not install_test_dependencies():
             sys.exit(1)
         
-        # Run Django tests
         if not run_django_tests():
             sys.exit(1)
         
-        # Run pytest tests
-        if not run_pytest_tests():
+        if not run_pytest_tests():  
             sys.exit(1)
         
-        # Show coverage
         show_test_coverage()
     
     print("\n🎉 Test run completed!")
