@@ -1,6 +1,3 @@
-# Simple Docker setup for Job.it application
-# This runs Django with SQLite database - no external dependencies needed
-
 services:
   web:
     build: 
@@ -9,22 +6,19 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - .:/app  # Mount current directory for live code changes
+      - .:/app
       - static_volume:/app/staticfiles 
       - media_volume:/app/media        
     environment:
-      # Django Settings
       - DEBUG=True
       - DJANGO_SETTINGS_MODULE=jobit.settings       
       - ALLOWED_HOSTS=localhost,127.0.0.1,0.0.0.0
       - SECRET_KEY=django-insecure-demo-key-for-thesis
       
-      # Disable external services for demo
       - OPENAI_API_KEY=
       - AZURE_STORAGE_CONNECTION_STRING=
       - EMAIL_HOST_PASSWORD=
       
-      # Use local file storage instead of Azure
       - USE_LOCAL_STORAGE=True
       
     command: >
