@@ -22,8 +22,19 @@ services:
       - USE_LOCAL_STORAGE=True
       
     command: >
-      sh -c "python manage.py migrate &&
+      sh -c "echo '🚀 Starting Job.it application...' &&
+             echo '📁 Creating migration directories...' &&
+             mkdir -p users/migrations jobs/migrations applications/migrations chat/migrations matching/migrations &&
+             touch users/migrations/__init__.py jobs/migrations/__init__.py applications/migrations/__init__.py chat/migrations/__init__.py matching/migrations/__init__.py &&
+             echo '🔧 Generating initial migrations...' &&
+             python manage.py makemigrations &&
+             echo '⏳ Running database migrations...' &&
+             python manage.py migrate &&
+             echo '📚 Initializing skills...' &&
+             python manage.py init_skills &&
+             echo '📁 Collecting static files...' &&
              python manage.py collectstatic --noinput &&
+             echo '🌐 Starting Django server...' &&
              python manage.py runserver 0.0.0.0:8000"
     
     restart: unless-stopped
