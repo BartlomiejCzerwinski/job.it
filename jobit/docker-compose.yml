@@ -32,6 +32,8 @@ services:
              python manage.py migrate &&
              echo '📚 Initializing skills...' &&
              python manage.py init_skills &&
+             echo '🎯 Generating sample data...' &&
+             python manage.py generate_sample_data --job-count 25 --user-count 5 &&
              echo '📁 Collecting static files...' &&
              python manage.py collectstatic --noinput &&
              echo '🌐 Starting Django server...' &&
